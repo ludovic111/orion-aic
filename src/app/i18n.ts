@@ -787,10 +787,10 @@ export const { t, tn, tIn, dict } = translator({
     de: "Später",
     it: "Più tardi",
   },
-  "Le menu du poste (vos initiales, en haut à droite) passe du thème clair au thème sombre choisis ici. Chaque poste garde son propre thème.":
+  "Le menu opérateur (vos initiales, en haut à droite) passe du thème clair au thème sombre choisis ici. Chaque poste garde son propre thème.":
     {
-      de: "Das Menü des Arbeitsplatzes (Ihre Initialen, oben rechts) wechselt zwischen dem hellen und dem dunklen Thema, die hier gewählt sind. Jeder Arbeitsplatz behält sein eigenes Thema.",
-      it: "Il menu della postazione (le vostre iniziali, in alto a destra) passa dal tema chiaro al tema scuro scelti qui. Ogni postazione mantiene il proprio tema.",
+      de: "Das Operateur-Menü (Ihre Initialen, oben rechts) wechselt zwischen dem hellen und dem dunklen Thema, die hier gewählt sind. Jeder Arbeitsplatz behält sein eigenes Thema.",
+      it: "Il menu operatore (le vostre iniziali, in alto a destra) passa dal tema chiaro al tema scuro scelti qui. Ogni postazione mantiene il proprio tema.",
     },
   "Modules de la barre": {
     de: "Module der Leiste",

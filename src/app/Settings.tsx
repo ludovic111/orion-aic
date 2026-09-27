@@ -274,7 +274,7 @@ function PostSettings() {
         />
         <p className="hint">
           {t(
-            "Le menu du poste (vos initiales, en haut à droite) passe du thème clair au thème sombre choisis ici. Chaque poste garde son propre thème.",
+            "Le menu opérateur (vos initiales, en haut à droite) passe du thème clair au thème sombre choisis ici. Chaque poste garde son propre thème.",
           )}
         </p>
       </section>
