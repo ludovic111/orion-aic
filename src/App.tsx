@@ -61,6 +61,7 @@ import { TopBar } from "./app/TopBar";
 import { JournalMenu, OperatorMenu } from "./app/ShellMenus";
 import { OverlayHost } from "./app/OverlayHost";
 import { useSync } from "./sync/useSync";
+import { rekeyEntryText, rekeyToastText } from "./sync/PostsPanel";
 import { LiveHost } from "./live/LiveHost";
 import { JournalView } from "./modules/journal/JournalView";
 import { Situation } from "./modules/situation/Situation";
@@ -264,6 +265,26 @@ export default function App() {
         setJoinError((err as Error).message);
         setJoining(null);
       }
+    },
+    onRekey: (event) => {
+      // Follow the new code, or stop (removed, or not given the code).
+      const room = event.kind === "follow" ? event.code : undefined;
+      setWorkspace((previous) => {
+        if (!previous) return previous;
+        const next = { ...previous, room };
+        if (!room) delete next.room;
+        return next;
+      });
+      if (!workspace && room) setJoining((j) => (j ? { ...j, code: room } : j));
+      // Written once, by the post that changed the code (never the code).
+      if (event.own && event.kind === "follow")
+        actions.addEntry({
+          type: "Observation",
+          message: rekeyEntryText(event),
+          reliability: "Confirmé",
+          tags: ["synchronisation"],
+        });
+      if (!event.own) notify(rekeyToastText(event));
     },
     onRemoteEntries: (journalId, ids) => {
       if (!prefs.autoPrintRemote) return;

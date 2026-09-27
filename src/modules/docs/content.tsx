@@ -2287,6 +2287,49 @@ export const TOPICS: Topic[] = [
           session. Transmettez-le de vive voix, sur papier ou par un canal sûr,
           jamais sur un canal ouvert.
         </Note>
+        <H>Qui est connecté ?</H>
+        <p>
+          <Path steps={["Réglages", "Synchronisation"]} />, liste{" "}
+          <Ui>Postes connectés</Ui> : chaque poste avec son nom et sa fonction.
+        </p>
+        <ul>
+          <li>
+            <Ui>En ligne</Ui> ou <Ui>Hors ligne</Ui> (depuis combien de temps).
+            Un poste qui décroche passe hors ligne en quelques secondes et monte
+            en haut de la liste.
+          </li>
+          <li>
+            <Ui>À jour</Ui> : il a tout. <Ui>En retard</Ui> : il lui manque des
+            changements depuis plus de 2 minutes ; vérifiez son Wi-Fi ou son
+            réseau.
+          </li>
+        </ul>
+        <H>Tablette perdue ? Poste parti ?</H>
+        <Steps>
+          <li>
+            Dans <Ui>Postes connectés</Ui>, sur la ligne du poste :{" "}
+            <Ui>Retirer ce poste</Ui>. (Ou, en bas de la liste,{" "}
+            <Ui>Changer le code de session</Ui>.)
+          </li>
+          <li>
+            Lisez la fenêtre qui s’ouvre, puis{" "}
+            <Ui>Retirer et changer le code</Ui>.
+          </li>
+          <li>
+            C’est tout : les postes en ligne passent au nouveau code tout seuls.
+            Le poste retiré garde ce qu’il avait déjà, mais ne reçoit plus rien
+            de nouveau.
+          </li>
+          <li>
+            Un poste qui était hors ligne doit saisir le nouveau code à la main
+            : il s’affiche avec son QR code, comme d’habitude.
+          </li>
+        </Steps>
+        <Note kind="info">
+          Le changement est noté au journal. Le code, lui, n’y est jamais écrit.
+          Rien ne peut effacer à distance ce qu’un appareil perdu avait déjà :
+          protégez les postes par une phrase de récupération.
+        </Note>
       </>
     ),
     full: (
@@ -2340,6 +2383,16 @@ export const TOPICS: Topic[] = [
             Le code évite les caractères qui se confondent (0 et O, 1 et I ou L)
             : moins d’erreurs de lecture.
           </li>
+          <li>
+            Quand le code change, le nouveau code est chiffré séparément pour
+            chaque poste qui reste. Ni le poste retiré ni le serveur ne peuvent
+            le lire.
+          </li>
+          <li>
+            Le nom et la fonction affichés sont ceux que chaque poste indique :
+            si deux postes portent le même nom, orion aic le signale ; vérifiez
+            de quel appareil il s’agit avant de retirer.
+          </li>
         </ul>
         <H>Sans internet : le réseau local</H>
         <Steps>
@@ -2370,8 +2423,8 @@ export const TOPICS: Topic[] = [
         <ul>
           <li>
             <Path steps={["Réglages", "Synchronisation"]} /> montre l’état
-            (Connecté, Reconnexion…), les autres postes et leur module, l’heure
-            du dernier échange.
+            (Connecté, Reconnexion…), les postes connectés (en ligne, à jour),
+            l’heure du dernier échange.
           </li>
           <li>
             <Ui>Rejoindre avec un code</Ui>, depuis une session déjà ouverte,
@@ -3574,8 +3627,14 @@ export const TOPICS: Topic[] = [
           chiffrés. Il ne garde rien.
         </Faq>
         <Faq q="Le code de session a été divulgué. Que faire ?">
-          Sur chaque poste, <Ui>Arrêter sur ce poste</Ui>. Puis un poste crée un
-          nouveau code, et les autres le rejoignent.
+          <Path steps={["Réglages", "Synchronisation"]} /> →{" "}
+          <Ui>Changer le code de session</Ui>. Les postes en ligne passent au
+          nouveau code tout seuls ; donnez-le à la main aux postes hors ligne.
+        </Faq>
+        <Faq q="Une tablette a été perdue. Que faire ?">
+          Dans <Ui>Postes connectés</Ui>, sur sa ligne,{" "}
+          <Ui>Retirer ce poste</Ui>. Elle garde ce qu’elle avait déjà, mais ne
+          reçoit plus rien de nouveau.
         </Faq>
         <Faq q="Peut-on synchroniser par Bluetooth ?">
           Non, les navigateurs ne le permettent pas pour cet usage. Sans

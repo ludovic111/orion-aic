@@ -101,6 +101,8 @@ Sans compte ni base de données : chaque poste garde une copie complète de la s
 1. Poste A : menu opérateur → **Synchronisation** → **Créer un code de session** (format `ABCD-EFGH-JKMN-PQRS`). Un QR code et un lien s’affichent.
 2. Poste B : page d’accueil → **Rejoindre** → saisir le code (ou scanner le QR) et son nom. La session arrive, puis tout reste synchronisé en direct : journal, messages, carte, moyens, équipe, radio, référentiels…
 3. La puce en haut indique `Seul`, `3 postes` (avec qui travaille sur quel module), `Reconnexion` ou `Recharger` (un poste utilise une autre version d’orion aic). Un chiffre à côté signale des fusions à voir (Réglages → Synchronisation → Fusions entre postes).
+4. **Postes connectés** (Réglages → Synchronisation) : chaque poste de la session avec son opérateur et sa fonction, `En ligne` ou `Hors ligne · il y a 3 min` (un poste qui décroche passe hors ligne en quelques secondes et monte en tête de liste), l’heure à laquelle il a été vu pour la dernière fois, et s’il est `À jour` ou `En retard` (il lui manque des changements depuis plus de 2 minutes).
+5. **Tablette perdue, poste parti ?** Sur sa ligne, **Retirer ce poste** (ou **Changer le code de session** en bas de la liste). Après confirmation, un nouveau code est créé et envoyé tout seul aux postes en ligne, **sauf** au poste retiré : ils continuent sans rien faire. Le poste retiré garde ce qu’il avait déjà, mais ne reçoit plus rien de nouveau. Un poste hors ligne à ce moment-là saisit le nouveau code à la main (affiché avec son QR code). Le changement est noté au journal (jamais le code).
 
 | Question                              | Réponse                                                                                                                                                                                                                                                                                                 |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -110,7 +112,7 @@ Sans compte ni base de données : chaque poste garde une copie complète de la s
 | Deux postes modifient la même chose ? | Journal : les deux versions sont gardées. Autres éléments : la modification faite en dernier l’emporte, dans l’ordre réel des événements et non selon l’horloge des postes ; une suppression l’emporte sur une modification antérieure. Les cas simultanés sont listés dans Réglages → Synchronisation. |
 | Deux entrées avec le même numéro ?    | Deux postes ont saisi au même moment : aucune n’est renumérotée. La première garde `#007`, l’autre devient `#007·B` (lettre propre au poste). Un numéro affiché ou imprimé ne change jamais en silence. Idem pour les messages (`M013·B`).                                                              |
 | Bluetooth ?                           | Les navigateurs ne permettent pas ce mode d’échange ; le Wi-Fi local (`npm run lan`) le remplace.                                                                                                                                                                                                       |
-| Sécurité du code ?                    | Le code est un mot de passe : il donne accès à toute la session. Le transmettre sur place ou par un canal sûr.                                                                                                                                                                                          |
+| Sécurité du code ?                    | Le code est un mot de passe : il donne accès à toute la session. Le transmettre sur place ou par un canal sûr. S’il a fuité ou qu’un appareil est perdu : **Changer le code de session** (les postes en ligne suivent tout seuls).                                                                      |
 | PC front et PC arrière ?              | Chacun garde sa session. **Réglages → Synchronisation → Liaison entre PC** crée un code de liaison (autre salle du même relais, autre clé) : seuls les messages, diffusions et accusés envoyés exprès passent, remis avec confirmation et renvoyés tant que l’autre PC ne les a pas reçus.              |
 
 Les réglages du poste (thème, modules affichés, impression automatique) restent propres à chaque poste.
@@ -485,6 +487,7 @@ Module **Débriefing et exercice** (RETEX).
 
 - Chiffrement local : AES-256-GCM, IV aléatoire de 96 bits par écriture, clé dérivée par PBKDF2-SHA-256 (600 000 itérations, sel de 128 bits), clé non extractible. La phrase n’est jamais stockée.
 - Synchronisation chiffrée de bout en bout avec une clé dérivée du code de session ; relais aveugle, en mémoire, sans stockage.
+- Changer le code de session (retirer un poste) : le nouveau code est chiffré séparément pour chaque poste qui reste (ECDH P-256, clé neuve à chaque connexion) ; ni le poste retiré ni le relais ne peuvent le lire. Modèle de menace et limites : [SECURITY.md](SECURITY.md#changer-le-code-de-session-retirer-un-poste).
 - Services externes facultatifs et à la demande : tuiles swisstopo / OpenStreetMap, recherche geo.admin.ch, prévisions Open-Meteo (coordonnées seulement), alertes officielles OFEV / cantons via geo.admin.ch (coordonnées seulement) et mesures des stations OFEV via LINDAS (`environment.ld.admin.ch`, numéros de station seulement). Ni compte, ni télémétrie, ni IA, ni police ou script externe. CSP stricte.
 - Imports et données reçues validés par schéma strict (Zod), avec limites de taille ; formules neutralisées dans les exports tableurs ; HTML exporté sans script.
 - Détails et limites : [SECURITY.md](SECURITY.md).
@@ -492,7 +495,7 @@ Module **Débriefing et exercice** (RETEX).
 ## Limites
 
 - Les noms d’opérateur sont déclaratifs ; l’historique n’est pas une signature électronique.
-- Le code de session donne accès à toute la session ; un poste retiré garde sa copie.
+- Le code de session donne accès à toute la session. **Changer le code** écarte un poste pour la suite, mais rien ne peut effacer à distance ce qu’il a déjà reçu : une tablette perdue garde la copie de la session jusqu’à ce moment (protégez les postes par une phrase de récupération). Un poste hors ligne pendant le changement doit saisir le nouveau code à la main ; s’il se reconnecte avec l’ancien code, il n’y retrouve plus que le poste retiré, s’il est en ligne. Un poste retiré qui est en ligne et malveillant au moment précis du changement peut le perturber (voir [SECURITY.md](SECURITY.md#changer-le-code-de-session-retirer-un-poste)) : vérifiez ensuite la liste des postes connectés.
 - Les conflits sont résolus dans l’ordre réel des événements (horloge logique hybride) : un poste en retard de quelques minutes ne perd plus ses modifications. Une heure très fausse (des heures d’écart) reste à corriger : elle s’affiche dans les heures des versions.
 - Le plan radio documente le réseau ; il ne pilote pas les terminaux. Les numéros de groupes et RFSI réels viennent du plan de flotte cantonal. Ceux de la démonstration sont fictifs.
 - Effacer les données du navigateur efface la sauvegarde locale. Une sauvegarde locale n’est pas une archive.
@@ -575,6 +578,8 @@ shared/            Modèle validé, sans dépendance au navigateur
   history.ts       Traçabilité : enregistrement, fusion, machine à remonter le temps,
                    comparaison de versions, restauration
   room.ts          Code de session, clé et salle (PBKDF2 + HKDF), trames chiffrées en parts
+  rekey.ts         Changement de code : nouveau code scellé par poste (ECDH P-256), arbitrage
+  posts.ts         Postes connectés : en ligne, vu pour la dernière fois, à jour ou en retard
   radio.ts         Groupes, noms d’appel, terminaux, remises, contrôles, fusion radio
   workflow.ts      Entrées liées et fil, clôture par quittance, relance d’échéance, modèles
   interchange.ts   CSV/TSV, import JSON et ancien format, HTML, texte
@@ -598,7 +603,8 @@ src/
   present/         Mode présentation, affichage mural, vue orateur, annotations,
                    PowerPoint / ODP / PDF / HTML animés
   ui/              Kit : champs standardisés, fiche générique, liens, fond papier
-  sync/            Synchronisation en direct (useSync), fusions à signaler (ConflictPanel)
+  sync/            Synchronisation en direct (useSync), fusions à signaler (ConflictPanel),
+                   postes connectés et changement de code (PostsPanel)
   journal/ radio/  Journal, réseau radio
   print/           Fiches, quittances, rapport, étiquettes, formules : aperçu A4, PDF
   styles.css theme.css motion.css atelier.css

@@ -34,6 +34,7 @@ import { MODULES, moduleInfo } from "./modules";
 import { DARK_PALETTES, LIGHT_PALETTES, type Palette } from "./palettes";
 import type { useSync } from "../sync/useSync";
 import { ConflictPanel } from "../sync/ConflictPanel";
+import { PostsPanel, RekeyNotice } from "../sync/PostsPanel";
 import { AlertSettings, PostRoleSettings } from "../post/PostPanel";
 import { LiaisonPanel } from "../liaison/LiaisonPanel";
 import { LANGS, LANG_NAMES, formatTime, rich, type Lang } from "../i18n";
@@ -505,6 +506,7 @@ function SyncSettings({
           "Plusieurs ordinateurs, tablettes ou téléphones travaillent sur la même session, en direct, sans compte ni base de données : chaque poste garde toute la session et les postes s’échangent les changements, chiffrés de bout en bout avec le code de session. Le serveur ne fait que relayer des messages illisibles et ne garde rien.",
         )}
       </p>
+      <RekeyNotice sync={sync} />
       {!secure && (
         <p className="hint warn">
           {rich(
@@ -661,6 +663,7 @@ function SyncSettings({
           </form>
         </div>
       )}
+      {room && <PostsPanel sync={sync} />}
       {room && (
         <section className="stack" style={{ gap: 10 }}>
           <span className="label">

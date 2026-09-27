@@ -1,0 +1,112 @@
+/* « Postes connectés » and changing the session code (PostsPanel.tsx).
+   Big touch targets: the list is used on tablets and phones too. */
+
+.posts-panel {
+  gap: 10px;
+}
+.posts-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.post-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-2);
+}
+.post-row.off {
+  border-color: color-mix(in srgb, var(--warn) 35%, var(--line));
+}
+.post-row.removed {
+  opacity: 0.7;
+}
+.post-row.self {
+  background: transparent;
+}
+.post-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: hsl(var(--h, 200) 55% 45%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+.post-row.off .post-avatar {
+  filter: grayscale(0.8);
+  opacity: 0.7;
+}
+.post-main {
+  display: grid;
+  flex: 1 1 200px;
+  gap: 4px;
+  min-width: 0;
+}
+.post-main strong {
+  overflow-wrap: anywhere;
+  font-size: 15px;
+}
+.post-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.post-pills .pill {
+  height: 26px;
+  font-size: 12px;
+}
+.post-note {
+  color: var(--text-2);
+  line-height: 1.4;
+}
+.post-remove,
+.rotate-button,
+.rotate-actions button,
+.rekey-notice button {
+  min-height: 44px;
+}
+.post-remove {
+  align-self: center;
+}
+.rotate-card {
+  gap: 8px;
+}
+.rotate-card .rotate-button {
+  justify-self: start;
+}
+.rotate-points {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+.rotate-actions {
+  justify-content: flex-end;
+}
+.rekey-notice {
+  display: grid;
+  gap: 6px;
+}
+.rekey-notice p {
+  margin: 0;
+}
+@media (max-width: 560px) {
+  .post-remove,
+  .rotate-card .rotate-button,
+  .rotate-actions button {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}
