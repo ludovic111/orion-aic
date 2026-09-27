@@ -24,12 +24,16 @@ import { versionVector, type VersionVector } from "../../shared/stamps";
 import { stampSchema } from "../../shared/hlc";
 import {
   answerHello,
+  asked,
+  dropAsks,
   localChanges,
   newMemory,
   noteReceived,
   partialIds,
+  pickAsks,
   summarise,
   usable,
+  type Ask,
   type PeerMemory,
   type Summary,
 } from "../../shared/protocol";
@@ -44,9 +48,10 @@ import {
   PEER_ID,
   PROTOCOL,
   Reassembler,
+  TooLarge,
   newRoomCode,
   roomKeys,
-  sealFrames,
+  sealStream,
   type RoomKeys,
 } from "../../shared/room";
 import { localNode } from "../../shared/hlc";
@@ -85,9 +90,13 @@ import { readPost } from "../post/store";
 // - hello: who I am, and for each journal its digest and version vector
 //   (latest stamp seen of each post). Sent to everyone on connection and
 //   every 40 s; answered, to the sender only, when something differs.
-// - state: journals, whole or only what the recipient lacks (sliceJournal
-//   against its version vector), and the removed journals. A peer whose
-//   digest did not move after a partial state gets the whole journal.
+//   `want`: the journals this post lacks and asks of the recipient alone
+//   (the first post whose hello lists them; another one if nothing came
+//   for 30 s): one post sends a whole journal, not all of them at once.
+// - state: journals, whole (asked for) or only what the recipient lacks
+//   (sliceJournal against its version vector), and the removed journals. A
+//   peer whose digest did not move after a partial state gets the whole
+//   journal.
 // - presence, bye. Hellos and presence also carry the node (stable id of
 //   the post), its function and cell, and a public key for a change of
 //   code (kx, one per connection): « Postes connectés » (shared/posts.ts).
@@ -128,6 +137,8 @@ type Wire =
       journals: Summary;
       gone?: Record<string, string>;
       reply?: boolean;
+      /** Journals asked of the recipient (absent: earlier version). */
+      want?: string[];
     } & Self)
   | {
       type: "state";
@@ -200,6 +211,8 @@ const NEWER: ErrorKey =
   "Un poste utilise une version plus récente d’orion aic — rechargez la page.";
 const OLDER_PAGE: ErrorKey =
   "Cette page utilise une version plus ancienne d’orion aic — rechargez la page.";
+const LARGE: ErrorKey =
+  "Un transfert volumineux a été interrompu (trop de données reçues à la fois) ; il sera relancé automatiquement.";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** Removed journals received: valid ids and stamps only. */
@@ -318,6 +331,11 @@ export function useSync(options: {
     const replied = new Map<string, number>();
     const memory = new Map<string, PeerMemory>();
     const names = new Map<string, string>();
+    // Journals this post lacks, each asked of one post (current connection).
+    const asks = new Map<string, Ask>();
+    // Parts of the messages of the current connection.
+    let incoming: Reassembler | null = null;
+    const lastPart = (peer: string) => incoming?.lastPart(peer) ?? 0;
 
     const workspace = () => latest.current.workspace;
     const journals = () => workspace()?.journals ?? [];
@@ -336,7 +354,7 @@ export function useSync(options: {
         kx: exchange?.publicKey,
       };
     };
-    const hello = async (reply: boolean, to = "") => {
+    const hello = async (reply: boolean, to = "", want: string[] = []) => {
       const ch = channel.current;
       if (!ch) return;
       await ch.send(
@@ -349,6 +367,7 @@ export function useSync(options: {
           journals: await summary(),
           gone: workspace()?.gone,
           reply,
+          want,
         },
         to,
       );
@@ -394,17 +413,33 @@ export function useSync(options: {
     ) {
       const peer = memory.get(from) ?? newMemory();
       memory.set(from, peer);
-      const { send, differ } = await answerHello(
+      const now = Date.now();
+      // Whole journals go only to a post that asks for them (a hello
+      // without `want` comes from an earlier version: all of them).
+      const want = Array.isArray(wire.want)
+        ? wire.want.filter((id) => typeof id === "string").slice(0, 1000)
+        : undefined;
+      const { send, differ, lacking } = await answerHello(
         journals(),
         workspace()?.gone,
         wire.journals ?? {},
         peer,
+        now,
+        want,
+        (id) => !!asked(asks, id, lastPart, now),
       );
       if (send.length) await sendState(send, from);
+      // What it has and we lack: asked of it, unless already coming from
+      // another post.
+      const ask = pickAsks(lacking, from, asks, lastPart, Date.now());
       const last = replied.get(from) ?? 0;
-      if (!wire.reply || (differ && Date.now() - last > REPLY_INTERVAL)) {
+      if (
+        ask.length ||
+        !wire.reply ||
+        (differ && Date.now() - last > REPLY_INTERVAL)
+      ) {
         replied.set(from, Date.now());
-        await hello(true, from);
+        await hello(true, from, ask);
       }
     }
 
@@ -442,6 +477,8 @@ export function useSync(options: {
       }
       if (wire.type === "bye") {
         setPeers((list) => list.filter((x) => x.peer !== wire.peer));
+        // What it was sending us: asked of another post.
+        if (dropAsks(asks, from)) void hello(false);
         if (known) {
           records.current.set(from, { ...known, left: Date.now() });
           bump();
@@ -498,16 +535,24 @@ export function useSync(options: {
         }
       }
       const local = workspace();
+      const partial = Array.isArray(wire.partial)
+        ? wire.partial.map(String)
+        : [];
       const { journals: whole, missing } = usable(
         (local?.journals ?? []).map((j) => j.id),
         list,
-        Array.isArray(wire.partial) ? wire.partial.map(String) : [],
+        partial,
       );
+      // A whole journal arrived: an interrupted transfer went through.
+      if (whole.some((j) => !partial.includes(j.id)))
+        setError((e) => (e === LARGE ? "" : e));
       await apply(whole, goneOf(wire.gone), from, wire.digests ?? {});
-      // Parts of journals this post lacks: ask for the whole ones.
-      if (missing.length) {
+      // Parts of journals this post lacks: ask for the whole ones (of this
+      // post, unless they are coming from another one).
+      const ask = pickAsks(missing, from, asks, lastPart);
+      if (ask.length) {
         replied.set(from, Date.now());
-        await hello(true, from);
+        await hello(true, from, ask);
       }
     }
 
@@ -599,6 +644,8 @@ export function useSync(options: {
       digests: Record<string, string>,
     ) {
       const local = workspace();
+      // Journals received whole: no longer awaited.
+      for (const j of list) asks.delete(j.id);
       if (!local) {
         if (!joined.current && list.length && latest.current.onJoin) {
           joined.current = true;
@@ -689,6 +736,9 @@ export function useSync(options: {
       const socket = new WebSocket(`${scheme}://${location.host}/sync`);
       socket.binaryType = "arraybuffer";
       const parts = new Reassembler(keys.key);
+      incoming = parts;
+      // Other connection, other relay ids: nothing asked yet.
+      asks.clear();
       let queue = Promise.resolve();
       let fatal = false;
       let relay = "";
@@ -696,8 +746,11 @@ export function useSync(options: {
       let count = 0;
       const send = async (wire: Wire, to = "") => {
         if (socket.readyState !== WebSocket.OPEN) return;
-        const frames = await sealFrames(wire, keys.key, to);
-        for (const frame of frames) {
+        // Each part is encrypted and sent once the browser has sent most of
+        // the previous ones: a large message is not held twice in memory,
+        // and the relay can slow this post down (backpressure) when the
+        // recipient reads slowly.
+        for await (const frame of sealStream(wire, keys.key, to)) {
           while (
             socket.readyState === WebSocket.OPEN &&
             socket.bufferedAmount > BUFFERED
@@ -737,17 +790,24 @@ export function useSync(options: {
             // One post less: roll call, so that the one that dropped out
             // shows at once (the others answer a hello without `reply`).
             if (others < count && channel.current?.socket === socket) {
-              const asked = Date.now();
+              const called = Date.now();
               void hello(false);
               setTimeout(() => {
                 if (stopped) return;
+                let dropped = false;
                 for (const r of rollCall(
                   records.current.values(),
-                  asked,
+                  called,
                   Date.now(),
-                ))
+                )) {
+                  // Still sending us a large message: not gone.
+                  if (r.lost && lastPart(r.relay) >= called) continue;
                   records.current.set(r.relay, r);
+                  if (r.lost && dropAsks(asks, r.relay)) dropped = true;
+                }
                 bump();
+                // What it was sending us: asked of another post.
+                if (dropped) void hello(false);
               }, ROLL_CALL_MS);
             }
             count = others;
@@ -806,9 +866,12 @@ export function useSync(options: {
           let message: { from: string; value: unknown } | undefined;
           try {
             message = await parts.accept(bytes);
-          } catch {
+          } catch (err) {
+            // Too many parts waiting at once: given up, not a wrong code.
             setError(
-              "Message illisible reçu : un autre poste utilise-t-il un autre code ?",
+              err instanceof TooLarge
+                ? LARGE
+                : "Message illisible reçu : un autre poste utilise-t-il un autre code ?",
             );
             return;
           }

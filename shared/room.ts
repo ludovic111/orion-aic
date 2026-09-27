@@ -166,6 +166,21 @@ export async function sealFrames(
   key: CryptoKey,
   to = "",
 ): Promise<Uint8Array[]> {
+  const frames: Uint8Array[] = [];
+  for await (const frame of sealStream(value, key, to)) frames.push(frame);
+  return frames;
+}
+
+/**
+ * The frames of sealFrames, each encrypted when asked for: a sender that
+ * waits for the network between parts does not hold every encrypted part
+ * of a large message at once.
+ */
+export async function* sealStream(
+  value: unknown,
+  key: CryptoKey,
+  to = "",
+): AsyncGenerator<Uint8Array> {
   const packed = await deflate(text(JSON.stringify(value)));
   const count = Math.max(1, Math.ceil(packed.length / PART_BYTES));
   if (count > MAX_PARTS)
@@ -176,7 +191,6 @@ export async function sealFrames(
     );
   const id = crypto.getRandomValues(new Uint8Array(8));
   const target = peerBytes(to);
-  const frames: Uint8Array[] = [];
   for (let index = 0; index < count; index++) {
     const chunk = packed.subarray(index * PART_BYTES, (index + 1) * PART_BYTES);
     const plain = new Uint8Array(HEADER + chunk.length);
@@ -197,16 +211,31 @@ export async function sealFrames(
     frame.set(target, 1);
     frame.set(iv, 9);
     frame.set(data, FRAME);
-    frames.push(frame);
+    yield frame;
   }
-  return frames;
 }
 
 /** Relay id of the sender (or the recipient) written in a frame. */
 export const framePeer = (frame: Uint8Array) =>
   new TextDecoder().decode(frame.subarray(1, 9)).replace(/\0+$/, "");
 
-type Pending = { parts: (Uint8Array | undefined)[]; got: number; at: number };
+type Pending = {
+  parts: (Uint8Array | undefined)[];
+  got: number;
+  at: number;
+  /** When the last part arrived. */
+  last: number;
+};
+/**
+ * A message given up because the parts waiting would exceed the limit
+ * (not a wrong code): the sender sends it again later.
+ */
+export class TooLarge extends Error {
+  constructor() {
+    super("Message trop volumineux.");
+    this.name = "TooLarge";
+  }
+}
 /** Largest total of parts waiting for the rest of their message. */
 const MAX_PENDING = 128 * 1024 * 1024;
 const EXPIRY = 120_000;
@@ -259,16 +288,18 @@ export class Reassembler {
     const id = `${from}:${hex(plain.slice(0, 8).buffer)}`;
     if (this.refused.has(id)) return;
     let entry = this.pending.get(id);
+    const now = Date.now();
     if (!entry) {
-      entry = { parts: new Array(count), got: 0, at: Date.now() };
+      entry = { parts: new Array(count), got: 0, at: now, last: now };
       this.pending.set(id, entry);
     }
     if (entry.parts.length !== count || entry.parts[index]) return;
     if (this.bytes + data.length > this.limit) {
       this.drop(id);
-      this.refused.set(id, Date.now());
-      throw new Error("Message trop volumineux.");
+      this.refused.set(id, now);
+      throw new TooLarge();
     }
+    entry.last = now;
     entry.parts[index] = data;
     entry.got++;
     this.bytes += data.length;
@@ -298,6 +329,16 @@ export class Reassembler {
       if (now - entry.at > EXPIRY) this.drop(id);
     for (const [id, at] of this.refused)
       if (now - at > EXPIRY) this.refused.delete(id);
+  }
+  /**
+   * When the last part of a message still in progress came from `from`
+   * (0 if none): a large message is still arriving.
+   */
+  lastPart(from: string): number {
+    let last = 0;
+    for (const [id, entry] of this.pending)
+      if (id.startsWith(`${from}:`)) last = Math.max(last, entry.last);
+    return last;
   }
   /** Forget what a sender that left had started. */
   forget(from: string) {

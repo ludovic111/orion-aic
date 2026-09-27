@@ -4,7 +4,8 @@ import { createServer } from "node:http";
 import { connect } from "node:net";
 import { randomBytes } from "node:crypto";
 import { handle } from "../server/app.mjs";
-import { attachRelay } from "../server/relay.mjs";
+import { LIMITS, attachRelay } from "../server/relay.mjs";
+import { slowPost } from "./slow-post.mjs";
 
 const servers = [];
 async function relayServer(limits = {}) {
@@ -156,6 +157,7 @@ test("relay closes a frame above its limit and a post that does not read", async
   const { url, relay } = await relayServer({
     payload: 64 * 1024,
     backlog: 256 * 1024,
+    stall: 500,
   });
   const big = open(url);
   await big.join(room("d"));
@@ -185,10 +187,207 @@ test("relay closes a frame above its limit and a post that does not read", async
   await fast.join(room("e"));
   assert.equal(relay.rooms.get(room("e")).size, 2);
   for (let i = 0; i < 400; i++) fast.socket.send(frame(bytes(60 * 1024)));
-  // The relay drops the post that does not keep up instead of buffering.
+  // The relay drops the post that does not read (after the stall timeout)
+  // instead of buffering for it.
   for (let i = 0; i < 200 && relay.rooms.get(room("e")).size > 1; i++)
     await new Promise((r) => setTimeout(r, 25));
   assert.equal(relay.rooms.get(room("e")).size, 1);
   slow.destroy();
   fast.socket.close();
+});
+
+// ---------- Flow control: slow posts are waited for, not dropped ----------
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const PART = 192 * 1024 + 60; // a part of a message, as sent by a post
+const MB = 1_000_000;
+
+/**
+ * Sends `total` bytes as parts to the post `to` ("" for everyone), waiting
+ * like the browser (useSync) while more than 1 MB is buffered.
+ */
+async function pour(post, total, to, tag) {
+  const count = Math.ceil(total / PART);
+  for (let i = 0; i < count; i++) {
+    while (post.socket.readyState === 1 && post.socket.bufferedAmount > MB)
+      await sleep(4);
+    if (post.socket.readyState !== 1) throw new Error("sender disconnected");
+    const payload = new Uint8Array(PART);
+    payload[0] = tag;
+    new DataView(payload.buffer).setUint32(1, i);
+    post.socket.send(frame(payload, to));
+  }
+  return count;
+}
+/** Largest queue of the relay for the post `id`, sampled until stopped. */
+function watchQueue(relay, id) {
+  let max = 0;
+  let paused = 0;
+  let samples = 0;
+  const timer = setInterval(() => {
+    for (const peers of relay.rooms.values())
+      for (const peer of peers)
+        if (peer.id === id) max = Math.max(max, peer.socket.writableLength);
+    samples++;
+    if (relay.stats().paused) paused++;
+  }, 2);
+  return () => {
+    clearInterval(timer);
+    return { max, pausedShare: samples ? paused / samples : 0 };
+  };
+}
+/** Checks that each sender's parts arrive whole and in order. */
+function tally() {
+  const next = new Map();
+  let bad = 0;
+  return {
+    onFrame(bytes) {
+      const tag = bytes[9];
+      const index = new DataView(bytes.buffer, bytes.byteOffset).getUint32(10);
+      if (bytes.length !== 9 + PART || index !== (next.get(tag) ?? 0)) bad++;
+      next.set(tag, index + 1);
+    },
+    count: (tag) => next.get(tag) ?? 0,
+    bad: () => bad,
+  };
+}
+const mbps = (bytes, ms) => ((bytes / ms) * 1000) / MB;
+/** The relay's side of the post `id`. */
+const peerOf = (relay, id) => {
+  for (const peers of relay.rooms.values())
+    for (const peer of peers) if (peer.id === id) return peer;
+};
+/**
+ * Waits until the relay drops `peer` (a post that does not read never sees
+ * the close frame): the close code and when.
+ */
+async function dropped(peer) {
+  while (!peer.closed) await sleep(2);
+  return { code: peer.closeCode, at: Date.now() };
+}
+
+test("a post reading slower than the sender gets 40 MB without being dropped", async (t) => {
+  const { url, relay } = await relayServer();
+  const got = tally();
+  const phone = await slowPost(url, room("5"), {
+    rate: 20 * MB,
+    onFrame: got.onFrame,
+  });
+  const sender = open(url);
+  await sender.join(room("5"));
+  const stop = watchQueue(relay, phone.id());
+  const started = Date.now();
+  const count = await pour(sender, 40 * MB, phone.id(), 1);
+  while (got.count(1) < count && !phone.state.closedAt) await sleep(10);
+  const ms = Date.now() - started;
+  const { max, pausedShare } = stop();
+  assert.equal(phone.state.closedAt, 0, "the slow post stays connected");
+  assert.equal(got.count(1), count);
+  assert.equal(got.bad(), 0);
+  // The relay queues little more than its limit for it.
+  assert.ok(max <= LIMITS.backlog + 2 * PART, `queue ${max}`);
+  t.diagnostic(
+    `1 sender, 40 MB in ${ms} ms (${mbps(40 * MB, ms).toFixed(1)} MB/s, reader at 20 MB/s); relay queue for it at most ${(max / MB).toFixed(2)} MB; sender paused ${(pausedShare * 100).toFixed(0)} % of the time`,
+  );
+  phone.destroy();
+  sender.socket.close();
+});
+
+test("a slow post gets 40 MB from each of three posts at once, the relay queue stays bounded", async (t) => {
+  const { url, relay } = await relayServer();
+  const got = tally();
+  const phone = await slowPost(url, room("6"), {
+    rate: 25 * MB,
+    onFrame: got.onFrame,
+  });
+  const senders = [open(url), open(url), open(url)];
+  for (const s of senders) await s.join(room("6"));
+  const stop = watchQueue(relay, phone.id());
+  const started = Date.now();
+  const counts = await Promise.all(
+    senders.map((s, i) => pour(s, 40 * MB, phone.id(), i + 1)),
+  );
+  while (counts.some((c, i) => got.count(i + 1) < c) && !phone.state.closedAt)
+    await sleep(10);
+  const ms = Date.now() - started;
+  const { max, pausedShare } = stop();
+  assert.equal(phone.state.closedAt, 0, "the slow post stays connected");
+  counts.forEach((c, i) => assert.equal(got.count(i + 1), c));
+  assert.equal(got.bad(), 0);
+  // At most one part per sender above the limit.
+  assert.ok(max <= LIMITS.backlog + 4 * PART, `queue ${max}`);
+  t.diagnostic(
+    `3 senders, 120 MB in ${ms} ms (${mbps(120 * MB, ms).toFixed(1)} MB/s, reader at 25 MB/s); relay queue for it at most ${(max / MB).toFixed(2)} MB; a sender paused ${(pausedShare * 100).toFixed(0)} % of the time`,
+  );
+  phone.destroy();
+  for (const s of senders) s.socket.close();
+});
+
+test("a post that stops reading is dropped after the stall timeout; the others go on", async (t) => {
+  const stall = 1500;
+  const { url, relay } = await relayServer({ stall });
+  const stuck = await slowPost(url, room("7"), { rate: 0 });
+  const sender = open(url);
+  const other = open(url);
+  await sender.join(room("7"));
+  await other.join(room("7"));
+  let received = 0;
+  other.socket.addEventListener("message", (e) => {
+    if (typeof e.data !== "string") received++;
+  });
+  const stop = watchQueue(relay, stuck.id());
+  const peer = peerOf(relay, stuck.id());
+  // To everyone: the post that does not read holds the sender back…
+  let congestedAt = 0;
+  const seen = setInterval(() => {
+    if (!congestedAt && peer.congested) congestedAt = Date.now();
+  }, 2);
+  const [count, { code, at }] = await Promise.all([
+    pour(sender, 40 * MB, "", 1),
+    dropped(peer),
+  ]);
+  clearInterval(seen);
+  const { max } = stop();
+  // …for the stall timeout at most, then it is dropped.
+  assert.equal(code, 1013);
+  assert.ok(congestedAt, "it was congested");
+  const held = at - congestedAt;
+  assert.ok(
+    held >= stall - 50 && held < stall + 1000,
+    `dropped after ${held} ms`,
+  );
+  assert.equal(relay.stats().congested, 0);
+  while (received < count) await sleep(10);
+  assert.equal(received, count, "the other post got everything");
+  assert.equal(sender.socket.readyState, 1, "the sender stays connected");
+  assert.ok(max <= LIMITS.backlog + 2 * PART, `queue ${max}`);
+  t.diagnostic(
+    `post not reading: dropped (1013) ${held} ms after its queue passed the limit (stall ${stall} ms); relay queue for it at most ${(max / MB).toFixed(2)} MB; the other post got all ${count} parts`,
+  );
+  stuck.destroy();
+  sender.socket.close();
+  other.socket.close();
+});
+
+test("a post whose queue passes the hard ceiling is dropped at once", async () => {
+  const { url, relay } = await relayServer({
+    backlog: 256 * 1024,
+    hardBacklog: 1024 * 1024,
+    stall: 60_000,
+  });
+  const stuck = await slowPost(url, room("8"), { rate: 0 });
+  const senders = Array.from({ length: 6 }, () => open(url));
+  for (const s of senders) await s.join(room("8"));
+  const peer = peerOf(relay, stuck.id());
+  const started = Date.now();
+  // Many senders at once, large frames: each may forward one frame after
+  // the post is congested, beyond the ceiling.
+  const big = new Uint8Array(900 * 1024);
+  for (const s of senders)
+    for (let i = 0; i < 12; i++) s.socket.send(frame(big, stuck.id()));
+  const { code, at } = await dropped(peer);
+  assert.equal(code, 1013);
+  assert.ok(at - started < 10_000, "well before the stall timeout");
+  stuck.destroy();
+  for (const s of senders) s.socket.close();
 });

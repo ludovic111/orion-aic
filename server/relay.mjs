@@ -20,9 +20,19 @@ import { createHash, randomBytes } from "node:crypto";
 // A post of protocol 1 (room in the URL) is refused with 426.
 //
 // Minimal WebSocket server (RFC 6455) without dependencies. Memory stays
-// flat: incoming data is kept as a list of chunks, each outgoing frame is
-// built once per broadcast, and a post that does not read (its send buffer
-// above LIMITS.backlog) is disconnected instead of being buffered for.
+// flat: incoming data is kept as a list of chunks and each outgoing frame is
+// built once per broadcast.
+//
+// Flow control: a post that reads slower than others send to it (a phone
+// joining a large session) is not dropped. Once more than LIMITS.backlog
+// bytes wait for it, it is congested: every post whose frame goes to it
+// stops being read (socket.pause(), the kernel and TCP hold the rest, the
+// sender's browser waits) until the queue is back under half the limit.
+// Each sender forwards at most the frame in progress after that, so the
+// queue stays close to the limit. A congested post that does not get back
+// under half the limit within LIMITS.stall, or whose queue exceeds
+// LIMITS.hardBacklog, is disconnected, and the posts waiting for it are
+// read again: a slow post slows the others down for a while, never for ever.
 
 const GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 export const PROTOCOL = 2;
@@ -39,8 +49,12 @@ export const LIMITS = {
   /** Joins per address: a burst of 30, then one every 2 s. */
   joinBurst: 30,
   joinRefillMs: 2000,
-  /** Bytes waiting to be sent to one post before it is disconnected. */
-  backlog: 8 * 1024 * 1024,
+  /** Bytes waiting for one post above which its senders are paused. */
+  backlog: 2 * 1024 * 1024,
+  /** Bytes waiting for one post above which it is disconnected. */
+  hardBacklog: 16 * 1024 * 1024,
+  /** Longest congestion of one post (ms) before it is disconnected. */
+  stall: 45_000,
   joinTimeout: 10_000,
 };
 const BROADCAST = Buffer.alloc(8);
@@ -96,6 +110,19 @@ class Peer {
     this.alive = true;
     this.closed = false;
     this.handlers = handlers;
+    // Flow control: congested receivers this post waits for (it is not
+    // read meanwhile), and the senders waiting for this post.
+    this.waiting = new Set();
+    this.blocked = new Set();
+    this.congested = false;
+    this.stallTimer = null;
+    this.flushed = () => {
+      if (
+        this.congested &&
+        this.socket.writableLength <= this.limits.backlog / 2
+      )
+        this.relieve();
+    };
     socket.setNoDelay(true);
     socket.on("data", (chunk) => this.read(chunk));
     socket.on("close", () => this.finish());
@@ -108,10 +135,45 @@ class Peer {
   /** Send a frame built by the caller (shared between recipients). */
   write(buffer) {
     if (this.closed) return;
-    this.socket.write(buffer);
-    // Backpressure: a post that does not keep up is disconnected; it
-    // reconnects and catches up from the others (only what it lacks).
-    if (this.socket.writableLength > this.limits.backlog) this.close(1013);
+    // The callback runs as the frame leaves for the network: the queue
+    // shrinks, the senders waiting for this post may go on.
+    this.socket.write(buffer, this.flushed);
+    const queued = this.socket.writableLength;
+    if (queued > this.limits.hardBacklog) return this.close(1013);
+    if (!this.congested && queued > this.limits.backlog) this.congest();
+  }
+  congest() {
+    this.congested = true;
+    this.stallTimer = setTimeout(() => {
+      // Still congested: it reads too slowly (or not at all) for the
+      // others to wait. It reconnects and catches up later.
+      if (this.congested) this.close(1013);
+    }, this.limits.stall);
+    this.stallTimer.unref?.();
+  }
+  /** Back under half the limit: the senders waiting for it go on. */
+  relieve() {
+    this.congested = false;
+    clearTimeout(this.stallTimer);
+    const senders = [...this.blocked];
+    this.blocked.clear();
+    for (const sender of senders) {
+      sender.waiting.delete(this);
+      if (!sender.waiting.size) sender.proceed();
+    }
+  }
+  /** A frame of this post went to `receiver`, which is congested. */
+  waitFor(receiver) {
+    if (this.closed || receiver.closed || !receiver.congested) return;
+    receiver.blocked.add(this);
+    this.waiting.add(receiver);
+    this.socket.pause();
+  }
+  /** Read again after a pause (and what arrived before it). */
+  proceed() {
+    if (this.closed) return;
+    this.socket.resume();
+    this.parse();
   }
   send(value) {
     this.write(text(value));
@@ -121,12 +183,14 @@ class Peer {
     this.close(close);
   }
   ping() {
-    if (!this.alive) return this.close(1001);
+    // A post not read (waiting for a congested one) may have answered.
+    if (!this.alive && !this.waiting.size) return this.close(1001);
     this.alive = false;
     this.write(frame(9));
   }
   close(code = 1000) {
     if (this.closed) return;
+    this.closeCode = code;
     const payload = Buffer.alloc(2);
     payload.writeUInt16BE(code);
     // end() sends the close frame after what is queued, then closes; the
@@ -141,7 +205,12 @@ class Peer {
       this.closed = true;
       clearTimeout(this.joinTimer);
       this.chunks = [];
+      this.length = 0;
       this.fragments = [];
+      // Gone: those waiting for it go on; it waits for no one.
+      this.relieve();
+      for (const receiver of this.waiting) receiver.blocked.delete(this);
+      this.waiting.clear();
       this.handlers.leave(this);
     }
     if (destroy) this.socket.destroy();
@@ -177,7 +246,11 @@ class Peer {
     if (this.closed) return;
     this.chunks.push(chunk);
     this.length += chunk.length;
-    while (this.length >= 2) {
+    this.parse();
+  }
+  /** Frames waiting, until one goes to a congested post. */
+  parse() {
+    while (this.length >= 2 && !this.waiting.size && !this.closed) {
       const head = this.peek(Math.min(this.length, 14));
       const first = head[0];
       const second = head[1];
@@ -321,8 +394,11 @@ export function attachRelay(server, { shared = false, limits = {} } = {}) {
       message.write(peer.id, 1, 8, "latin1");
       const out = frame(2, message);
       for (const other of rooms.get(peer.room) ?? [])
-        if (other !== peer && (everyone || other.id === target))
+        if (other !== peer && (everyone || other.id === target)) {
           other.write(out);
+          // Backpressure: the sender waits until the receiver catches up.
+          if (other.congested) peer.waitFor(other);
+        }
     },
   };
   server.on("upgrade", (req, socket) => {
@@ -374,11 +450,25 @@ export function attachRelay(server, { shared = false, limits = {} } = {}) {
   timer.unref();
   return {
     rooms,
-    stats: () => ({
-      rooms: rooms.size,
-      addresses: sockets.size,
-      joins: joins.size,
-    }),
+    stats: () => {
+      let queued = 0;
+      let congested = 0;
+      let paused = 0;
+      for (const peers of rooms.values())
+        for (const peer of peers) {
+          queued += peer.socket.writableLength;
+          if (peer.congested) congested++;
+          if (peer.waiting.size) paused++;
+        }
+      return {
+        rooms: rooms.size,
+        addresses: sockets.size,
+        joins: joins.size,
+        queued,
+        congested,
+        paused,
+      };
+    },
     close() {
       clearInterval(timer);
       for (const peers of rooms.values())
