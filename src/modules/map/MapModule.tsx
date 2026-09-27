@@ -1289,8 +1289,11 @@ export function MapModule() {
       window.removeEventListener("online", online);
       window.removeEventListener("offline", offline);
       baseLayer.current = null;
-      layer.off();
+      // Removed first: Leaflet unhooks the layer from the map on its own
+      // « remove » event, which off() would drop (every zoom would then
+      // reach a layer without a map).
       layer.remove();
+      layer.off();
     };
   }, [base]);
 
