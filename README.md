@@ -564,13 +564,29 @@ Pour un autre hébergeur : servir `dist/` avec les en-têtes de [`public/_header
 npm run dev           # serveur Vite sur http://127.0.0.1:4311
 npm run check         # TypeScript
 npm test              # tests Node (node:test)
+npm run e2e           # tests de bout en bout (Playwright, Chromium) sur le build de production
 npm run format:check  # Prettier
 npm run build         # build de production + service worker
 npm start             # serveur de production + relais
 npm run lan           # réseau local en HTTPS
 ```
 
-La CI GitHub (`.github/workflows`) exécute format, typecheck, tests, build, `npm audit` et le build Docker à chaque push. Guide du kit d’interface pour écrire un module : [docs/UI.md](docs/UI.md).
+La CI GitHub (`.github/workflows`) exécute format, typecheck, tests, build, tests de bout en bout, `npm audit` et le build Docker à chaque push ; en cas d’échec, le rapport Playwright est joint à l’exécution (artefact `playwright-report`).
+
+### Tests de bout en bout
+
+Playwright (`e2e/`, configuration `e2e/playwright.config.ts`) construit l’application (`npm run build`), lance le serveur de production (`node server/index.mjs`, fichiers et relais WebSocket) sur `http://127.0.0.1:4390`, puis joue les parcours dans Chromium : ordinateur (1360 × 900) et téléphone (Pixel 7).
+
+```sh
+npx playwright install chromium    # une fois : le navigateur de test
+npm run e2e                        # build + serveur + tests
+E2E_SKIP_BUILD=1 npm run e2e       # réutiliser dist/ déjà construit
+E2E_PORT=4391 npm run e2e          # autre port
+npm run e2e -- --ui                # mode interactif ; --headed pour voir le navigateur
+npx playwright show-report         # rapport HTML (playwright-report/)
+```
+
+Parcours couverts : exercice de démonstration et navigation par la barre des modules et « Plus d’outils » ; nouvelle session chiffrée et entrées numérotées au journal ; message reçu inscrit au journal et relié à son entrée ; deux postes reliés par un code de session (entrée transmise, poste « En ligne » dans « Postes connectés ») ; téléchargement d’une archive `.orionaic` chiffrée ; téléphone (formulaire avant la présentation, barre du bas, aucun défilement horizontal) ; passage du français à l’allemand. Chaque test part d’un navigateur neuf, sans service worker ; aucune requête ne quitte le poste (tuiles, swisstopo, geo.admin.ch, open-meteo et avertissements officiels reçoivent une réponse vide), et une erreur JavaScript non rattrapée fait échouer le test. Ces tests restent hors de `npm test` et de l’image Docker (Playwright est une dépendance de développement). Guide du kit d’interface pour écrire un module : [docs/UI.md](docs/UI.md).
 
 Tests couverts : modèle et révisions, suppression et numérotation, entrées liées et fil, clôture par quittance, relance d’échéance, modèles, batteries, QR et scan, rapport de situation, quittance de remise, fusion, plan radio, chiffrement, CSV/TSV, formats bureautiques, exports, serveur statique, **fusion de synchronisation** (propriétés commutative, associative et idempotente sur des postes aléatoires, horloges décalées de 5 minutes, numéros partagés et références, messages numérotés à la réception, journaux retirés puis réimportés, différences = tout, protocole avec pertes de messages), **coffre local** (compression, anciens coffres, taille), **images** gardées une fois et compaction de l’historique, **liens** explicites et implicites, **relais WebSocket** (salles, envoi à un seul poste, limites par adresse, trames trop grandes, poste qui ne lit pas, protocole 1 refusé), échange chiffré de bout en bout entre deux postes, **historique** (enregistrement, regroupement, fusion commutative, machine à remonter le temps, restauration), **formats géographiques** (aller-retour GeoJSON / KML / GPX), **exports** (dossier, formats bureautiques, agenda, contacts, empreintes), **présentations** (diapositives, PowerPoint et ODP bien formés), **barre des modules** (modules essentiels, choix par fonction, déplacement et masquage, barre du téléphone, reprise tolérante des anciens réglages).
 
@@ -634,6 +650,7 @@ server/
   lan.mjs          Serveur HTTPS du réseau local (QR code des adresses : terminal-qr.mjs)
 scripts/           Archive du code source, service worker
 tests/             Tests node:test
+e2e/               Tests de bout en bout Playwright (parcours dans Chromium)
 docs/              Architecture, système de design, kit d’interface, choix métier, licences,
                    provenance des signes
 ```
