@@ -151,7 +151,7 @@ export function JournalSetup({
               checked={protect}
               onChange={(e) => setProtect(e.target.checked)}
             />
-            <span>{t("Sauvegarde chiffrée sur ce poste")}</span>
+            <span>{t("Garder la session sur cet appareil (recommandé)")}</span>
           </label>
           {protect ? (
             <div className="details-fields">
@@ -182,14 +182,12 @@ export function JournalSetup({
                   />
                 </label>
               </div>
-              <small>
-                {t("Demandée après fermeture ou crash. Irrécupérable.")}
-              </small>
+              <RecoveryHelp />
             </div>
           ) : (
             <p className="hint warn">
               {t(
-                "Temporaire : perdu à la fermeture de l’onglet. Exportez régulièrement.",
+                "Sans enregistrement, tout disparaît quand l’onglet se ferme. Exportez régulièrement.",
               )}
             </p>
           )}
@@ -212,5 +210,16 @@ export function JournalSetup({
         <ArrowRight size={15} />
       </button>
     </form>
+  );
+}
+
+/** What the recovery phrase is, in plain words (landing and settings). */
+export function RecoveryHelp() {
+  return (
+    <p className="hint recovery-help">
+      {t(
+        "La phrase de récupération est un mot de passe que vous inventez, par exemple « crue arve carouge 2026 ». Elle sera demandée pour rouvrir la session sur cet appareil. Notez-la : personne ne peut la retrouver.",
+      )}
+    </p>
   );
 }

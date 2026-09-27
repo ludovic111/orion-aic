@@ -75,7 +75,10 @@ import { Docs } from "./modules/docs/Docs";
 import { MyTasks } from "./modules/tasks/MyTasks";
 import { Orders } from "./modules/orders/Orders";
 import { ConductLayer } from "./post/ConductLayer";
-import { identityOf } from "./post/roles";
+import { identityOf, roleProfile } from "./post/roles";
+import { usePost } from "./post/store";
+import { dockLayout } from "./app/dock.ts";
+import type { SettingsTab } from "./app/Settings";
 import { taskBadge } from "../shared/diffusion";
 import { TimeBar } from "./timeline/TimeBar";
 import { usePastJournal } from "./timeline/replay";
@@ -157,6 +160,8 @@ export default function App() {
   const store = useWorkspace();
   const { workspace, setWorkspace } = store;
   const [prefs, setPrefs] = usePrefs();
+  // Function of this post: decides the automatic modules of the dock.
+  const [post] = usePost();
   // Language of the post: the shell re-renders and the module is mounted
   // again when it changes (texts computed once are computed again).
   const lang = useLang();
@@ -456,6 +461,10 @@ export default function App() {
     (target: string) => overlays.open({ kind: "trace", target }),
     [overlays.open],
   );
+  const openSettings = useCallback(
+    (tab: SettingsTab) => overlays.open({ kind: "settings", tab }),
+    [overlays.open],
+  );
   const toggleTheme = useCallback(
     () =>
       setPrefs({
@@ -725,6 +734,7 @@ export default function App() {
             prefs,
             setPrefs,
             help,
+            settings: openSettings,
             addEntry,
             compose,
             openEntry,
@@ -753,6 +763,7 @@ export default function App() {
       prefs,
       setPrefs,
       help,
+      openSettings,
       addEntry,
       compose,
       openEntry,
@@ -821,15 +832,17 @@ export default function App() {
     <Ctx.Provider value={ctx}>
       <Cosmos />
       <ClickSparks />
-      <div className="app">
+      <div className="app" data-dock={prefs.dockLabels ? "labels" : "icons"}>
         <a href="#main" className="skip-link">
           {t("Aller au contenu")}
         </a>
         <Dock
           current={module}
-          hidden={prefs.hidden}
+          layout={dockLayout(prefs, roleProfile(post.role)?.focus)}
+          labels={prefs.dockLabels}
           onGo={go}
           onLogo={() => go("situation")}
+          onChoose={() => openSettings("post")}
           badges={{
             journal: { value: late.length },
             messages: { value: unread, tone: "accent" },
@@ -851,7 +864,6 @@ export default function App() {
             persistent={store.persistent}
             online={online}
             viewAt={viewAt}
-            theme={prefs.theme}
             onJournalMenu={(anchor) =>
               overlays.open({ kind: "menu", menu: "journal", anchor })
             }
@@ -859,10 +871,9 @@ export default function App() {
               overlays.open({ kind: "menu", menu: "operator", anchor })
             }
             onPalette={() => overlays.open({ kind: "palette" })}
-            onSync={() => overlays.open({ kind: "settings", tab: "sync" })}
-            onTimeMachine={() => setViewAt(viewAt === null ? Date.now() : null)}
-            onPresent={() => present("present")}
-            onTheme={toggleTheme}
+            onSync={() => openSettings("sync")}
+            onSave={() => openSettings("session")}
+            onTimeMachine={() => setViewAt(null)}
           />
           <main id="main" className="main">
             {updateReady && (
@@ -903,6 +914,7 @@ export default function App() {
               </div>
             )}
             <ConductLayer />
+            <ReminderBar />
             <div
               className="module reveal"
               key={`${module}-${journal.id}-${lang}`}
@@ -1105,6 +1117,9 @@ export default function App() {
               : overlays.open({ kind: "dialog", name: "install" })
           }
           onTheme={toggleTheme}
+          viewAt={viewAt}
+          onTimeMachine={() => setViewAt(viewAt === null ? Date.now() : null)}
+          onPresent={() => present("present")}
           onEnd={() => void closeSession()}
           onWall={() => overlays.open({ kind: "wall" })}
         />
@@ -1200,7 +1215,6 @@ export default function App() {
       {viewAt !== null && <TimeBar />}
       {/* Live positions of the teams (ephemeral, never stored). */}
       <LiveHost sync={sync} />
-      <ReminderBar />
       <ExerciseRunner />
       <Toast message={toast} onDone={() => setToast(null)} />
     </Ctx.Provider>

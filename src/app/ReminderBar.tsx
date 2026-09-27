@@ -22,8 +22,8 @@ const PRINT_SECTIONS = [
 ] as const;
 
 /**
- * Reminders due now (export, print, point de situation), at the bottom of
- * the screen with their action in one click. Scheduled in the page: no
+ * Reminders due now (export, print, point de situation), at the top of
+ * the page with their action in one click. Scheduled in the page: no
  * server, nothing sent. "Plus tard" is kept on this post only.
  */
 export function ReminderBar() {
@@ -84,14 +84,14 @@ export function ReminderBar() {
               </span>
               <span className="rm-buttons">
                 <button
-                  className="small icon-button"
-                  title={t("Plus tard (15 min)")}
-                  aria-label={t("Me le rappeler dans 15 minutes")}
+                  className="small"
+                  title={t("Me le rappeler dans 15 minutes")}
                   onClick={() =>
                     setSnoozed((s) => ({ ...s, [key(d)]: Date.now() + SNOOZE }))
                   }
                 >
                   <Clock3 size={14} />
+                  {t("Plus tard")}
                 </button>
                 <button
                   className="small"

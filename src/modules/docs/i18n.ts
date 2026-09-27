@@ -122,4 +122,9 @@ export const { t, tn, tIn, dict } = translator({
       de: "Der Bildschirm von orion aic, vereinfacht. Die Nummern verweisen auf die Liste unten.",
       it: "Lo schermo di orion aic, semplificato. I numeri rimandano all’elenco qui sotto.",
     },
+  // « Bien démarrer »: show the first steps on Situation again
+  "Revoir « Par où commencer ? »": {
+    de: "« Wo anfangen? » wieder anzeigen",
+    it: "Rivedere « Da dove cominciare? »",
+  },
 } satisfies Dict);

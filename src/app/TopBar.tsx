@@ -1,11 +1,4 @@
-import {
-  ChevronDown,
-  History,
-  MonitorPlay,
-  Moon,
-  Search,
-  Sun,
-} from "lucide-react";
+import { ChevronDown, History, Search } from "lucide-react";
 import type { Journal } from "../../shared/journal";
 import { Brand } from "../ui/Mark";
 import { Clock } from "../ui/Clock";
@@ -16,7 +9,12 @@ import { t, tn } from "./i18n.ts";
 
 type Sync = ReturnType<typeof useSync>;
 
-/** Top bar of the shell: journal switch, search, status, operator. */
+/**
+ * Top bar of the shell: journal switch, search, status in plain words
+ * (shared or not, saved or not), the clock and the menu of the post. The
+ * rarer actions (time machine, presentation, theme) are in that menu and in
+ * the search (⌘K).
+ */
 export function TopBar({
   journal,
   author,
@@ -25,14 +23,12 @@ export function TopBar({
   persistent,
   online,
   viewAt,
-  theme,
   onJournalMenu,
   onOperatorMenu,
   onPalette,
   onSync,
+  onSave,
   onTimeMachine,
-  onPresent,
-  onTheme,
 }: {
   journal: Journal;
   author: string;
@@ -41,14 +37,14 @@ export function TopBar({
   persistent: boolean;
   online: boolean;
   viewAt: number | null;
-  theme: string;
   onJournalMenu: (anchor: HTMLElement) => void;
   onOperatorMenu: (anchor: HTMLElement) => void;
   onPalette: () => void;
   onSync: () => void;
+  /** Where the session is kept (Réglages → Session et journal). */
+  onSave: () => void;
+  /** Leave the time machine (shown only while in the past). */
   onTimeMachine: () => void;
-  onPresent: () => void;
-  onTheme: () => void;
 }) {
   const peersShown = sync.peers.slice(0, 4);
   return (
@@ -71,11 +67,12 @@ export function TopBar({
         className="command-trigger"
         onClick={onPalette}
         aria-label={t("Rechercher ou agir partout (⌘K)")}
+        title={t("Rechercher ou agir partout (⌘K)")}
       >
         <Search size={15} />
         <span>
-          {t("Rechercher ou agir")}
-          <span className="wide">{t("… partout")}</span>
+          {t("Rechercher")}
+          <span className="wide">{t("… ou agir partout")}</span>
         </span>
         <kbd>⌘K</kbd>
       </button>
@@ -86,7 +83,7 @@ export function TopBar({
           title={
             sync.status === "off"
               ? t(
-                  "Synchronisation désactivée : partager la session avec d’autres postes",
+                  "Cette session n’est que sur ce poste. Cliquer pour la partager avec d’autres postes.",
                 )
               : sync.status === "outdated"
                 ? sync.error
@@ -114,7 +111,7 @@ export function TopBar({
           <span className={`radar ${sync.status === "live" ? "" : "idle"}`} />
           <span className="status-text">
             {sync.status === "off"
-              ? t("Seul")
+              ? t("Non partagé")
               : sync.status === "outdated"
                 ? t("Recharger")
                 : sync.status === "live"
@@ -140,12 +137,21 @@ export function TopBar({
             </span>
           )}
         </button>
-        <span
-          className={`status-chip hide-narrow ${saveState === "error" ? "crit" : persistent ? "ok" : "warn"}`}
+        <button
+          className={`status-chip ${saveState === "error" ? "crit" : persistent ? "ok hide-narrow" : "warn save-warn"}`}
+          onClick={onSave}
           title={
-            persistent
-              ? t("Sauvegarde chiffrée sur ce poste")
-              : t("Session temporaire : exportez avant de fermer")
+            saveState === "error"
+              ? t(
+                  "L’enregistrement sur ce poste a échoué : exportez une copie maintenant.",
+                )
+              : persistent
+                ? t(
+                    "Enregistré et chiffré sur ce poste : rien n’est perdu en fermant l’onglet.",
+                  )
+                : t(
+                    "Rien n’est gardé sur ce poste : fermer l’onglet efface la session. Cliquer pour la protéger ou l’exporter.",
+                  )
           }
         >
           <span className="dot" />
@@ -154,9 +160,9 @@ export function TopBar({
             : saveState === "saving"
               ? t("Sauvegarde…")
               : persistent
-                ? t("Chiffré")
-                : t("Temporaire")}
-        </span>
+                ? t("Enregistré")
+                : t("Non enregistré")}
+        </button>
         {!online && (
           <span
             className="status-chip warn hide-narrow"
@@ -167,45 +173,24 @@ export function TopBar({
           </span>
         )}
         <Clock />
-        <button
-          className={`icon-button${viewAt !== null ? " active" : ""}`}
-          onClick={onTimeMachine}
-          aria-label={
-            viewAt !== null
-              ? t("Revenir à l’état actuel")
-              : t("Remonter le temps")
-          }
-          aria-pressed={viewAt !== null}
-          title={t(
-            "Remonter le temps : revoir l’opération à n’importe quelle heure",
-          )}
-        >
-          <History size={16} />
-        </button>
-        <button
-          className="icon-button hide-narrow"
-          onClick={onPresent}
-          aria-label={t("Présenter la situation")}
-          title={t("Présenter la situation (plein écran)")}
-        >
-          <MonitorPlay size={16} />
-        </button>
-        <button
-          className="icon-button hide-phone"
-          onClick={onTheme}
-          aria-label={theme === "light" ? t("Thème sombre") : t("Thème clair")}
-          title={theme === "light" ? t("Thème sombre") : t("Thème clair")}
-        >
-          {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
-        </button>
+        {viewAt !== null && (
+          <button className="past-exit" onClick={onTimeMachine}>
+            <History size={15} />
+            {t("Revenir au direct")}
+          </button>
+        )}
         <button
           className="operator"
           onClick={(e) => onOperatorMenu(e.currentTarget)}
-          title={t("Opérateur, réglages et session")}
+          title={t("Menu : réglages, affichage, session")}
+          aria-label={t("Menu de {name} : réglages, affichage, session", {
+            name: author,
+          })}
           aria-haspopup="menu"
         >
           <span className="avatar">{author.slice(0, 2).toUpperCase()}</span>
           <span className="operator-name">{author}</span>
+          <ChevronDown size={14} aria-hidden="true" />
         </button>
       </div>
     </header>

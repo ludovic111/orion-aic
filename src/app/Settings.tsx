@@ -31,6 +31,9 @@ import { useApp } from "./context";
 import { speechSupported } from "../ui/dictation";
 import { ContactCard } from "./contact";
 import { MODULES, moduleInfo } from "./modules";
+import { CORE, place, placementOf, type Placement } from "./dock.ts";
+import { usePost } from "../post/store";
+import { roleProfile } from "../post/roles";
 import { DARK_PALETTES, LIGHT_PALETTES, type Palette } from "./palettes";
 import type { useSync } from "../sync/useSync";
 import { ConflictPanel } from "../sync/ConflictPanel";
@@ -219,6 +222,7 @@ function PostSettings() {
         </p>
       </section>
       <PostRoleSettings />
+      <DockSettings />
       <AlertSettings />
       <section className="settings-section">
         <h3 className="section-label">{t("Apparence")}</h3>
@@ -270,7 +274,7 @@ function PostSettings() {
         />
         <p className="hint">
           {t(
-            "Le bouton soleil / lune de la barre du haut passe du thème clair au thème sombre choisis ici. Chaque poste garde son propre thème.",
+            "Le menu du poste (vos initiales, en haut à droite) passe du thème clair au thème sombre choisis ici. Chaque poste garde son propre thème.",
           )}
         </p>
       </section>
@@ -312,53 +316,86 @@ function PostSettings() {
         </div>
       </section>
       <DictationSettings />
-      <section className="settings-section">
-        <h3 className="section-label">{t("Modules affichés")}</h3>
-        <p className="muted" style={{ marginBottom: 10 }}>
-          {t(
-            "Masquez ce que vous n’utilisez pas. Les données restent intactes et les autres postes gardent leur propre choix.",
-          )}
-        </p>
-        <div
-          className="tile-grid"
-          style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-          }}
-        >
+    </div>
+  );
+}
+
+/**
+ * The modules of the dock: in the bar, under « Plus d’outils » or hidden.
+ * Automatic until changed: the essential modules and those of the function
+ * of this post (src/app/dock.ts).
+ */
+function DockSettings() {
+  const { prefs, setPrefs } = useApp();
+  const [post] = usePost();
+  const focus = roleProfile(post.role)?.focus ?? [];
+  const automatic = prefs.dock === null && !prefs.hidden.length;
+  return (
+    <section className="settings-section">
+      <h3 className="section-label">{t("Modules de la barre")}</h3>
+      <p className="muted" style={{ marginBottom: 10 }}>
+        {t(
+          "Choisissez ce qui est dans la barre de gauche (en bas sur téléphone), ce qui attend sous « Plus d’outils » et ce qui est masqué. Les données restent intactes et les autres postes gardent leur propre choix.",
+        )}
+      </p>
+      <div className="stack">
+        <Toggle
+          label={t("Afficher le nom sous chaque icône")}
+          hint={t("Sans les noms, la barre est plus étroite.")}
+          checked={prefs.dockLabels}
+          onChange={(dockLabels) => setPrefs({ dockLabels })}
+        />
+        <div className="dock-settings">
           {MODULES.map((m) => {
             const Icon = m.icon;
-            const shown = m.core || !prefs.hidden.includes(m.id);
+            const fixed = CORE.includes(m.id);
+            const where = placementOf(prefs, m.id, focus);
             return (
-              <button
-                key={m.id}
-                className="tile"
-                disabled={m.core}
-                onClick={() =>
-                  setPrefs({
-                    hidden: shown
-                      ? [...prefs.hidden, m.id]
-                      : prefs.hidden.filter((h) => h !== m.id),
-                  })
-                }
-                style={{ opacity: shown ? 1 : 0.5, padding: "10px 12px" }}
-              >
-                <span className="tile-top" style={{ alignItems: "center" }}>
-                  <Icon size={16} style={{ color: `hsl(${m.hue} 85% 68%)` }} />
-                  <strong style={{ fontSize: 13 }}>{m.short}</strong>
-                  {m.core ? (
-                    <small>{t("toujours")}</small>
-                  ) : shown ? (
-                    <Eye size={14} />
-                  ) : (
-                    <EyeOff size={14} />
-                  )}
+              <div key={m.id} className="dock-settings-row">
+                <Icon size={16} aria-hidden="true" />
+                <span className="dock-settings-name">
+                  {m.label}
+                  <small>{m.description}</small>
                 </span>
-              </button>
+                {fixed ? (
+                  <span className="muted small">{t("toujours")}</span>
+                ) : (
+                  <select
+                    aria-label={t("Place de {module}", { module: m.label })}
+                    value={where}
+                    onChange={(e) =>
+                      setPrefs(
+                        place(prefs, m.id, e.target.value as Placement, focus),
+                      )
+                    }
+                  >
+                    <option value="bar">{t("Dans la barre")}</option>
+                    <option value="more">{t("Plus d’outils")}</option>
+                    <option value="hidden">{t("Masqué")}</option>
+                  </select>
+                )}
+              </div>
             );
           })}
         </div>
-      </section>
-    </div>
+        <p className="hint">
+          {automatic
+            ? t(
+                "Choix automatique : les modules essentiels, plus ceux de la fonction de ce poste choisie plus haut.",
+              )
+            : t("Choix personnalisé pour ce poste.")}{" "}
+          {!automatic && (
+            <button
+              className="link"
+              onClick={() => setPrefs({ dock: null, hidden: [] })}
+            >
+              <RotateCcw size={13} />
+              {t("Revenir au choix automatique")}
+            </button>
+          )}
+        </p>
+      </div>
+    </section>
   );
 }
 

@@ -14,11 +14,6 @@ export const { t, tn, tIn, dict } = translator({
     de: "Die Führung sicherstellen",
     it: "Mantenere la condotta",
   },
-  "Le journal, les messages, la carte, les moyens, l’équipe et la radio d’un poste de conduite de protection civile, au même endroit. Tout reste dans le navigateur, chiffré et sans compte ; les postes d’un même PC se synchronisent en direct.":
-    {
-      de: "Journal, Meldungen, Karte, Mittel, Team und Funk einer Führungsstelle des Zivilschutzes an einem Ort. Alles bleibt im Browser, verschlüsselt und ohne Konto; die Arbeitsplätze desselben KP synchronisieren sich live.",
-      it: "Il diario, i messaggi, la carta, i mezzi, la squadra e la radio di un posto di condotta della protezione civile, in un unico luogo. Tutto resta nel browser, cifrato e senza account; le postazioni di uno stesso PC si sincronizzano in tempo reale.",
-    },
   "Main courante horodatée, suivis, retards, relèves.": {
     de: "Einsatzjournal mit Zeitstempel, Pendenzen, Verspätungen, Ablösungen.",
     it: "Registro cronologico con orario, seguiti, ritardi, avvicendamenti.",
@@ -114,11 +109,6 @@ export const { t, tn, tIn, dict } = translator({
     de: "Die Wiederherstellungssätze stimmen nicht überein.",
     it: "Le frasi di recupero non corrispondono.",
   },
-  "Un autre poste a partagé sa session (Réglages → Synchronisation). Saisissez son code ou scannez son QR code.":
-    {
-      de: "Ein anderer Arbeitsplatz hat seine Sitzung geteilt (Einstellungen → Synchronisation). Geben Sie deren Code ein oder scannen Sie den QR-Code.",
-      it: "Un’altra postazione ha condiviso la sua sessione (Impostazioni → Sincronizzazione). Inserire il suo codice o scansionare il codice QR.",
-    },
   "Code de session": { de: "Sitzungscode", it: "Codice di sessione" },
   "Votre nom ou fonction": {
     de: "Ihr Name oder Ihre Funktion",
@@ -127,10 +117,6 @@ export const { t, tn, tIn, dict } = translator({
   "ex. Sgt Muller, opérateur journal": {
     de: "z. B. Wm Müller, Operateur Journal",
     it: "es. sgt Muller, operatore diario",
-  },
-  "Sauvegarde chiffrée sur ce poste": {
-    de: "Verschlüsselte Sicherung auf diesem Arbeitsplatz",
-    it: "Salvataggio cifrato su questa postazione",
   },
   Répéter: { de: "Wiederholen", it: "Ripeti" },
   "Une session est déjà enregistrée sur ce poste : celle-ci restera temporaire (exportez régulièrement).":
@@ -181,14 +167,6 @@ export const { t, tn, tIn, dict } = translator({
     it: "Minimo 12 caratteri",
   },
   "Répéter la phrase": { de: "Satz wiederholen", it: "Ripeti la frase" },
-  "Demandée après fermeture ou crash. Irrécupérable.": {
-    de: "Wird nach dem Schliessen oder einem Absturz verlangt. Nicht wiederherstellbar.",
-    it: "Richiesta dopo la chiusura o un crash. Non recuperabile.",
-  },
-  "Temporaire : perdu à la fermeture de l’onglet. Exportez régulièrement.": {
-    de: "Temporär: geht beim Schliessen des Tabs verloren. Exportieren Sie regelmässig.",
-    it: "Temporaneo: perso alla chiusura della scheda. Esportare regolarmente.",
-  },
   "Engagement réel : poste et installation autorisés par votre organisation uniquement.":
     {
       de: "Echter Einsatz: nur auf Arbeitsplätzen und Installationen, die Ihre Organisation zugelassen hat.",
@@ -809,6 +787,47 @@ export const { t, tn, tIn, dict } = translator({
   "Sauvegarde locale impossible. Exportez une copie avant de quitter.": {
     de: "Lokale Sicherung nicht möglich. Exportieren Sie vor dem Verlassen eine Kopie.",
     it: "Salvataggio locale impossibile. Esportare una copia prima di uscire.",
+  },
+  // Landing in plain words
+  "Garder la session sur cet appareil (recommandé)": {
+    de: "Sitzung auf diesem Gerät behalten (empfohlen)",
+    it: "Conservare la sessione su questo dispositivo (consigliato)",
+  },
+  "Sans enregistrement, tout disparaît quand l’onglet se ferme. Exportez régulièrement.":
+    {
+      de: "Ohne Speicherung verschwindet alles, wenn der Tab geschlossen wird. Exportieren Sie regelmässig.",
+      it: "Senza salvataggio, tutto scompare quando la scheda si chiude. Esportate regolarmente.",
+    },
+  "La phrase de récupération est un mot de passe que vous inventez, par exemple « crue arve carouge 2026 ». Elle sera demandée pour rouvrir la session sur cet appareil. Notez-la : personne ne peut la retrouver.":
+    {
+      de: "Der Wiederherstellungssatz ist ein Passwort, das Sie sich ausdenken, zum Beispiel « hochwasser arve carouge 2026 ». Er wird verlangt, um die Sitzung auf diesem Gerät wieder zu öffnen. Notieren Sie ihn: Niemand kann ihn wiederfinden.",
+      it: "La frase di recupero è una password che inventate, per esempio « piena arve carouge 2026 ». Sarà chiesta per riaprire la sessione su questo dispositivo. Annotatela: nessuno può ritrovarla.",
+    },
+  "Le journal, les messages, la carte et les moyens d’un poste de conduite de protection civile, au même endroit. Sans compte, chiffré, aussi hors ligne.":
+    {
+      de: "Journal, Meldungen, Karte und Mittel eines Kommandopostens des Zivilschutzes an einem Ort. Ohne Konto, verschlüsselt, auch offline.",
+      it: "Il diario, i messaggi, la carta e i mezzi di un posto di comando della protezione civile, in un solo luogo. Senza account, cifrato, anche offline.",
+    },
+  "Pour essayer sans rien risquer : un exercice fictif.": {
+    de: "Zum Ausprobieren ohne Risiko: eine fiktive Übung.",
+    it: "Per provare senza rischi: un esercizio fittizio.",
+  },
+  "Rejoindre une session": {
+    de: "Einer Sitzung beitreten",
+    it: "Unirsi a una sessione",
+  },
+  "Un autre poste a déjà ouvert la session ? Demandez-lui son code de session, ou scannez son QR code avec l’appareil photo : le code se remplit tout seul.":
+    {
+      de: "Hat ein anderer Arbeitsplatz die Sitzung schon geöffnet? Fragen Sie nach seinem Sitzungscode, oder scannen Sie seinen QR-Code mit der Kamera: Der Code wird von selbst ausgefüllt.",
+      it: "Un’altra postazione ha già aperto la sessione? Chiedetele il codice di sessione, oppure scansionate il suo codice QR con la fotocamera: il codice si compila da solo.",
+    },
+  "Vous êtes le premier poste ?": {
+    de: "Sind Sie der erste Arbeitsplatz?",
+    it: "Siete la prima postazione?",
+  },
+  "Ouvrir une nouvelle session": {
+    de: "Neue Sitzung eröffnen",
+    it: "Aprire una nuova sessione",
   },
 } satisfies Dict);
 

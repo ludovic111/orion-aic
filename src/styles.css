@@ -23,8 +23,9 @@
   --line: rgba(0, 0, 0, 0.1);
   --line-2: var(--color-fog);
   --text: var(--color-near-black);
-  --text-2: var(--color-slate);
-  --text-3: #86827e;
+  /* Readable on the cream paper too (WCAG AA: 5.2:1 and 4.3:1 on --bg). */
+  --text-2: #5d5a56;
+  --text-3: #6a6661;
   --accent-rgb: 23, 23, 23;
   --accent: var(--color-pressed-graphite);
   --accent-2: var(--color-charcoal-ink);
