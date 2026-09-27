@@ -356,8 +356,12 @@ export const CONDUCT_MODULE_TOPICS: Topic[] = [
             Eine gelöschte Warnung wird für diesen Tag nicht neu erstellt.
           </li>
           <li>
-            Der Pegel der Gewässer ist nicht Teil der Prognose (Open Meteo,
-            kostenlos): Erfassen Sie Hochwasserwarnungen von Hand.
+            <strong>Abfluss oder Pegel eines Gewässers</strong>: Wählen Sie die
+            Grösse und dann eine der nahen BAFU-Stationen (laden Sie zuerst die
+            offiziellen Warnungen im Wetter). Die Schwelle wird mit der Messung
+            verglichen, jedes Mal wenn dieser Arbeitsplatz die offiziellen
+            Warnungen lädt; solange das Wasser darüber bleibt, bleibt die
+            Warnung in Kraft.
           </li>
         </ul>
       </>

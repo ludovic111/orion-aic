@@ -69,6 +69,7 @@ import {
   weatherLabel,
   weatherTone,
 } from "../weather/forecast";
+import { OfficialChips } from "../weather/Official";
 import "../weather/weather.css";
 import "./situation.css";
 import { FollowCards } from "./FollowCards";
@@ -1433,6 +1434,10 @@ function WeatherCard() {
         )}
         <GoButton to="weather" label={t("Météo")} />
       </div>
+      <OfficialChips
+        place={journal.ops.settings.weatherPlace}
+        onOpen={() => go("weather")}
+      />
       {!cached && !alerts.length && !lastObs ? (
         <Empty
           actions={

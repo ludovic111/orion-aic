@@ -107,3 +107,35 @@ test("the service worker may fetch map tiles (connect-src), in the server and in
       assert.ok(directive(policy, "img-src").includes(host), host);
     }
 });
+
+test("official warnings: only the needed hosts are in connect-src, never in img-src", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const directive = (policy, name) =>
+    policy
+      .split(";")
+      .map((d) => d.trim())
+      .find((d) => d.startsWith(`${name} `)) ?? "";
+  const served = (await fetch(`${base}/`)).headers.get(
+    "content-security-policy",
+  );
+  const file = (await readFile("public/_headers", "utf8")).match(
+    /Content-Security-Policy: (.+)/,
+  )[1];
+  for (const policy of [served, file]) {
+    const connect = directive(policy, "connect-src").split(/\s+/);
+    // Flood map and stations (data.geo.admin.ch), forest fire danger
+    // (api3.geo.admin.ch), measurement of a station (LINDAS).
+    for (const host of [
+      "https://data.geo.admin.ch",
+      "https://api3.geo.admin.ch",
+      "https://environment.ld.admin.ch",
+    ])
+      assert.ok(connect.includes(host), host);
+    assert.ok(!connect.some((h) => h.includes("*")), "no wildcard host");
+    assert.ok(
+      !connect.some((h) => /meteoswiss|meteoschweiz|meteosuisse/.test(h)),
+      "MeteoSwiss pages are links, not requests",
+    );
+    assert.ok(!directive(policy, "img-src").includes("ld.admin.ch"));
+  }
+});

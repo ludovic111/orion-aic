@@ -1,0 +1,21 @@
+{
+  "@id": "https://environment.ld.admin.ch/foen/hydro/lake/observation/2026",
+  "@type": "https://cube.link/Observation",
+  "https://cube.link/observedBy": {
+    "@id": "https://register.ld.admin.ch/staatskalender/organization/10008758"
+  },
+  "https://environment.ld.admin.ch/foen/hydro/dimension/dangerLevel": {
+    "@id": "https://cube.link/Undefined"
+  },
+  "https://environment.ld.admin.ch/foen/hydro/dimension/measurementTime": {
+    "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+    "@value": "2026-09-27T18:10:00+01:00"
+  },
+  "https://environment.ld.admin.ch/foen/hydro/dimension/station": {
+    "@id": "https://environment.ld.admin.ch/foen/hydro/station/2026"
+  },
+  "https://environment.ld.admin.ch/foen/hydro/dimension/waterLevel": {
+    "@type": "http://www.w3.org/2001/XMLSchema#decimal",
+    "@value": "372.141"
+  }
+}

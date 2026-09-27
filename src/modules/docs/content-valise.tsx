@@ -93,6 +93,10 @@ export const VALISE_TOPIC: Topic = {
           ],
           ["Recherche de lieu (geo.admin.ch)", "Non : tapez des coordonnées"],
           ["Météo (Open-Meteo)", "Non"],
+          [
+            "Alertes officielles et cours d’eau (OFEV)",
+            "Non : les dernières données restent affichées",
+          ],
         ]}
       />
       <H>Le matériel</H>

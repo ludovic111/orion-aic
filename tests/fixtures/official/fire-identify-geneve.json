@@ -1,0 +1,23 @@
+{
+  "results": [
+    {
+      "layerBodId": "ch.bafu.gefahren-waldbrand_warnung",
+      "layerName": "Danger d'incendie de forêt",
+      "featureId": 800,
+      "id": 800,
+      "attributes": {
+        "name_de": "Kanton Genf",
+        "name_fr": "Canton de Genève",
+        "name_it": "Canton Ginevra",
+        "name_en": "Canton of Geneva",
+        "title_de": "Erhebliche Gefahr",
+        "title_fr": "Danger marqué",
+        "title_it": "Pericolo marcato",
+        "title_en": "Considerable danger",
+        "valid_from": "26.08.2026",
+        "canton": "GE",
+        "label": 800
+      }
+    }
+  ]
+}
