@@ -1,28 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  decrypt,
-  decryptWith,
-  deriveKey,
-  encryptVault,
-  type VaultKey,
-  type VaultRecord,
-} from "../../shared/crypto";
-import {
-  packWorkspace,
-  workspaceSchema,
-  type Workspace,
-} from "../../shared/journal";
+import { deriveKey, type VaultKey } from "../../shared/crypto";
+import { workspaceSchema, type Workspace } from "../../shared/journal";
 import { localNode, setLocalNode } from "../../shared/hlc";
 import { stampWorkspace } from "../../shared/sync";
-import { joinPhotoBlobs, splitPhotoBlobs } from "../../shared/photos";
 import {
   deleteVault,
   readPictureKeys,
-  readPictures,
   readVault,
-  writeVault,
   type StoredVault,
 } from "./storage";
+import { openVault, sealVault } from "./vault";
 import { t } from "./i18n.ts";
 /** The session keeps the id of this post in its stamps across reloads. */
 function withNode(value: Workspace): Workspace {
@@ -31,40 +18,6 @@ function withNode(value: Workspace): Workspace {
     return value;
   }
   return { ...value, node: localNode() };
-}
-/**
- * Write a session to the vault: compressed, encrypted, images once (see
- * packWorkspace). Photo pictures, large and never changed, are sealed apart,
- * each once: `pictures` holds the keys already in the vault and is updated.
- */
-async function sealVault(
-  value: Workspace,
-  key: VaultKey,
-  pictures: Set<string>,
-): Promise<VaultRecord> {
-  const { workspace, pictures: all } = splitPhotoBlobs(packWorkspace(value));
-  const record = await encryptVault(workspace, key);
-  const add: [string, VaultRecord][] = [];
-  for (const [k, picture] of Object.entries(all))
-    if (!pictures.has(k)) add.push([k, await encryptVault(picture, key)]);
-  const drop = [...pictures].filter((k) => all[k] === undefined);
-  await writeVault(record, add, drop);
-  pictures.clear();
-  for (const k of Object.keys(all)) pictures.add(k);
-  return record;
-}
-/** A session read from the vault, with its photo pictures put back. */
-async function openVault(data: StoredVault, password: string) {
-  const { value, vault } = await decrypt(data, password);
-  const pictures: Record<string, string> = {};
-  for (const [k, sealed] of await readPictures())
-    try {
-      const picture = await decryptWith(sealed, vault);
-      if (typeof picture === "string") pictures[k] = picture;
-    } catch {
-      // A damaged picture: its photo shows as missing, the session opens.
-    }
-  return { value: joinPhotoBlobs(value, pictures), vault, pictures };
 }
 async function acquireWriter(): Promise<() => void> {
   if (!navigator.locks)

@@ -516,6 +516,30 @@ export function repairRadio(radio: Radio): Radio {
   return radioSchema.parse({ ...radio, stations, terminals, checks });
 }
 
+/**
+ * Photos whose item is gone for good go with it: a photo added on one post
+ * to an entry, a message or a map object removed meanwhile on another
+ * would otherwise stay, shown nowhere, counted in the room of the session
+ * and carried in every archive. A photo whose item has not arrived yet
+ * (neither here nor removed) is kept.
+ */
+function livePhotos(
+  ops: Pick<Ops, "photos" | "messages" | "places">,
+  deleted: Deletion[],
+  removed: Record<string, string>,
+): Ops["photos"] {
+  const gone = new Set(deleted.map((d) => d.id));
+  const here = new Set([
+    ...ops.messages.map((m) => m.id),
+    ...ops.places.map((p) => p.id),
+  ]);
+  const kept = ops.photos.filter((p) => {
+    const [kind, id] = p.target.split(":");
+    return kind === "entry" ? !gone.has(id) : here.has(id) || !removed[id];
+  });
+  return kept.length === ops.photos.length ? ops.photos : kept;
+}
+
 /** Combine two versions of the same journal. Commutative and idempotent. */
 export function mergeJournal(mine: Journal, theirs: Journal): Journal {
   if (mine === theirs) return mine;
@@ -557,6 +581,7 @@ export function mergeJournal(mine: Journal, theirs: Journal): Journal {
     x.cellId && !members.has(x.cellId) ? { ...x, cellId: "" } : x,
   );
   const { entries, deleted } = mergeEntries(mine, theirs);
+  ops.photos = livePhotos(ops, deleted, removed);
   const compacted = later(a.compacted, b.compacted) || undefined;
   return journalSchema.parse({
     ...mine,

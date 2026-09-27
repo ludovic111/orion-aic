@@ -18,14 +18,17 @@ import { NODE, canonicalStamp, stampSchema } from "./hlc.ts";
 import { signatureBlockSchema, signingKeySchema } from "./signature.ts";
 import {
   BLOB_KEY,
+  BLOB_REF,
   DATA_IMAGE,
   IMAGE_FIELDS,
   LIVE_ONLY,
   blobKey,
   blobsOf,
   internState,
+  keyOfRef,
   resolveState,
 } from "./blobs.ts";
+import { DATA_PHOTO } from "./photo-schema.ts";
 import { formatDateTime, formatLongDate, formatTime } from "./i18n/core.ts";
 import { t } from "./i18n/journal.ts";
 
@@ -202,6 +205,20 @@ const journalObject = z
     for (const value of Object.values(journal.blobs))
       if (!DATA_IMAGE.test(value))
         ctx.addIssue({ code: "custom", message: t("Image invalide.") });
+    // The picture of a photo sent by reference passes the same checks as a
+    // photo sent inline (a JPEG), and is the one its key names (its hash):
+    // another post cannot slip in another kind of image, or another
+    // picture under the key of a photo.
+    for (const p of journal.ops.photos) {
+      if (!BLOB_REF.test(p.image)) continue;
+      const key = keyOfRef(p.image);
+      const picture = journal.blobs[key];
+      if (
+        picture !== undefined &&
+        (!DATA_PHOTO.test(picture) || blobKey(picture) !== key)
+      )
+        ctx.addIssue({ code: "custom", message: t("Image invalide.") });
+    }
   });
 type JournalData = z.infer<typeof journalObject>;
 // Parsing also brings older data up to date (see normalizeJournal()).

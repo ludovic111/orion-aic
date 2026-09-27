@@ -56,9 +56,15 @@ import {
 } from "../src/export/dossier.ts";
 import { entrySheet, sheetPhotos } from "../src/print/sheet.ts";
 
-/** A JPEG data URL of about `bytes` bytes (content is not decoded here). */
+/**
+ * A JPEG data URL of `bytes` bytes: the JPEG signature, then noise (the
+ * content is not decoded here).
+ */
 const jpeg = (bytes = 3000) =>
-  `data:image/jpeg;base64,${randomBytes(bytes).toString("base64")}`;
+  `data:image/jpeg;base64,${Buffer.concat([
+    Buffer.from([0xff, 0xd8, 0xff]),
+    randomBytes(Math.max(0, bytes - 3)),
+  ]).toString("base64")}`;
 const shot = (bytes) => ({ image: jpeg(bytes), width: 1600, height: 1200 });
 const at = (minute) =>
   new Date(Date.UTC(2026, 8, 24, 10, minute)).toISOString();

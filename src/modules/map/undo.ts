@@ -5,8 +5,10 @@
 
 import type { Ops } from "../../../shared/ops.ts";
 
-export type Tracked = "places" | "links";
-const TRACKED: Tracked[] = ["places", "links"];
+// Photos too: removing an object removes its photos in the same change, so
+// undoing the removal brings them back with it (their pictures included).
+export type Tracked = "places" | "links" | "photos";
+const TRACKED: Tracked[] = ["places", "links", "photos"];
 type Row = { id: string; updatedAt?: string; createdAt?: string };
 export type ChangeItem = {
   collection: Tracked;
@@ -117,5 +119,19 @@ export function applyChange(
       ? { ...item, before: written }
       : { ...item, after: written };
   });
+  // An object taken away by this step takes its photos with it (as
+  // removeRecords does), also the ones added since by another post.
+  const gone = new Set(
+    change.items
+      .filter(
+        (i) =>
+          i.collection === "places" &&
+          !stateOf(next, "places", i.id) &&
+          stateOf(ops, "places", i.id),
+      )
+      .map((i) => `place:${i.id}`),
+  );
+  if (gone.size && next.photos.some((p) => gone.has(p.target)))
+    next = { ...next, photos: next.photos.filter((p) => !gone.has(p.target)) };
   return { ops: next, change: { ...change, items }, applied, conflicts };
 }
