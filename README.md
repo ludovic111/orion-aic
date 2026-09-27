@@ -185,10 +185,10 @@ orion aic parle **français, allemand (Suisse) et italien (Suisse)**, pour la co
 
 ## Session et stockage
 
-| Mode                | Stockage                                            | Survit à la fermeture de l’onglet | Remarque                                         |
-| ------------------- | --------------------------------------------------- | --------------------------------- | ------------------------------------------------ |
-| Sauvegarde chiffrée | IndexedDB `orion-journal-v1`, enveloppe AES-256-GCM | Oui                               | Déverrouillage par la phrase de récupération     |
-| Temporaire          | Mémoire de l’onglet                                 | Non                               | Avertissement avant fermeture. Exporter souvent. |
+| Mode                                      | Stockage                                            | Survit à la fermeture de l’onglet | Remarque                                         |
+| ----------------------------------------- | --------------------------------------------------- | --------------------------------- | ------------------------------------------------ |
+| Sauvegarde chiffrée (puce « Enregistré ») | IndexedDB `orion-journal-v1`, enveloppe AES-256-GCM | Oui                               | Déverrouillage par la phrase de récupération     |
+| Temporaire (puce « Non enregistré »)      | Mémoire de l’onglet                                 | Non                               | Avertissement avant fermeture. Exporter souvent. |
 
 - Chaque modification est sauvegardée 250 ms après la dernière frappe, brouillon de nouvelle entrée compris.
 - Un verrou Web Locks empêche d’ouvrir la même session sauvegardée dans deux onglets.
