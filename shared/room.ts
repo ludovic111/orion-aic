@@ -218,10 +218,16 @@ const EXPIRY = 120_000;
  */
 export class Reassembler {
   private pending = new Map<string, Pending>();
+  // Messages given up (too large): their next parts are ignored, not
+  // collected again for a message that can no longer complete.
+  private refused = new Map<string, number>();
   private bytes = 0;
   private key: CryptoKey;
-  constructor(key: CryptoKey) {
+  private limit: number;
+  /** `limit`: largest total of parts waiting (tests use a small one). */
+  constructor(key: CryptoKey, limit = MAX_PENDING) {
     this.key = key;
+    this.limit = limit;
   }
 
   /** The message completed by this frame, or undefined. */
@@ -251,14 +257,16 @@ export class Reassembler {
     if (count === 1) return { from, value: await this.open(data) };
     this.expire();
     const id = `${from}:${hex(plain.slice(0, 8).buffer)}`;
+    if (this.refused.has(id)) return;
     let entry = this.pending.get(id);
     if (!entry) {
       entry = { parts: new Array(count), got: 0, at: Date.now() };
       this.pending.set(id, entry);
     }
     if (entry.parts.length !== count || entry.parts[index]) return;
-    if (this.bytes + data.length > MAX_PENDING) {
+    if (this.bytes + data.length > this.limit) {
       this.drop(id);
+      this.refused.set(id, Date.now());
       throw new Error("Message trop volumineux.");
     }
     entry.parts[index] = data;
@@ -288,11 +296,15 @@ export class Reassembler {
     const now = Date.now();
     for (const [id, entry] of this.pending)
       if (now - entry.at > EXPIRY) this.drop(id);
+    for (const [id, at] of this.refused)
+      if (now - at > EXPIRY) this.refused.delete(id);
   }
   /** Forget what a sender that left had started. */
   forget(from: string) {
     for (const id of [...this.pending.keys()])
       if (id.startsWith(`${from}:`)) this.drop(id);
+    for (const id of [...this.refused.keys()])
+      if (id.startsWith(`${from}:`)) this.refused.delete(id);
   }
 }
 

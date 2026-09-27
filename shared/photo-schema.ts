@@ -14,8 +14,12 @@ export const PHOTO_TARGETS = ["entry", "message", "place"] as const;
 export type PhotoTarget = (typeof PHOTO_TARGETS)[number];
 export const PHOTO_TARGET =
   /^(entry|message|place):[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-/** A photo as stored: a JPEG data URL (re-encoded, without metadata). */
-export const DATA_PHOTO = /^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/;
+/**
+ * A photo as stored: a JPEG data URL (re-encoded, without metadata), whose
+ * bytes start with the JPEG signature (FF D8 FF, "/9j/" in base64).
+ */
+export const DATA_PHOTO =
+  /^data:image\/jpeg;base64,\/9j\/[A-Za-z0-9+/]*={0,2}$/;
 
 // ---------- Limits ----------
 
