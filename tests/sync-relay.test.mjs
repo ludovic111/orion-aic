@@ -15,8 +15,10 @@ import {
   normalizeCode,
   roomKeys,
   sealFrames,
+  sealStream,
   validCode,
 } from "../shared/room.ts";
+import { slowPost } from "./slow-post.mjs";
 
 let server, relay, port;
 before(async () => {
@@ -166,4 +168,73 @@ test("a message larger than the relay limit is split into parts and put back tog
   await new Promise((r) => setTimeout(r, 100));
   assert.equal(c.received.length, 0);
   for (const p of [a, b, c]) p.socket.close();
+});
+
+/** Sends like useSync: parts sealed one by one, 1 MB buffered at most. */
+async function paced(socket, value, key, to) {
+  for await (const frame of sealStream(value, key, to)) {
+    while (socket.readyState === 1 && socket.bufferedAmount > 1_000_000)
+      await new Promise((r) => setTimeout(r, 4));
+    if (socket.readyState !== 1) throw new Error("sender disconnected");
+    socket.send(frame);
+  }
+}
+
+test("a phone reading slowly receives a 40 MB session from one post, then from three at once", async (t) => {
+  const code = newRoomCode();
+  const keys = await roomKeys(code);
+  const url = `ws://127.0.0.1:${port}/sync`;
+  // About 40 MB once compressed (incompressible photos).
+  const big = {
+    type: "state",
+    photos: randomBytes(40_000_000).toString("base64"),
+  };
+  const parts = new Reassembler(keys.key);
+  const done = [];
+  let unreadable = 0;
+  let queue = Promise.resolve();
+  const phone = await slowPost(url, keys.room, {
+    rate: 20_000_000,
+    onFrame: (bytes) => {
+      queue = queue.then(async () => {
+        try {
+          const message = await parts.accept(bytes);
+          if (message) done.push(message);
+        } catch {
+          unreadable++;
+        }
+      });
+    },
+  });
+  const senders = [await post(code), await post(code), await post(code)];
+  const wait = async (n) => {
+    while (done.length < n && !phone.state.closedAt)
+      await new Promise((r) => setTimeout(r, 20));
+    await queue;
+  };
+  // One post answers (this version).
+  let started = Date.now();
+  await paced(senders[0].socket, big, keys.key, phone.id());
+  await wait(1);
+  const one = Date.now() - started;
+  assert.equal(phone.state.closedAt, 0, "the phone stays connected");
+  assert.equal(done[0].from, senders[0].id());
+  assert.equal(done[0].value.photos, big.photos);
+  const bytes = phone.state.bytes;
+  // Three posts answer at once (posts of the previous version).
+  started = Date.now();
+  await Promise.all(
+    senders.map((s) => paced(s.socket, big, keys.key, phone.id())),
+  );
+  await wait(4);
+  const three = Date.now() - started;
+  assert.equal(phone.state.closedAt, 0, "the phone stays connected");
+  assert.equal(unreadable, 0);
+  assert.equal(done.length, 4);
+  assert.ok(done.every((m) => m.value.photos === big.photos));
+  t.diagnostic(
+    `${(bytes / 1e6).toFixed(1)} MB sealed: from one post in ${one} ms, from three at once in ${three} ms (phone reading at 20 MB/s), never disconnected`,
+  );
+  phone.destroy();
+  for (const s of senders) s.socket.close();
 });

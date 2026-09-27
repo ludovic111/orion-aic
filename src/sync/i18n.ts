@@ -28,6 +28,11 @@ export const { t, tn, tIn, dict } = translator({
     de: "Sitzung voll: höchstens 64 Arbeitsplätze auf dem Relais.",
     it: "Sessione completa: al massimo 64 postazioni sul relè.",
   },
+  "Un transfert volumineux a été interrompu (trop de données reçues à la fois) ; il sera relancé automatiquement.":
+    {
+      de: "Eine große Übertragung wurde unterbrochen (zu viele Daten gleichzeitig empfangen); sie wird automatisch neu gestartet.",
+      it: "Un trasferimento voluminoso è stato interrotto (troppi dati ricevuti in una volta); verrà ripreso automaticamente.",
+    },
   "Message illisible reçu : un autre poste utilise-t-il un autre code ?": {
     de: "Unlesbare Meldung empfangen: Verwendet ein anderer Arbeitsplatz einen anderen Code?",
     it: "Ricevuto un messaggio illeggibile: un’altra postazione usa un altro codice?",
