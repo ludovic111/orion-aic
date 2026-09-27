@@ -3,7 +3,8 @@ import { common } from "../../../shared/i18n/common.ts";
 
 // Map module, second dictionary: sheets and dialogs of the map objects,
 // symbols, geo.admin.ch layers, offline sectors, print to scale, files.
-// (MapModule.tsx and its panels have their own dictionary, i18n.ts.)
+// (MapModule.tsx, its parts and its panels have their own dictionary,
+// i18n.ts.)
 
 export const { t, tn, tIn, dict } = translator({
   ...common,
