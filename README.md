@@ -642,6 +642,16 @@ src/
                    choix par fonction, reprise des anciens réglages)
   modules/         Un dossier par module (situation, journal, messages, missions, map,
                    resources, team, contacts, weather, agenda, network, trace, debrief, docs)
+  modules/map/     Carte de situation. MapModule.tsx : l’état et l’assemblage des parties ;
+                   carte Leaflet et références partagées (useLeafletMap), fond et quadrillage
+                   MN95 (useBackground), objets et signes (useObjectLayer, PinBody), croquis,
+                   dessin libre et sommets (useDrawing, useShapeEditor), clavier
+                   (useMapKeyboard), annuler / rétablir (useMapHistory, undo.ts) ; ce
+                   qu’écrivent les outils (drawActions) et ce que montre la carte : cartes,
+                   fonds, calques, cadrage (viewActions) ; panneau, commandes, barre d’outils,
+                   consignes, cartes flottantes (MapPanel, MapControls, MapToolbar, ToolHint,
+                   MapCards). Pur et testé : tools.ts, places.ts, browser.ts, geo.ts,
+                   geoformats.ts, printscale.ts, tilecache.ts…
   photos/          Photos : bouton Photo (appareil, galerie, glisser, coller), réduction
                    en JPEG, vignettes, plein écran, légende, suppression
   timeline/        Barre du temps et relecture (pas à pas, ×10, ×60), fiche Historique, points figés

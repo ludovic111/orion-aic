@@ -1,8 +1,10 @@
 import { translator, type Dict } from "../../../shared/i18n/core.ts";
 import { common } from "../../../shared/i18n/common.ts";
 
-// Situation map: MapModule, MapDialog, MapTabs, MapSearch, OverlayPanel,
-// LiveLayer, panels, ProfilePanel. (The other map files: i18n-2.ts.)
+// Situation map: MapModule and its parts (tools, hooks, drawActions,
+// viewActions, MapPanel, MapControls, MapToolbar, ToolHint, MapCards,
+// PinBody), MapDialog, MapTabs, MapSearch, OverlayPanel, LiveLayer, panels,
+// ProfilePanel. (The other map files: i18n-2.ts.)
 // German: « LV95 » for MN95 (Landesvermessung 1995).
 export const { t, tn, tIn, dict } = translator({
   ...common,
