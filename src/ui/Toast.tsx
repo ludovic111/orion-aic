@@ -49,6 +49,8 @@ export function Toast({
       className="toast"
       role="status"
       aria-live="polite"
+      // A tap hides it at once: it never stays over what one reads.
+      onClick={() => done.current()}
       {...{ popover: "manual" }}
     >
       {message.tone === "info" ? <Info size={14} /> : <Check size={14} />}

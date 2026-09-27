@@ -43,37 +43,42 @@ export const PART1: Topic[] = [
             vollständige fiktive Übung, « Hochwasser der Arve », wird geladen.
           </li>
           <li>
-            <strong>Eine Sitzung erstellen.</strong> Register{" "}
-            <Ui>Neue Sitzung</Ui>: den Namen des Ereignisses (zum Beispiel «
-            Hochwasser der Arve »), Ihren Namen oder Ihre Funktion und den Modus{" "}
-            <Ui>Übung</Ui> oder <Ui>Einsatz</Ui>.
+            <strong>Einer Sitzung beitreten oder eine erstellen.</strong> Hat
+            ein anderer Arbeitsplatz die Sitzung schon geöffnet? Register{" "}
+            <Ui>Einer Sitzung beitreten</Ui> (von selbst geöffnet): seinen Code
+            eingeben oder seinen QR-Code mit der Kamera scannen. Sind Sie der
+            erste Arbeitsplatz? Register <Ui>Neue Sitzung</Ui>: den Namen des
+            Ereignisses (zum Beispiel « Hochwasser der Arve »), Ihren Namen oder
+            Ihre Funktion und den Modus <Ui>Übung</Ui> oder <Ui>Einsatz</Ui>.
           </li>
           <li>
             <strong>Ihre Daten schützen.</strong> Lassen Sie{" "}
-            <Ui>Verschlüsselte Sicherung auf diesem Arbeitsplatz</Ui> angekreuzt
-            und wählen Sie einen <em>Wiederherstellungssatz</em> mit mindestens
-            12 Zeichen. Notieren Sie ihn an einem sicheren Ort: Niemand kann ihn
-            für Sie wiederfinden.
+            <Ui>Sitzung auf diesem Gerät behalten (empfohlen)</Ui> angekreuzt
+            und denken Sie sich einen <em>Wiederherstellungssatz</em> aus: ein
+            Passwort mit mindestens 12 Zeichen, das zum Wiederöffnen der Sitzung
+            verlangt wird. Notieren Sie ihn an einem sicheren Ort: Niemand kann
+            ihn für Sie wiederfinden.
           </li>
           <li>
-            <strong>Das erste Ereignis festhalten.</strong> Schreiben Sie im{" "}
-            <Ui>Journal</Ui>, was geschieht, dann <Ui>Speichern</Ui> (oder{" "}
-            <K>⌘↵</K> / <K>Ctrl+↵</K>). Der Eintrag erhält eine Nummer: #001.
+            <strong>Das erste Ereignis festhalten.</strong> Die Seite Lage
+            öffnet sich mit der Karte <Ui>Wo anfangen?</Ui>: vier Schritte,
+            jeder mit seiner Schaltfläche. <Ui>Neuer Eintrag</Ui>, schreiben
+            Sie, was geschieht, dann <Ui>Speichern</Ui> (oder <K>⌘↵</K> /{" "}
+            <K>Ctrl+↵</K>). Der Eintrag erhält eine Nummer: #001.
           </li>
           <li>
             <strong>Die anderen Arbeitsplätze einladen</strong> (wenn Sie
-            mehrere sind).{" "}
-            <Path
-              steps={[
-                "Einstellungen",
-                "Synchronisation",
-                "Sitzungscode erstellen",
-              ]}
-            />
-            . Auf dem anderen Arbeitsplatz: <Ui>Beitreten</Ui>, dann den Code
-            eingeben. Schon arbeiten Sie zusammen.
+            mehrere sind). Tippen Sie oben auf <Ui>Nicht geteilt</Ui>, dann auf{" "}
+            <Ui>Sitzungscode erstellen</Ui>. Auf dem anderen Arbeitsplatz:{" "}
+            <Ui>Einer Sitzung beitreten</Ui>, dann den Code eingeben. Schon
+            arbeiten Sie zusammen.
           </li>
         </Steps>
+        <p>
+          Die Karte <Ui>Wo anfangen?</Ui> verschwindet mit <Ui>Verstanden</Ui>.
+          Um sie wieder zu sehen: Schaltfläche{" "}
+          <Ui>« Wo anfangen? » wieder anzeigen</Ui> oben in diesem Thema.
+        </p>
         <Example>
           <p>
             14:05, die Patrouille Alpha meldet per Funk: « Die Arve tritt am
@@ -110,10 +115,13 @@ export const PART1: Topic[] = [
               <Ui>Fortsetzen</Ui>,
               "Auf diesem Arbeitsplatz ist bereits eine verschlüsselte Sitzung gespeichert: Wiederherstellungssatz eingeben, dann Entsperren.",
             ],
-            [<Ui>Neue Sitzung</Ui>, "Ein neues Ereignis beginnt."],
             [
-              <Ui>Beitreten</Ui>,
-              "Ein anderer Arbeitsplatz hat die Sitzung bereits und hat Ihnen seinen Code (oder QR-Code) gegeben.",
+              <Ui>Einer Sitzung beitreten</Ui>,
+              "Ein anderer Arbeitsplatz hat die Sitzung bereits und hat Ihnen seinen Code (oder QR-Code) gegeben. Dieses Register ist von selbst geöffnet.",
+            ],
+            [
+              <Ui>Neue Sitzung</Ui>,
+              "Ein neues Ereignis beginnt, und Sie sind der erste Arbeitsplatz.",
             ],
             [
               <Ui>Importieren</Ui>,
@@ -178,8 +186,10 @@ export const PART1: Topic[] = [
     short: (
       <p>
         Oben die Leiste: das aktive Journal, die Suche und der Zustand des
-        Arbeitsplatzes. Links (auf dem Telefon unten) das <strong>Dock</strong>{" "}
-        mit allen Modulen. In der Mitte die Seite des gewählten Moduls.
+        Arbeitsplatzes, in Worten. Links (auf dem Telefon unten) die{" "}
+        <strong>Modulleiste</strong>, jedes Modul mit seinem Namen; die
+        selteneren liegen unter <Ui>Weitere Werkzeuge</Ui>. In der Mitte die
+        Seite des gewählten Moduls.
       </p>
     ),
     guide: (
@@ -197,34 +207,39 @@ export const PART1: Topic[] = [
             <Ui>Journal aus der Sitzung entfernen</Ui>.
           </li>
           <li>
-            <strong>Suchen oder handeln</strong> (<K>⌘K</K> / <K>Ctrl+K</K>):
-            Tippen Sie ein paar Buchstaben, um ein Element, ein Modul oder eine
-            Aktion zu finden.
+            <strong>Suchen</strong> (<K>⌘K</K> / <K>Ctrl+K</K> mit der
+            Tastatur): Tippen Sie ein paar Buchstaben, um ein Element, ein Modul
+            oder eine Aktion zu finden.
           </li>
           <li>
-            <strong>Synchronisation</strong>: <Ui>Allein</Ui>, wenn Sie allein
-            arbeiten, <Ui>3 Plätze</Ui> mit den Initialen aller, wenn Sie
-            mehrere sind, <Ui>Neu verbinden</Ui>, wenn die Verbindung
-            unterbrochen ist.
+            <strong>Teilen</strong>: <Ui>Nicht geteilt</Ui>, wenn die Sitzung
+            nur auf diesem Arbeitsplatz ist, <Ui>3 Plätze</Ui> mit den Initialen
+            aller, wenn Sie mehrere sind, <Ui>Neu verbinden</Ui>, wenn die
+            Verbindung unterbrochen ist. Ein Tippen öffnet die Synchronisation.
           </li>
           <li>
-            <strong>Sicherung</strong>: <Ui>Verschlüsselt</Ui> (grün, alles wird
-            auf dem Arbeitsplatz gespeichert) oder <Ui>Temporär</Ui> (orange,
-            geht beim Schliessen des Tabs verloren).
+            <strong>Sicherung</strong>: <Ui>Gespeichert</Ui> (alles bleibt
+            verschlüsselt auf dem Arbeitsplatz) oder <Ui>Nicht gespeichert</Ui>{" "}
+            (orange: Das Schliessen des Tabs löscht alles). Ein Tippen öffnet
+            die Sitzung, um sie zu schützen oder zu exportieren.
           </li>
           <li>
-            <strong>Schweizer Zeit</strong> und Schaltfläche{" "}
-            <strong>helles / dunkles Design</strong>.
+            <strong>Schweizer Zeit</strong>.
           </li>
           <li>
             <strong>Operateur-Menü</strong> (Ihre Initialen): Einstellungen des
-            Arbeitsplatzes, Wertelisten, Synchronisation, Sitzung, Sicherheit,
-            Installation, Quellcode, Sperren.
+            Arbeitsplatzes, Wertelisten, Synchronisation, Sitzung; helles /
+            dunkles Thema, <Ui>Zeitreise</Ui>, <Ui>Lage präsentieren</Ui>,
+            Wandanzeige; Sicherheit, Installation, Quellcode, Sperren.
           </li>
           <li>
-            <strong>Dock</strong>: ein Klick = ein Modul. Ein roter Punkt{" "}
+            <strong>Modulleiste</strong>: ein Tippen = ein Modul, mit seinem
+            Namen unter dem Symbol. Von selbst: Lage, Journal, Meldungen, Meine
+            Aufgaben, Karte, Mittel, Team (und die Module Ihrer Funktion).{" "}
+            <Ui>Weitere Werkzeuge</Ui> öffnet alle anderen, jedes mit einem
+            Satz; <Ui>Hilfe</Ui> steht unten. Ein roter Punkt{" "}
             <span className="docs-dot crit" /> zeigt überschrittene Fristen an;
-            ein violetter Punkt <span className="docs-dot accent" /> neue
+            ein dunkler Punkt <span className="docs-dot accent" /> neue
             Meldungen.
           </li>
           <li>
@@ -239,20 +254,42 @@ export const PART1: Topic[] = [
         <H>Nützliche Details</H>
         <ul>
           <li>
-            Beim Überfahren mit der Maus zeigt jedes Symbol im Dock den Namen
-            des Moduls und einen Satz, der erklärt, wozu es dient.
+            Bleibt die Maus auf einem Modul der Leiste, erscheint ein Satz, der
+            erklärt, wozu es dient (derselbe wie unter{" "}
+            <Ui>Weitere Werkzeuge</Ui>).
           </li>
           <li>
-            Module, die Sie nicht verwenden, lassen sich ausblenden:{" "}
+            Jedes Modul kann in die Leiste, unter <Ui>Weitere Werkzeuge</Ui>{" "}
+            oder ausgeblendet werden:{" "}
             <Path
               steps={[
                 "Einstellungen",
                 "Dieser Arbeitsplatz",
-                "Angezeigte Module",
+                "Module der Leiste",
               ]}
-            />
-            . Lage, Journal und Hilfe bleiben immer sichtbar. Das Ausblenden
-            eines Moduls löscht keine Daten.
+            />{" "}
+            (oder <Ui>Module der Leiste wählen</Ui> unten in « Weitere Werkzeuge
+            »). Lage, Journal und Hilfe bleiben immer sichtbar. Das Ausblenden
+            eines Moduls löscht keine Daten;{" "}
+            <Ui>Zur automatischen Wahl zurückkehren</Ui> stellt die Leiste nach
+            der Funktion des Arbeitsplatzes wieder her.
+          </li>
+          <li>
+            Ohne Namen unter den Symbolen ist die Leiste schmaler:{" "}
+            <Ui>Namen unter jedem Symbol anzeigen</Ui>, in derselben
+            Einstellung.
+          </li>
+          <li>
+            Auf der Seite Lage zeigt die einfache Ansicht das Wesentliche;{" "}
+            <Ui>Ganzes Dashboard anzeigen</Ui> fügt Lagetafeln, Checklisten,
+            Mittel, Team, Funk, Wetter und Verknüpfungen hinzu und bleibt auf
+            diesem Arbeitsplatz so.
+          </li>
+          <li>
+            Erinnerungen (Export, Druck, Lagerapport) erscheinen oben auf der
+            Seite, nie darüber: <Ui>Später</Ui>, <Ui>Erledigt</Ui> oder ihre
+            Aktion. Eine Bestätigung unten am Bildschirm schliesst sich mit
+            einem Tippen.
           </li>
           <li>
             Fällt die Internetverbindung aus, erscheint ein Hinweis{" "}
@@ -308,8 +345,8 @@ export const PART1: Topic[] = [
             ],
             [
               "Obere Leiste",
-              <span className="pill ok">Verschlüsselt</span>,
-              <span className="pill warn">Temporär</span>,
+              <span className="pill ok">Gespeichert</span>,
+              <span className="pill warn">Nicht gespeichert</span>,
             ],
           ]}
         />
@@ -423,8 +460,9 @@ export const PART1: Topic[] = [
         <H>Grenzen</H>
         <p>
           10 000 Einträge pro Journal, 500 Versionen pro Eintrag, 12 000 Zeichen
-          pro Meldung, importierte Dateien von höchstens 32 MB. Keine Anhänge
-          (Fotos, PDF): Notieren Sie deren Referenz.
+          pro Meldung, importierte Dateien von höchstens 96 MB. Fotos: 12 pro
+          Eintrag, Meldung oder Kartenobjekt, 40 MB für die ganze Sitzung.
+          Andere Anhänge (PDF, Dokumente): Notieren Sie deren Referenz.
         </p>
       </>
     ),
@@ -813,7 +851,7 @@ export const PART1: Topic[] = [
           </li>
           <li>
             <Ui>Speichern</Ui>: Die Meldung erscheint in der Spalte <Ui>Neu</Ui>
-            , und im Dock erscheint ein violetter Punkt.
+            , und in der Modulleiste erscheint ein Punkt auf <Ui>Meldungen</Ui>.
           </li>
         </Steps>
         <H>Eine Meldung bearbeiten</H>

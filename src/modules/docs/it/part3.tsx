@@ -126,7 +126,7 @@ export const PART3A: Topic[] = [
         <Steps>
           <li>
             <Path steps={["Menu operatore", "Sincronizzazione"]} />, oppure un
-            clic sull’indicatore <Ui>Da solo</Ui> in alto.
+            clic sull’indicatore <Ui>Non condivisa</Ui> in alto.
           </li>
           <li>
             <Ui>Crea un codice di sessione</Ui>. Appare un codice del tipo{" "}
@@ -140,15 +140,15 @@ export const PART3A: Topic[] = [
         <H>Sulle altre postazioni: unirsi</H>
         <Steps>
           <li>
-            Aprite <a href={SITE}>orionaic.xyz</a> → <Ui>Unisciti</Ui>. (Oppure
-            scansionate il codice QR con il telefono: il codice è già
-            compilato.)
+            Aprite <a href={SITE}>orionaic.xyz</a> →{" "}
+            <Ui>Unirsi a una sessione</Ui>. (Oppure scansionate il codice QR con
+            il telefono: il codice è già compilato.)
           </li>
           <li>Digitate il codice e il vostro nome o la vostra funzione.</li>
           <li>
-            Se volete conservare la sessione su questa postazione, spuntate{" "}
-            <Ui>Salvataggio cifrato su questa postazione</Ui> e scegliete una
-            frase.
+            Per conservare la sessione su questa postazione, lasciate spuntato{" "}
+            <Ui>Conservare la sessione su questo dispositivo (consigliato)</Ui>{" "}
+            e inventate una frase.
           </li>
           <li>
             <Ui>Unisciti alla sessione</Ui>. La sessione arriva non appena una
@@ -156,14 +156,58 @@ export const PART3A: Topic[] = [
           </li>
         </Steps>
         <p>
-          In alto, l’indicatore mostra <Ui>Da solo</Ui>, <Ui>3 postazioni</Ui>{" "}
-          (con le iniziali di ciascuno; al passaggio del mouse, chi si trova su
-          quale modulo) oppure <Ui>Riconnessione</Ui>.
+          In alto, l’indicatore mostra <Ui>Non condivisa</Ui>,{" "}
+          <Ui>3 postazioni</Ui> (con le iniziali di ciascuno; al passaggio del
+          mouse, chi si trova su quale modulo) oppure <Ui>Riconnessione</Ui>.
         </p>
         <Note kind="warn">
           Il codice è una <strong>password</strong>: apre l’intera sessione.
           Trasmettetelo a voce, su carta o tramite un canale sicuro, mai su un
           canale aperto.
+        </Note>
+        <H>Chi è collegato?</H>
+        <p>
+          <Path steps={["Impostazioni", "Sincronizzazione"]} />, elenco{" "}
+          <Ui>Postazioni collegate</Ui>: ogni postazione con il suo nome e la
+          sua funzione.
+        </p>
+        <ul>
+          <li>
+            <Ui>Online</Ui> o <Ui>Offline</Ui> (da quanto tempo). Una postazione
+            che perde la connessione passa offline in pochi secondi e sale in
+            cima all’elenco.
+          </li>
+          <li>
+            <Ui>Aggiornata</Ui>: ha tutto. <Ui>In ritardo</Ui>: le mancano
+            modifiche da più di 2 minuti; verificate il suo Wi-Fi o la sua rete.
+          </li>
+        </ul>
+        <H>Tablet persa? Postazione partita?</H>
+        <Steps>
+          <li>
+            In <Ui>Postazioni collegate</Ui>, sulla riga della postazione:{" "}
+            <Ui>Rimuovi questa postazione</Ui>. (Oppure, in fondo all’elenco,{" "}
+            <Ui>Cambia il codice di sessione</Ui>.)
+          </li>
+          <li>
+            Leggete la finestra che si apre, poi{" "}
+            <Ui>Rimuovi e cambia il codice</Ui>.
+          </li>
+          <li>
+            È tutto: le postazioni online passano da sole al nuovo codice. La
+            postazione rimossa conserva ciò che aveva già, ma non riceve più
+            nulla di nuovo.
+          </li>
+          <li>
+            Una postazione che era offline deve inserire il nuovo codice a mano:
+            viene visualizzato con il suo codice QR, come al solito.
+          </li>
+        </Steps>
+        <Note kind="info">
+          Il cambiamento è annotato nel diario. Il codice, invece, non vi viene
+          mai scritto. Ciò che un apparecchio perso aveva già non può essere
+          cancellato a distanza: proteggete le postazioni con una frase di
+          recupero.
         </Note>
       </>
     ),
@@ -219,6 +263,17 @@ export const PART3A: Topic[] = [
             Il codice evita i caratteri che si confondono (0 e O, 1 e I o L):
             meno errori di lettura.
           </li>
+          <li>
+            Quando il codice cambia, il nuovo codice è cifrato separatamente per
+            ogni postazione che resta. Né la postazione rimossa né il server
+            possono leggerlo.
+          </li>
+          <li>
+            Nome e funzione visualizzati sono quelli indicati da ogni
+            postazione: se due postazioni hanno lo stesso nome, orion aic lo
+            segnala; verificate di quale apparecchio si tratta prima di
+            rimuoverla.
+          </li>
         </ul>
         <H>Senza internet: la rete locale</H>
         <Steps>
@@ -249,8 +304,8 @@ export const PART3A: Topic[] = [
         <ul>
           <li>
             <Path steps={["Impostazioni", "Sincronizzazione"]} /> mostra lo
-            stato (Connesso, Riconnessione…), le altre postazioni e il loro
-            modulo, l’ora dell’ultimo scambio.
+            stato (Connesso, Riconnessione…), le postazioni collegate (online,
+            aggiornate), l’ora dell’ultimo scambio.
           </li>
           <li>
             <Ui>Unisciti con un codice</Ui>, da una sessione già aperta, unisce
@@ -554,8 +609,8 @@ export const PART3B: Topic[] = [
         <H>Presentare in 3 passi</H>
         <Steps>
           <li>
-            Pulsante schermo <Ui>Presentazione della situazione</Ui> in alto a
-            destra (oppure <K>⌘K</K> → « Presenta »).
+            Menu operatore (le vostre iniziali, in alto a destra) →{" "}
+            <Ui>Presentare la situazione</Ui> (oppure <K>⌘K</K> → « Presenta »).
           </li>
           <li>
             Preparate in pochi secondi: il vostro nome, il pubblico (« Sindaco,
@@ -664,9 +719,10 @@ export const PART3B: Topic[] = [
         <H>Tornare a un’ora precisa</H>
         <Steps>
           <li>
-            Fate clic sull’orologio <Ui>Macchina del tempo</Ui> in alto a destra
-            (oppure <K>⌘K</K> → « Macchina del tempo »). In basso appare una
-            barra.
+            Menu operatore (le vostre iniziali, in alto a destra) →{" "}
+            <Ui>Macchina del tempo</Ui> (oppure <K>⌘K</K> → « Macchina del tempo
+            »). In basso appare una barra; <Ui>Tornare alla diretta</Ui>, in
+            alto, riporta ad adesso.
           </li>
           <li>
             Trascinate il cursore, oppure digitate una data e un’ora. Le piccole
@@ -906,7 +962,7 @@ export const PART3B: Topic[] = [
           <li>
             File accettati: <code>.orionaic</code>, <code>.orion</code>,{" "}
             <code>.json</code>, <code>.csv</code>, <code>.tsv</code>, al massimo
-            32 MB. Il file viene letto sulla postazione, non viene inviato da
+            96 MB. Il file viene letto sulla postazione, non viene inviato da
             nessuna parte.
           </li>
           <li>

@@ -53,7 +53,18 @@ export const { t, tn, tIn, dict } = translator({
   },
   // Dock
   Modules: { de: "Module", it: "Moduli" },
-  "Plus de modules": { de: "Weitere Module", it: "Altri moduli" },
+  Plus: { de: "Mehr", it: "Altro" },
+  "Plus d’outils": { de: "Weitere Werkzeuge", it: "Altri strumenti" },
+  "Tous les autres modules": {
+    de: "Alle weiteren Module",
+    it: "Tutti gli altri moduli",
+  },
+  "Tous les modules": { de: "Alle Module", it: "Tutti i moduli" },
+  "Vos modules": { de: "Ihre Module", it: "I vostri moduli" },
+  "Choisir les modules de la barre": {
+    de: "Module der Leiste wählen",
+    it: "Scegliere i moduli della barra",
+  },
   // Install
   "Installer orion aic": {
     de: "orion aic installieren",

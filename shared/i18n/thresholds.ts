@@ -46,4 +46,28 @@ export const { t, tn, tIn, dict } = translator({
     de: "Schwellenwert überschritten",
     it: "soglia superata",
   },
+  // Discharge and water level (FOEN gauging stations)
+  "Débit mesuré": { de: "Gemessener Abfluss", it: "Portata misurata" },
+  "Niveau d’eau mesuré": {
+    de: "Gemessener Wasserstand",
+    it: "Livello dell’acqua misurato",
+  },
+  Crue: { de: "Hochwasser", it: "Piena" },
+  "Seuil du journal · mesure OFEV, station {station}": {
+    de: "Schwellenwert des Journals · Messung BAFU, Station {station}",
+    it: "Soglia del diario · misura UFAM, stazione {station}",
+  },
+  "{label} : mesuré {measured} (station {station}, {name}). Les références restent l’OFEV et les autorités.":
+    {
+      de: "{label}: gemessen {measured} (Station {station}, {name}). Massgebend bleiben das BAFU und die Behörden.",
+      it: "{label}: misurato {measured} (stazione {station}, {name}). I riferimenti restano l’UFAM e le autorità.",
+    },
+  "OFEV, station {station}": {
+    de: "BAFU, Station {station}",
+    it: "UFAM, stazione {station}",
+  },
+  "Seuil de cours d’eau franchi : {label}, mesuré {measured}.": {
+    de: "Gewässer-Schwellenwert überschritten: {label}, gemessen {measured}.",
+    it: "Soglia del corso d’acqua superata: {label}, misurato {measured}.",
+  },
 } satisfies Dict);

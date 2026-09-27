@@ -9,6 +9,7 @@ import {
   type Workspace,
 } from "../../shared/journal";
 import { EntryForm } from "../journal/EntryForm";
+import type { NewPhoto } from "../../shared/photos";
 import { EntryDetail } from "../journal/EntryDetail";
 import { JournalSetup } from "../journal/JournalSetup";
 import { Modal } from "../journal/Modal";
@@ -95,7 +96,7 @@ export function OverlayHost({
   discardDraft: () => boolean;
   onDraft: (fields: Fields) => void;
   onTyping: () => void;
-  onAdd: (fields: Fields) => boolean;
+  onAdd: (fields: Fields, photos?: NewPhoto[]) => boolean;
   onCreate: (value: Journal, author: string, password?: string) => void;
   onImport: (value: Journal, merge: boolean, author?: string) => void;
   onBackup: () => void;
@@ -326,8 +327,8 @@ export function OverlayHost({
               preset={dialog.preset ?? draft}
               onDraft={onDraft}
               suggestions={suggestions}
-              onSave={(fields) => {
-                if (onAdd(fields)) closeDialog();
+              onSave={(fields, _reason, photos) => {
+                if (onAdd(fields, photos)) closeDialog();
               }}
             />
           </div>

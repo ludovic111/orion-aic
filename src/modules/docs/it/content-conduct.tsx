@@ -344,8 +344,11 @@ export const CONDUCT_MODULE_TOPICS: Topic[] = [
           </li>
           <li>Un’allerta eliminata non viene ricreata per quel giorno.</li>
           <li>
-            Il livello dei corsi d’acqua non fa parte della previsione (Open
-            Meteo, gratuita): inserite a mano le allerte di piena.
+            <strong>Portata o livello di un corso d’acqua</strong>: scegliete la
+            grandezza, poi una delle stazioni UFAM vicine (caricate prima le
+            allerte ufficiali nella Meteo). La soglia è confrontata con la
+            misura ogni volta che questa postazione carica le allerte ufficiali;
+            finché l’acqua resta sopra, l’allerta resta in vigore.
           </li>
         </ul>
       </>
@@ -475,7 +478,8 @@ export const CONDUCT_TOGETHER_TOPICS: Topic[] = [
           <Ui>Prepara il punto della situazione</Ui> con un clic.
         </li>
         <li>
-          <Ui>Fatto</Ui> lo chiude; l’orologio lo rinvia di 15 minuti.
+          <Ui>Fatto</Ui> lo chiude; <Ui>Più tardi</Ui> lo rinvia di 15 minuti.
+          Il riquadro è in cima alla pagina: non nasconde nulla.
         </li>
       </Steps>
     ),

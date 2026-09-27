@@ -84,9 +84,10 @@ export const PART4: Topic[] = [
             <strong>Dunkles Thema</strong>: <em>Graphit</em> (Standard),{" "}
             <em>Mitternacht</em> (Nachtblau) oder <em>Taktische Nacht</em>:
             alles rot auf schwarz, Karte inbegriffen, um im Gelände das
-            Nachtsehen zu erhalten. Die Sonne-/Mond-Taste wechselt zwischen den
-            beiden; die Themen lassen sich auch über die Suche ausprobieren (
-            <kbd>⌘K</kbd>, « Thema »).
+            Nachtsehen zu erhalten. Das Operateur-Menü (<Ui>Dunkles Thema</Ui> /{" "}
+            <Ui>Helles Thema</Ui>) wechselt zwischen den beiden; die Themen
+            lassen sich auch über die Suche ausprobieren (<kbd>⌘K</kbd>, « Thema
+            »).
           </li>
           <li>
             <strong>Animationen</strong>: Alle oder Reduziert (langsamer
@@ -97,8 +98,9 @@ export const PART4: Topic[] = [
             Arbeitsplatzes, Einträge anderer Arbeitsplätze, Meldungen.
           </li>
           <li>
-            <strong>Angezeigte Module</strong>: Blenden Sie aus, was Sie nicht
-            benutzen. Die Daten bleiben unverändert.
+            <strong>Module der Leiste</strong>: für jedes Modul in der Leiste,
+            unter <Ui>Weitere Werkzeuge</Ui> oder ausgeblendet; Namen unter den
+            Symbolen oder schmale Leiste. Die Daten bleiben unverändert.
           </li>
         </ul>
         <H>Wertelisten</H>
@@ -275,14 +277,20 @@ export const PART4: Topic[] = [
         />
         <H>Was sich auf kleinen Bildschirmen ändert</H>
         <ul>
-          <li>Das Modul-Dock wandert an den unteren Bildschirmrand.</li>
+          <li>
+            Die Modulleiste wandert an den unteren Bildschirmrand: Lage,
+            Journal, Meldungen, Karte und <Ui>Mehr</Ui> für alle anderen.
+          </li>
           <li>
             Eine runde Schaltfläche <Ui>+</Ui> unten rechts öffnet einen neuen
             Eintrag.
           </li>
           <li>
-            Die Schaltflächen sind grösser, die Eingabe erfolgt in einem eigenen
-            Fenster.
+            Die Schaltflächen sind grösser (mindestens 44 px), die Eingabe
+            erfolgt in einem eigenen Fenster.
+          </li>
+          <li>
+            Auf der Startseite kommt das Formular zuerst, dann die Demo-Übung.
           </li>
         </ul>
       </>
@@ -466,8 +474,9 @@ export const PART4: Topic[] = [
           Versionen. Für den ganzen Einsatz: Modul <Ui>Nachvollziehbarkeit</Ui>.
         </Faq>
         <Faq q="Kann man die Lage so ansehen, wie sie um 10 Uhr war?">
-          Ja: die Uhr <Ui>Zeitreise</Ui> oben rechts, dann 10:00 wählen. Alle
-          Module zeigen den Stand dieses Zeitpunkts, das Wetter inbegriffen.
+          Ja: Operateur-Menü (Ihre Initialen, oben rechts) → <Ui>Zeitreise</Ui>,
+          dann 10:00 wählen. Alle Module zeigen den Stand dieses Zeitpunkts, das
+          Wetter inbegriffen.
         </Faq>
         <Faq q="Wie schlage ich eine Verbesserung vor?">
           Schreiben Sie an <a href={feedbackLink("FAQ")}>{CONTACT_EMAIL}</a>{" "}
@@ -502,8 +511,9 @@ export const PART4: Topic[] = [
               "Sitzungscode erstellen",
             ]}
           />
-          , dann auf den anderen Arbeitsplätzen: <Ui>Beitreten</Ui> und der
-          Code. Siehe « Synchronisation zwischen Arbeitsplätzen ».
+          , dann auf den anderen Arbeitsplätzen:{" "}
+          <Ui>Einer Sitzung beitreten</Ui> und der Code. Siehe « Synchronisation
+          zwischen Arbeitsplätzen ».
         </Faq>
         <Faq q="Funktioniert es ohne Internet?">
           Ja, nach einem ersten Laden. Die Synchronisation braucht Internet oder
@@ -541,13 +551,15 @@ export const PART4: Topic[] = [
           übermitteln Sie den Satz auf einem anderen Weg. Der andere
           Arbeitsplatz importiert es.
         </Faq>
-        <Faq q="Ich finde ein Modul im Dock nicht mehr.">
-          Es ist vielleicht ausgeblendet:{" "}
+        <Faq q="Ich finde ein Modul in der Leiste nicht mehr.">
+          Schauen Sie unter <Ui>Weitere Werkzeuge</Ui> (<Ui>Mehr</Ui> auf dem
+          Telefon): Dort liegen die selteneren Module. Ist es auch dort nicht,
+          ist es ausgeblendet:{" "}
           <Path
             steps={[
               "Einstellungen",
               "Dieser Arbeitsplatz",
-              "Angezeigte Module",
+              "Module der Leiste",
             ]}
           />
           .
@@ -566,17 +578,24 @@ export const PART4: Topic[] = [
           Nachrichten. Er speichert nichts.
         </Faq>
         <Faq q="Der Sitzungscode ist bekannt geworden. Was tun?">
-          Auf jedem Arbeitsplatz <Ui>Auf diesem Arbeitsplatz stoppen</Ui>. Dann
-          erstellt ein Arbeitsplatz einen neuen Code, und die anderen treten ihm
-          bei.
+          <Path steps={["Einstellungen", "Synchronisation"]} /> →{" "}
+          <Ui>Sitzungscode ändern</Ui>. Die Arbeitsplätze, die online sind,
+          wechseln von selbst zum neuen Code; geben Sie ihn den Arbeitsplätzen,
+          die offline sind, von Hand weiter.
+        </Faq>
+        <Faq q="Ein Tablet ist verloren gegangen. Was tun?">
+          In <Ui>Verbundene Arbeitsplätze</Ui>, auf seiner Zeile,{" "}
+          <Ui>Diesen Arbeitsplatz entfernen</Ui>. Es behält, was es schon hatte,
+          erhält aber nichts Neues mehr.
         </Faq>
         <Faq q="Kann man über Bluetooth synchronisieren?">
           Nein, die Browser erlauben das für diesen Zweck nicht. Ohne Internet
           verwenden Sie das lokale Netzwerk.
         </Faq>
-        <Faq q="Was bedeuten die Punkte auf dem Dock?">
-          Rot: Fristen sind überschritten. Violett: neue Meldungen warten auf
-          Bearbeitung.
+        <Faq q="Was bedeuten die Punkte auf der Modulleiste?">
+          Rot: Fristen sind überschritten. Dunkel: neue Meldungen warten auf
+          Bearbeitung. Ein Punkt auf <Ui>Weitere Werkzeuge</Ui>: Ein dort
+          abgelegtes Modul braucht Aufmerksamkeit.
         </Faq>
         <Faq q="Welchen Browser soll ich verwenden?">
           Einen aktuellen Browser: Chrome, Edge, Firefox oder Safari. Die Seite
@@ -587,8 +606,10 @@ export const PART4: Topic[] = [
           Verwenden Sie echte Daten nur mit der Erlaubnis Ihrer Organisation.
         </Faq>
         <Faq q="Kann ich einem Eintrag ein Foto anhängen?">
-          Nein, orion aic speichert keine Dateianhänge. Notieren Sie die
-          Referenz des Fotos oder Dokuments.
+          Ja: Öffnen Sie den Eintrag und tippen Sie auf <Ui>Foto</Ui> (auch in
+          einem neuen Eintrag, einer Meldung oder einem Kartenobjekt). Siehe «
+          Fotos ». Für ein PDF oder ein anderes Dokument notieren Sie die
+          Referenz.
         </Faq>
       </div>
     ),
@@ -652,7 +673,8 @@ export const PART4: Topic[] = [
         </Gloss>
         <Gloss term="Modul">
           Ein Teil von orion aic: Journal, Karte, Funk … Jedes hat sein Symbol
-          im Dock.
+          und seinen Namen in der Modulleiste oder unter{" "}
+          <Ui>Weitere Werkzeuge</Ui>.
         </Gloss>
         <Gloss term="Polycom">
           Das Schweizer Funknetz der Sicherheitsorganisationen.

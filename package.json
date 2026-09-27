@@ -1,6 +1,6 @@
 {
   "name": "orion-aic",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-only",
@@ -13,10 +13,11 @@
     "build": "vite build && node scripts/service-worker.mjs",
     "start": "node server/index.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 4311",
-    "check": "tsc --noEmit",
+    "check": "tsc --noEmit && tsc --noEmit -p e2e",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
-    "format": "prettier --write src shared server scripts tests docs *.json *.md index.html vite.config.ts .github/workflows",
-    "format:check": "prettier --check src shared server scripts tests docs *.json *.md index.html vite.config.ts .github/workflows",
+    "e2e": "playwright test -c e2e/playwright.config.ts",
+    "format": "prettier --write src shared server scripts tests e2e docs *.json *.md index.html vite.config.ts .github/workflows",
+    "format:check": "prettier --check src shared server scripts tests e2e docs *.json *.md index.html vite.config.ts .github/workflows",
     "lan": "npm run build && node server/lan.mjs",
     "lan:serve": "node server/lan.mjs"
   },
@@ -35,6 +36,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/d3-force": "^3.0.10",
     "@types/leaflet": "^1.9.22",
     "@types/node": "^24.0.0",

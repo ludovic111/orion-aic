@@ -1,0 +1,441 @@
+/*
+ * Simple shell: the dock with the names of the modules, a top bar in plain
+ * words, reminders in the page, the landing form first on phones and touch
+ * targets of 44 px. Loaded last (src/main.tsx): it refines theme.css and
+ * atelier.css without touching the tokens (see docs/DESIGN.md, « Coque »).
+ */
+
+/* ---------- Dock with names ---------- */
+@media (min-width: 901px) {
+  .app[data-dock="labels"] {
+    grid-template-columns: 104px minmax(0, 1fr);
+  }
+  .dock[data-labels="on"] .dock-rail {
+    width: 88px;
+    gap: 2px;
+    padding: 8px 6px;
+  }
+  .dock[data-labels="on"] .dock-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 76px;
+    height: auto;
+    min-height: 56px;
+    padding: 8px 2px 7px;
+    margin: 0;
+    transform: none;
+  }
+  .dock[data-labels="on"] .dock-item .badge {
+    top: 3px;
+    right: 12px;
+  }
+  .dock[data-labels="on"] .dock-item .badge.dot {
+    top: 7px;
+    right: 20px;
+  }
+  .dock[data-labels="on"] .dock-sep {
+    width: 44px;
+  }
+}
+.dock-label {
+  display: block;
+  max-width: 100%;
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+.dock-item:not([aria-current="page"]) .dock-label {
+  color: var(--text-2);
+}
+.dock-item:hover .dock-label {
+  color: var(--text);
+}
+/* A module opened from « Plus d'outils »: shown where the user is. */
+.dock-visiting {
+  outline: 1px dashed var(--line-2);
+  outline-offset: -1px;
+}
+
+/* « Plus d'outils » (computer, tablet): a panel at the right of the dock. */
+.dock-panel {
+  width: min(380px, calc(100vw - 16px));
+  max-width: min(380px, calc(100vw - 16px));
+  max-height: calc(100vh - 16px);
+  padding: 8px 8px 10px;
+}
+.dock-more-group + .dock-more-group {
+  margin-top: 6px;
+}
+@media (min-width: 1100px) {
+  .dock-panel {
+    width: 640px;
+    max-width: calc(100vw - 130px);
+  }
+  .dock-panel > div {
+    column-count: 2;
+    column-gap: 8px;
+  }
+  .dock-panel .menu-label {
+    column-span: all;
+  }
+  .dock-panel .dock-more-group {
+    break-inside: avoid;
+  }
+  .dock-panel .dock-more-group + .dock-more-group {
+    margin-top: 0;
+    padding-top: 6px;
+  }
+}
+.dock-more-heading {
+  margin: 0;
+  padding: 8px 10px 4px;
+  color: var(--text-3);
+  font-size: 12px;
+  font-weight: 500;
+}
+.menu .dock-panel-item {
+  position: relative;
+  align-items: flex-start;
+  min-height: 48px;
+  padding: 8px 10px;
+}
+.menu .dock-panel-item > svg {
+  margin-top: 2px;
+  color: var(--text-2);
+}
+.menu .dock-panel-item span {
+  display: block;
+  font-weight: 500;
+}
+.menu .dock-panel-item small {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-2);
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.35;
+  white-space: normal;
+}
+.menu .dock-panel-item[aria-current="page"] {
+  background: var(--bg-2);
+}
+.menu .dock-panel-item .badge {
+  position: static;
+  margin-left: auto;
+  padding: 0 6px;
+  border-radius: 9px;
+  background: var(--crit);
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+}
+.menu .dock-panel-item .badge.accent {
+  background: var(--text);
+  color: var(--solid);
+}
+.dock-choose {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 10px 0;
+  color: var(--text-2);
+  font-size: 13px;
+}
+.menu .dock-choose {
+  width: auto;
+  min-height: 36px;
+}
+.dock-more-list .dock-more-group + .dock-more-group {
+  margin-top: 14px;
+}
+.dock-more-list .dock-more-grid {
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+}
+.dock-more-list .dock-more-item {
+  min-height: 64px;
+}
+.dock-more-list .dock-more-heading {
+  padding: 0 0 8px;
+}
+
+/* ---------- Phone: bottom bar with names ---------- */
+@media (max-width: 900px) {
+  .dock .dock-rail {
+    align-items: stretch;
+    max-width: 480px;
+    padding: 4px;
+  }
+  .dock .dock-item {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    max-width: none;
+    height: auto;
+    min-height: 52px;
+    padding: 6px 2px 5px;
+  }
+  .dock .dock-label {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dock .dock-item .badge {
+    top: 2px;
+    right: calc(50% - 22px);
+  }
+  .dock .dock-item .badge.dot {
+    top: 6px;
+    right: calc(50% - 16px);
+  }
+  .dock .dock-sep {
+    display: none;
+  }
+}
+
+/* ---------- Landing: the form first on narrow screens ---------- */
+.landing-main {
+  grid-template-areas:
+    "hero start"
+    "demo start";
+  grid-template-rows: auto auto;
+  row-gap: 0;
+}
+.landing-main > .hero {
+  grid-area: hero;
+  align-self: end;
+}
+.landing-main > .start {
+  grid-area: start;
+}
+.landing-main > .landing-demo {
+  grid-area: demo;
+  align-self: start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+.landing-demo small {
+  color: var(--text-2);
+  font-size: 13px;
+}
+.start .tabs button {
+  height: auto;
+  min-height: 40px;
+  padding: 6px 8px;
+  line-height: 1.2;
+  white-space: normal;
+}
+.start-lead {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.start-switch {
+  margin: 2px 0 0;
+  color: var(--text-2);
+  font-size: 13.5px;
+  text-align: center;
+}
+.recovery-help {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+@media (max-width: 1100px) {
+  .landing-main {
+    grid-template-columns: minmax(0, 580px);
+    grid-template-areas:
+      "start"
+      "demo"
+      "hero";
+    justify-content: center;
+    row-gap: 28px;
+  }
+  .landing-main > .hero {
+    align-self: start;
+  }
+  .landing-main > .landing-demo {
+    margin-top: 0;
+  }
+  .landing .hero h1 {
+    font-size: clamp(32px, 7vw, 44px);
+  }
+}
+
+/* ---------- Top bar in plain words ---------- */
+.bar .operator {
+  gap: 6px;
+  padding: 0 8px 0 4px;
+}
+.bar .operator > svg {
+  color: var(--text-3);
+  flex: none;
+}
+.bar .past-exit {
+  height: 36px;
+  padding: 0 12px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  white-space: nowrap;
+}
+.bar .past-exit:hover {
+  background: var(--accent-2, var(--accent));
+}
+/* Between the phone and a wide screen, the search keeps its word. */
+@media (min-width: 901px) and (max-width: 1180px) {
+  .bar .command-trigger {
+    width: auto;
+    padding: 0 12px;
+    gap: 6px;
+  }
+  .bar .command-trigger > span {
+    display: inline;
+  }
+  .bar .command-trigger span.wide,
+  .bar .command-trigger kbd {
+    display: none;
+  }
+}
+/* No keyboard shortcut shown on a touch screen. */
+@media (hover: none) {
+  .bar .command-trigger kbd,
+  .bar .command-trigger span.wide {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .bar .save-warn {
+    padding: 0 10px;
+    font-size: 0;
+    gap: 0;
+  }
+  .bar .save-warn .dot {
+    width: 9px;
+    height: 9px;
+  }
+  .bar .past-exit {
+    padding: 0 10px;
+    font-size: 13px;
+  }
+}
+
+/* ---------- Settings: modules of the dock ---------- */
+.dock-settings {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line);
+}
+.dock-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+.dock-settings-row > svg {
+  flex: none;
+  color: var(--text-2);
+}
+.dock-settings-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+}
+.dock-settings-name small {
+  display: block;
+  color: var(--text-2);
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+.dock-settings-row select {
+  flex: none;
+  width: auto;
+  min-width: 150px;
+}
+@media (max-width: 600px) {
+  .dock-settings-name small {
+    display: none;
+  }
+  .dock-settings-row select {
+    min-width: 0;
+    max-width: 48%;
+  }
+}
+
+/* Phone: the landing bar fits the screen (no sideways scrolling). */
+@media (max-width: 600px) {
+  .landing-bar {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .landing-version {
+    display: none;
+  }
+  .landing-bar .lang-switch {
+    margin-left: auto;
+  }
+  .landing-bar .push {
+    order: 5;
+    margin-left: 0;
+  }
+}
+
+/* Phone: the journal keeps its room in the top bar. */
+@media (max-width: 600px) {
+  .bar .save-warn,
+  .bar .operator > svg {
+    display: none;
+  }
+}
+
+/* ---------- Touch screens: targets of 44 px at least ---------- */
+@media (pointer: coarse) {
+  button:not(.link):not(.link-chip):not(.pill):not(.dock-item),
+  select,
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  .menu a.menu-link {
+    min-height: 44px;
+  }
+  .icon-button,
+  button.icon-button {
+    min-width: 44px;
+  }
+  .link-chip {
+    min-height: 36px;
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 22px;
+    height: 22px;
+  }
+  .journal-switch,
+  .command-trigger,
+  .operator,
+  .status-chip {
+    height: 44px;
+  }
+  .command-trigger {
+    min-width: 44px;
+  }
+  /* The label of a check box is part of its target. */
+  .check-label {
+    min-height: 44px;
+    align-items: center;
+  }
+}

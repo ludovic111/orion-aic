@@ -1,12 +1,12 @@
 import { sha256 } from "./hash.ts";
 
-// Content-addressed store of the images of a journal (custom map symbols,
-// up to 600 KB each). An image is kept once in journal.blobs, under the
-// SHA-256 of its data URL, whatever the number of versions of the symbol
-// that show it. History states and stored or transmitted symbols refer to
-// it as "blob:<sha256>"; in memory, live symbols carry the data URL itself
-// (the same string as in the store, not a copy), so the modules display
-// them directly.
+// Content-addressed store of the images of a journal (custom map symbols
+// and photos, up to 600 KB each). An image is kept once in journal.blobs,
+// under the SHA-256 of its data URL, whatever the number of versions of the
+// record that show it. History states and stored or transmitted records
+// refer to it as "blob:<sha256>"; in memory, live records carry the data
+// URL itself (the same string as in the store, not a copy), so the modules
+// display them directly.
 
 export const DATA_IMAGE =
   /^data:image\/(png|svg\+xml|jpeg|webp);base64,[A-Za-z0-9+/=]+$/;
@@ -16,12 +16,19 @@ export const BLOB_KEY = /^[0-9a-f]{64}$/;
 /** Fields holding an image, by history scope. */
 export const IMAGE_FIELDS: Record<string, string[]> = {
   "ops.symbols": ["image"],
+  "ops.photos": ["image"],
 };
+/**
+ * Scopes whose images live only as long as a live record shows them: the
+ * picture of a removed photo is dropped, its history keeps the reference
+ * (and who, when, what it illustrated), not the picture.
+ */
+export const LIVE_ONLY = new Set(["ops.photos"]);
 
 export type Blobs = Record<string, string>;
 export const blobKey = (dataUrl: string) => sha256(dataUrl);
 export const refOf = (dataUrl: string) => `blob:${blobKey(dataUrl)}`;
-const keyOfRef = (ref: string) => ref.slice(5);
+export const keyOfRef = (ref: string) => ref.slice(5);
 
 /** A record state with its inline images replaced by references. */
 export function internState(

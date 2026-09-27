@@ -1,0 +1,102 @@
+{
+  "crs": { "type": "name", "properties": { "name": "EPSG:2056" } },
+  "mapname": "ch.bafu.hydroweb-messstationen_gefahren",
+  "map_long_name": "Niveaux de danger de crues",
+  "map_short_name": "Niveaux de danger de crues",
+  "map_abstract": "tbd",
+  "creation_time": "27.09.2026 19:21",
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "geometry": { "coordinates": [2661390, 1230220], "type": "Point" },
+      "id": "2416",
+      "properties": {
+        "name": "Aabach - Hitzkirch, Richensee (2416)",
+        "station_symbol": 2,
+        "quant-class": 1,
+        "symbol_design": 1.2,
+        "w-typ": "Cours d'eau",
+        "description": "<table><tbody><tr><td class='text-nowrap'><strong>Nom station</strong></td><td>Aabach - Hitzkirch, Richensee</td></tr><tr><td class='text-nowrap'><strong>numéro de la station</strong></td><td>2416</td></tr><tr><td class='text-nowrap'><strong>type d'eau</strong></td><td>Cours d'eau</td></tr><tr><td class='text-nowrap'><strong>Propriétaire </strong></td><td>BAFU</td></tr><tr><td class='text-nowrap'><strong>Lien</strong></td><td><a target=\"_blank\" href=\"https://www.hydrodaten.admin.ch/de/2416.html\">Informations sur cette station</a></td></tr></table></tbody>"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": { "coordinates": [2501220, 1115120], "type": "Point" },
+      "id": "2170",
+      "properties": {
+        "name": "Arve - Genève, Bout du Monde (2170)",
+        "station_symbol": 2,
+        "quant-class": 1,
+        "symbol_design": 1.2,
+        "w-typ": "Cours d'eau",
+        "description": "<table><tbody><tr><td class='text-nowrap'><strong>Nom station</strong></td><td>Arve - Genève, Bout du Monde</td></tr><tr><td class='text-nowrap'><strong>numéro de la station</strong></td><td>2170</td></tr><tr><td class='text-nowrap'><strong>type d'eau</strong></td><td>Cours d'eau</td></tr><tr><td class='text-nowrap'><strong>Propriétaire </strong></td><td>BAFU</td></tr><tr><td class='text-nowrap'><strong>Lien</strong></td><td><a target=\"_blank\" href=\"https://www.hydrodaten.admin.ch/de/2170.html\">Informations sur cette station</a></td></tr></table></tbody>"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": { "coordinates": [2524940, 1148410], "type": "Point" },
+      "id": "2027",
+      "properties": {
+        "name": "Lac Léman - St-Prex (2027)",
+        "station_symbol": 1,
+        "quant-class": 1,
+        "symbol_design": 1.1,
+        "w-typ": "Lac",
+        "description": "<table><tbody><tr><td class='text-nowrap'><strong>Nom station</strong></td><td>Lac Léman - St-Prex</td></tr><tr><td class='text-nowrap'><strong>numéro de la station</strong></td><td>2027</td></tr><tr><td class='text-nowrap'><strong>type d'eau</strong></td><td>Lac</td></tr><tr><td class='text-nowrap'><strong>Propriétaire </strong></td><td>BAFU</td></tr><tr><td class='text-nowrap'><strong>Lien</strong></td><td><a target=\"_blank\" href=\"https://www.hydrodaten.admin.ch/de/2027.html\">Informations sur cette station</a></td></tr></table></tbody>"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": { "coordinates": [2486600, 1112340], "type": "Point" },
+      "id": "2174",
+      "properties": {
+        "name": "Rhône - Chancy, Aux Ripes (2174)",
+        "station_symbol": 2,
+        "quant-class": 1,
+        "symbol_design": 1.2,
+        "w-typ": "Cours d'eau",
+        "description": "<table><tbody><tr><td class='text-nowrap'><strong>Nom station</strong></td><td>Rhône - Chancy, Aux Ripes</td></tr><tr><td class='text-nowrap'><strong>numéro de la station</strong></td><td>2174</td></tr><tr><td class='text-nowrap'><strong>type d'eau</strong></td><td>Cours d'eau</td></tr><tr><td class='text-nowrap'><strong>Propriétaire </strong></td><td>BAFU</td></tr><tr><td class='text-nowrap'><strong>Lien</strong></td><td><a target=\"_blank\" href=\"https://www.hydrodaten.admin.ch/de/2174.html\">Informations sur cette station</a></td></tr></table></tbody>"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": { "coordinates": [2499890, 1117850], "type": "Point" },
+      "id": "2606",
+      "properties": {
+        "name": "Rhône - Genève, Halle de l'Île (2606)",
+        "station_symbol": 2,
+        "quant-class": 1,
+        "symbol_design": 1.2,
+        "w-typ": "Cours d'eau",
+        "description": "<table><tbody><tr><td class='text-nowrap'><strong>Nom station</strong></td><td>Rhône - Genève, Halle de l'Île</td></tr><tr><td class='text-nowrap'><strong>numéro de la station</strong></td><td>2606</td></tr><tr><td class='text-nowrap'><strong>type d'eau</strong></td><td>Cours d'eau</td></tr><tr><td class='text-nowrap'><strong>Propriétaire </strong></td><td>BAFU</td></tr><tr><td class='text-nowrap'><strong>Lien</strong></td><td><a target=\"_blank\" href=\"https://www.hydrodaten.admin.ch/de/2606.html\">Informations sur cette station</a></td></tr></table></tbody>"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": { "coordinates": [2557660, 1133280], "type": "Point" },
+      "id": "2009",
+      "properties": {
+        "name": "Rhône - Porte du Scex (2009)",
+        "station_symbol": 2,
+        "quant-class": 1,
+        "symbol_design": 1.2,
+        "w-typ": "Cours d'eau",
+        "description": "<table><tbody><tr><td class='text-nowrap'><strong>Nom station</strong></td><td>Rhône - Porte du Scex</td></tr><tr><td class='text-nowrap'><strong>numéro de la station</strong></td><td>2009</td></tr><tr><td class='text-nowrap'><strong>type d'eau</strong></td><td>Cours d'eau</td></tr><tr><td class='text-nowrap'><strong>Propriétaire </strong></td><td>BAFU</td></tr><tr><td class='text-nowrap'><strong>Lien</strong></td><td><a target=\"_blank\" href=\"https://www.hydrodaten.admin.ch/de/2009.html\">Informations sur cette station</a></td></tr></table></tbody>"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": { "coordinates": [2629130, 1140910], "type": "Point" },
+      "id": "2269",
+      "properties": {
+        "name": "Lonza - Blatten (2269)",
+        "station_symbol": 2,
+        "quant-class": 0,
+        "symbol_design": 0.2,
+        "w-typ": "Cours d'eau",
+        "description": "<table><tbody><tr><td class='text-nowrap'><strong>Nom station</strong></td><td>Lonza - Blatten</td></tr><tr><td class='text-nowrap'><strong>numéro de la station</strong></td><td>2269</td></tr><tr><td class='text-nowrap'><strong>type d'eau</strong></td><td>Cours d'eau</td></tr><tr><td class='text-nowrap'><strong>Propriétaire </strong></td><td>BAFU</td></tr><tr><td class='text-nowrap'><strong>Lien</strong></td><td><a target=\"_blank\" href=\"https://www.hydrodaten.admin.ch/de/2269.html\">Informations sur cette station</a></td></tr></table></tbody>"
+      },
+      "type": "Feature"
+    }
+  ]
+}

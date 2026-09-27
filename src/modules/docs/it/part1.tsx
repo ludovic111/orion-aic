@@ -41,35 +41,42 @@ export const PART1: Topic[] = [
             carica un esercizio fittizio completo, «Piena dell’Arve».
           </li>
           <li>
-            <strong>Create una sessione.</strong> Scheda <Ui>Nuova sessione</Ui>
-            : il nome dell’evento (ad esempio «Piena dell’Arve»), il vostro nome
-            o la vostra funzione, e la modalità <Ui>Esercizio</Ui> o{" "}
+            <strong>Unitevi a una sessione o createne una.</strong>
+            Un’altra postazione ha già aperto la sessione? Scheda{" "}
+            <Ui>Unirsi a una sessione</Ui> (aperta da sola): il suo codice,
+            oppure scansionate il suo codice QR con la fotocamera. Siete la
+            prima postazione? Scheda <Ui>Nuova sessione</Ui>: il nome
+            dell’evento (ad esempio «Piena dell’Arve»), il vostro nome o la
+            vostra funzione, e la modalità <Ui>Esercizio</Ui> o{" "}
             <Ui>Intervento</Ui>.
           </li>
           <li>
             <strong>Proteggete i vostri dati.</strong> Lasciate selezionato{" "}
-            <Ui>Salvataggio cifrato su questa postazione</Ui> e scegliete una{" "}
-            <em>frase di recupero</em> di almeno 12 caratteri. Scrivetela in un
+            <Ui>Conservare la sessione su questo dispositivo (consigliato)</Ui>{" "}
+            e inventate una <em>frase di recupero</em>: una password di almeno
+            12 caratteri, chiesta per riaprire la sessione. Scrivetela in un
             luogo sicuro: nessuno potrà ritrovarla al posto vostro.
           </li>
           <li>
-            <strong>Annotate il primo evento.</strong> Nel <Ui>Diario</Ui>,
-            scrivete ciò che accade, poi <Ui>Salva</Ui> (oppure <K>⌘↵</K> /{" "}
-            <K>Ctrl+↵</K>). La voce riceve un numero: #001.
+            <strong>Annotate il primo evento.</strong> La pagina Situazione si
+            apre con la scheda <Ui>Da dove cominciare?</Ui>: quattro passi,
+            ciascuno con il suo pulsante. <Ui>Nuova voce</Ui>, scrivete ciò che
+            accade, poi <Ui>Salva</Ui> (oppure <K>⌘↵</K> / <K>Ctrl+↵</K>). La
+            voce riceve un numero: #001.
           </li>
           <li>
-            <strong>Invitate le altre postazioni</strong> (se siete in più).{" "}
-            <Path
-              steps={[
-                "Impostazioni",
-                "Sincronizzazione",
-                "Crea un codice di sessione",
-              ]}
-            />
-            . Sull’altra postazione: <Ui>Unisciti</Ui>, poi il codice. Ecco,
-            lavorate insieme.
+            <strong>Invitate le altre postazioni</strong> (se siete in più).
+            Toccate <Ui>Non condivisa</Ui> in alto, poi{" "}
+            <Ui>Crea un codice di sessione</Ui>. Sull’altra postazione:{" "}
+            <Ui>Unirsi a una sessione</Ui>, poi il codice. Ecco, lavorate
+            insieme.
           </li>
         </Steps>
+        <p>
+          La scheda <Ui>Da dove cominciare?</Ui> scompare con <Ui>Ho capito</Ui>
+          . Per rivederla: pulsante <Ui>Rivedere « Da dove cominciare? »</Ui> in
+          cima a questo argomento.
+        </p>
         <Example>
           <p>
             Ore 14:05, la Pattuglia Alpha annuncia via radio: «L’Arve straripa
@@ -106,10 +113,13 @@ export const PART1: Topic[] = [
               <Ui>Riprendi</Ui>,
               "Una sessione cifrata è già salvata su questa postazione: digitate la frase di recupero, poi Sblocca.",
             ],
-            [<Ui>Nuova sessione</Ui>, "Inizia un nuovo evento."],
             [
-              <Ui>Unisciti</Ui>,
-              "Un’altra postazione ha già la sessione e vi ha dato il suo codice (o il suo codice QR).",
+              <Ui>Unirsi a una sessione</Ui>,
+              "Un’altra postazione ha già la sessione e vi ha dato il suo codice (o il suo codice QR). Questa scheda è aperta da sola.",
+            ],
+            [
+              <Ui>Nuova sessione</Ui>,
+              "Inizia un nuovo evento e siete la prima postazione.",
             ],
             [
               <Ui>Importa</Ui>,
@@ -173,8 +183,10 @@ export const PART1: Topic[] = [
     short: (
       <p>
         In alto, la barra: il diario attivo, la ricerca e lo stato della
-        postazione. A sinistra (in basso sul telefono), il <strong>dock</strong>{" "}
-        con tutti i moduli. Al centro, la pagina del modulo scelto.
+        postazione, in parole. A sinistra (in basso sul telefono), la{" "}
+        <strong>barra dei moduli</strong>, ognuno con il suo nome; i meno
+        frequenti sono sotto <Ui>Altri strumenti</Ui>. Al centro, la pagina del
+        modulo scelto.
       </p>
     ),
     guide: (
@@ -192,34 +204,40 @@ export const PART1: Topic[] = [
             <Ui>Rimuovi questo diario dalla sessione</Ui>.
           </li>
           <li>
-            <strong>Cerca o agisci</strong> (<K>⌘K</K> / <K>Ctrl+K</K>):
+            <strong>Cerca</strong> (<K>⌘K</K> / <K>Ctrl+K</K> con la tastiera):
             digitate qualche lettera per trovare un elemento, un modulo o
             un’azione.
           </li>
           <li>
-            <strong>Sincronizzazione</strong>: <Ui>Da solo</Ui> quando lavorate
-            da soli, <Ui>3 postazioni</Ui> con le iniziali di ciascuno quando
-            siete in più, <Ui>Riconnessione</Ui> se il collegamento è
-            interrotto.
+            <strong>Condivisione</strong>: <Ui>Non condivisa</Ui> quando la
+            sessione è solo su questa postazione, <Ui>3 postazioni</Ui> con le
+            iniziali di ciascuno quando siete in più, <Ui>Riconnessione</Ui> se
+            il collegamento è interrotto. Un tocco apre la sincronizzazione.
           </li>
           <li>
-            <strong>Salvataggio</strong>: <Ui>Cifrato</Ui> (verde, tutto è
-            conservato sulla postazione) o <Ui>Temporaneo</Ui> (arancione, perso
-            alla chiusura della scheda).
+            <strong>Salvataggio</strong>: <Ui>Salvato</Ui> (tutto è conservato,
+            cifrato, sulla postazione) o <Ui>Non salvato</Ui> (arancione:
+            chiudere la scheda cancella tutto). Un tocco apre la sessione, per
+            proteggerla o esportarla.
           </li>
           <li>
-            <strong>Ora svizzera</strong> e pulsante{" "}
-            <strong>tema chiaro / scuro</strong>.
+            <strong>Ora svizzera</strong>.
           </li>
           <li>
             <strong>Menu operatore</strong> (le vostre iniziali): impostazioni
             della postazione, elenchi di riferimento, sincronizzazione,
-            sessione, sicurezza, installazione, codice sorgente, blocco.
+            sessione; tema chiaro / scuro, <Ui>Macchina del tempo</Ui>,{" "}
+            <Ui>Presentare la situazione</Ui>, schermo murale; sicurezza,
+            installazione, codice sorgente, blocco.
           </li>
           <li>
-            <strong>Dock</strong>: un clic = un modulo. Un pallino{" "}
+            <strong>Barra dei moduli</strong>: un tocco = un modulo, con il suo
+            nome sotto l’icona. Di base: Situazione, Diario, Messaggi, I miei
+            compiti, Carta, Mezzi, Squadra (e i moduli della vostra funzione).{" "}
+            <Ui>Altri strumenti</Ui> apre tutti gli altri, ognuno con una frase;{" "}
+            <Ui>Aiuto</Ui> è in basso. Un pallino{" "}
             <span className="docs-dot crit" /> rosso segnala scadenze superate;
-            un pallino <span className="docs-dot accent" /> viola, nuovi
+            un pallino <span className="docs-dot accent" /> scuro, nuovi
             messaggi.
           </li>
           <li>
@@ -233,20 +251,41 @@ export const PART1: Topic[] = [
         <H>Dettagli utili</H>
         <ul>
           <li>
-            Al passaggio del mouse, ogni icona del dock mostra il nome del
-            modulo e una frase che spiega a cosa serve.
+            Tenendo il mouse su un modulo della barra, compare una frase che
+            spiega a cosa serve (la stessa di <Ui>Altri strumenti</Ui>).
           </li>
           <li>
-            I moduli che non usate possono essere nascosti:{" "}
+            Ogni modulo può stare nella barra, sotto <Ui>Altri strumenti</Ui> o
+            essere nascosto:{" "}
             <Path
               steps={[
                 "Impostazioni",
                 "Questa postazione",
-                "Moduli visualizzati",
+                "Moduli della barra",
               ]}
-            />
-            . Situazione, Diario e Aiuto restano sempre visibili. Nascondere un
-            modulo non elimina alcun dato.
+            />{" "}
+            (oppure <Ui>Scegliere i moduli della barra</Ui> in fondo ad « Altri
+            strumenti »). Situazione, Diario e Aiuto restano sempre visibili.
+            Nascondere un modulo non elimina alcun dato;{" "}
+            <Ui>Tornare alla scelta automatica</Ui> ripristina la barra secondo
+            la funzione della postazione.
+          </li>
+          <li>
+            Senza i nomi sotto le icone, la barra è più stretta:{" "}
+            <Ui>Mostrare il nome sotto ogni icona</Ui>, nella stessa
+            impostazione.
+          </li>
+          <li>
+            Nella pagina Situazione, la vista semplice mostra l’essenziale;{" "}
+            <Ui>Mostrare tutto il cruscotto</Ui> aggiunge tabelle, liste di
+            controllo, mezzi, squadra, radio, meteo e collegamenti, e resta così
+            su questa postazione.
+          </li>
+          <li>
+            I promemoria (esportazione, stampa, punto della situazione)
+            compaiono in cima alla pagina, mai sopra: <Ui>Più tardi</Ui>,{" "}
+            <Ui>Fatto</Ui> o la loro azione. Una conferma in fondo allo schermo
+            si chiude con un tocco.
           </li>
           <li>
             Se la connessione internet cade, compare l’indicatore{" "}
@@ -297,8 +336,8 @@ export const PART1: Topic[] = [
             ["Per tornare", "Frase di recupero", "Importare un file esportato"],
             [
               "Barra in alto",
-              <span className="pill ok">Cifrato</span>,
-              <span className="pill warn">Temporaneo</span>,
+              <span className="pill ok">Salvato</span>,
+              <span className="pill warn">Non salvato</span>,
             ],
           ]}
         />
@@ -414,8 +453,9 @@ export const PART1: Topic[] = [
         <H>Limiti</H>
         <p>
           10 000 voci per diario, 500 versioni per voce, 12 000 caratteri per
-          messaggio, file importati di 32 MB al massimo. Niente allegati (foto,
-          PDF): annotatene il riferimento.
+          messaggio, file importati di 96 MB al massimo. Foto: 12 per voce,
+          messaggio od oggetto della carta, 40 MB per tutta la sessione. Gli
+          altri allegati (PDF, documenti): annotatene il riferimento.
         </p>
       </>
     ),
@@ -800,7 +840,7 @@ export const PART1: Topic[] = [
           </li>
           <li>
             <Ui>Salva</Ui>: il messaggio arriva nella colonna <Ui>Nuovo</Ui>, e
-            un pallino viola compare sul dock.
+            un pallino compare su <Ui>Messaggi</Ui>, nella barra dei moduli.
           </li>
         </Steps>
         <H>Trattare un messaggio</H>

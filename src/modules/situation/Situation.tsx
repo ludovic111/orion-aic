@@ -69,9 +69,11 @@ import {
   weatherLabel,
   weatherTone,
 } from "../weather/forecast";
+import { OfficialChips } from "../weather/Official";
 import "../weather/weather.css";
 import "./situation.css";
 import { FollowCards } from "./FollowCards";
+import { StartCard } from "./StartCard";
 import { SituationPointDialog } from "./SituationPoint";
 import { t, tn } from "./i18n.ts";
 
@@ -171,8 +173,21 @@ function elapsed(ms: number) {
 }
 
 export function Situation() {
-  const { journal, now, readOnly, compose, open, focus, setFocus, toast } =
-    useApp();
+  const {
+    journal,
+    now,
+    readOnly,
+    compose,
+    open,
+    focus,
+    setFocus,
+    toast,
+    prefs,
+    setPrefs,
+  } = useApp();
+  // The essential cards by default; the whole dashboard one tap away,
+  // remembered on this post.
+  const full = prefs.situationFull;
   const [fact, setFact] = useState<FactDraft | null>(null);
   const [board, setBoard] = useState<BoardDraft | null>(null);
   const [pointOpen, setPointOpen] = useState(false);
@@ -199,6 +214,20 @@ export function Situation() {
 
   const markChanged = (f: Fact, previous: string) =>
     setChanged((c) => (f.id in c ? c : { ...c, [f.id]: previous }));
+  const facts = (
+    <Facts
+      onEdit={setFact}
+      changed={changed}
+      onChanged={markChanged}
+      onLogged={(id) =>
+        setChanged((c) => {
+          const next = { ...c };
+          delete next[id];
+          return next;
+        })
+      }
+    />
+  );
 
   return (
     <>
@@ -228,31 +257,56 @@ export function Situation() {
           </>
         }
       />
-      <div className="bento stagger situation">
+      <div className={`bento stagger situation ${full ? "full" : "simple"}`}>
+        {!prefs.startDone && (
+          <StartCard onDone={() => setPrefs({ startDone: true })} />
+        )}
         <Pulse />
-        <Facts
-          onEdit={setFact}
-          changed={changed}
-          onChanged={markChanged}
-          onLogged={(id) =>
-            setChanged((c) => {
-              const next = { ...c };
-              delete next[id];
-              return next;
-            })
-          }
-        />
-        <OpenPoints />
-        <Boards onEdit={setBoard} />
-        <NextMeetings />
-        <FollowCards />
+        {full ? (
+          <>
+            {facts}
+            <OpenPoints />
+            <Boards onEdit={setBoard} />
+            <NextMeetings />
+            <FollowCards />
+          </>
+        ) : (
+          <>
+            {/* Simple view: the next meetings under the key facts, beside
+                the open points. */}
+            <div className="w-8 situation-stack">
+              {facts}
+              <NextMeetings />
+            </div>
+            <OpenPoints />
+          </>
+        )}
         <LatestMessages />
         <LatestEntries />
-        <ResourcesCard />
-        <TeamCard />
-        <RadioCard />
-        <WeatherCard />
-        <NetworkCard />
+        {full && (
+          <>
+            <ResourcesCard />
+            <TeamCard />
+            <RadioCard />
+            <WeatherCard />
+            <NetworkCard />
+          </>
+        )}
+      </div>
+      <div className="situation-toggle">
+        <button onClick={() => setPrefs({ situationFull: !full })}>
+          <LayoutList size={14} />
+          {full
+            ? t("Revenir à la vue simple")
+            : t("Afficher tout le tableau de bord")}
+        </button>
+        {!full && (
+          <small>
+            {t(
+              "Tableaux, listes de contrôle, moyens, équipe, radio, météo et liens.",
+            )}
+          </small>
+        )}
       </div>
       {fact && (
         <RecordSheet
@@ -1433,6 +1487,10 @@ function WeatherCard() {
         )}
         <GoButton to="weather" label={t("Météo")} />
       </div>
+      <OfficialChips
+        place={journal.ops.settings.weatherPlace}
+        onOpen={() => go("weather")}
+      />
       {!cached && !alerts.length && !lastObs ? (
         <Empty
           actions={

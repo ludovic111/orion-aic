@@ -20,10 +20,6 @@ const weather = {
   MétéoSuisse: { de: "MeteoSchweiz", it: "MeteoSvizzera" },
   "meilleur modèle": { de: "bestes Modell", it: "miglior modello" },
   "exemple fictif": { de: "fiktives Beispiel", it: "esempio fittizio" },
-  "https://www.meteosuisse.admin.ch": {
-    de: "https://www.meteoschweiz.admin.ch",
-    it: "https://www.meteosvizzera.admin.ch",
-  },
   // WMO weather codes
   "Ciel clair": { de: "Klarer Himmel", it: "Cielo sereno" },
   "Plutôt ensoleillé": {
@@ -197,10 +193,10 @@ const weather = {
     de: "Alle 30 Min. aktualisieren",
     it: "Aggiorna ogni 30 min",
   },
-  "Pour obtenir la prévision, les coordonnées du lieu sont envoyées à open-meteo.com (rien d’autre). Sans actualisation, aucune donnée ne quitte ce poste.":
+  "« Actualiser » envoie les coordonnées du lieu à open-meteo.com et à geo.admin.ch, et les numéros des stations proches à admin.ch (rien d’autre). Sans actualisation, aucune donnée ne quitte ce poste.":
     {
-      de: "Für die Prognose werden die Koordinaten des Ortes an open-meteo.com gesendet (sonst nichts). Ohne Aktualisierung verlassen keine Daten diesen Arbeitsplatz.",
-      it: "Per ottenere la previsione, le coordinate del luogo sono inviate a open-meteo.com (nient’altro). Senza aggiornamento, nessun dato lascia questa postazione.",
+      de: "« Aktualisieren » sendet die Koordinaten des Ortes an open-meteo.com und geo.admin.ch sowie die Nummern der nahen Stationen an admin.ch (sonst nichts). Ohne Aktualisierung verlassen keine Daten diesen Arbeitsplatz.",
+      it: "« Aggiorna » invia le coordinate del luogo a open-meteo.com e a geo.admin.ch, e i numeri delle stazioni vicine a admin.ch (nient’altro). Senza aggiornamento, nessun dato lascia questa postazione.",
     },
   "Aucun lieu météo défini pour ce journal.": {
     de: "Für dieses Journal ist kein Wetterort festgelegt.",
@@ -452,10 +448,10 @@ const weather = {
     it: "{n} allerte create.",
   },
   "Évaluer maintenant": { de: "Jetzt auswerten", it: "Valuta ora" },
-  "À chaque prévision reçue, un seuil franchi crée une alerte (une par jour et par seuil, même si plusieurs postes la voient) et, si demandé, une entrée à traiter. Le niveau des cours d’eau n’est pas dans la prévision : saisissez les alertes crue à la main.":
+  "À chaque prévision reçue, un seuil franchi crée une alerte (une par jour et par seuil, même si plusieurs postes la voient) et, si demandé, une entrée à traiter. Un seuil de débit ou de niveau d’eau est comparé à la mesure de la station OFEV choisie, chaque fois que ce poste charge les alertes officielles.":
     {
-      de: "Bei jeder erhaltenen Prognose erstellt eine überschrittene Schwelle eine Warnung (eine pro Tag und Schwelle, auch wenn mehrere Arbeitsplätze sie sehen) und auf Wunsch einen zu bearbeitenden Eintrag. Der Pegel der Gewässer ist nicht in der Prognose: Erfassen Sie Hochwasserwarnungen von Hand.",
-      it: "A ogni previsione ricevuta, una soglia superata crea un’allerta (una al giorno e per soglia, anche se più postazioni la vedono) e, se richiesto, una voce da trattare. Il livello dei corsi d’acqua non è nella previsione: registrate a mano le allerte di piena.",
+      de: "Bei jeder erhaltenen Prognose erstellt eine überschrittene Schwelle eine Warnung (eine pro Tag und Schwelle, auch wenn mehrere Arbeitsplätze sie sehen) und auf Wunsch einen zu bearbeitenden Eintrag. Eine Abfluss- oder Pegelschwelle wird mit der Messung der gewählten BAFU-Station verglichen, jedes Mal wenn dieser Arbeitsplatz die offiziellen Warnungen lädt.",
+      it: "A ogni previsione ricevuta, una soglia superata crea un’allerta (una al giorno e per soglia, anche se più postazioni la vedono) e, se richiesto, una voce da trattare. Una soglia di portata o di livello dell’acqua è confrontata con la misura della stazione UFAM scelta, ogni volta che questa postazione carica le allerte ufficiali.",
     },
   "degré {level}": { de: "Stufe {level}", it: "grado {level}" },
   "entrée à traiter": {
@@ -485,6 +481,215 @@ const weather = {
   },
   "Seuil météo": { de: "Wetterschwelle", it: "Soglia meteo" },
   "Nouveau seuil": { de: "Neue Schwelle", it: "Nuova soglia" },
+  // Official.tsx, official.ts, Thresholds.tsx: official warnings and water levels
+  "Hors ligne : les dernières données officielles restent affichées.": {
+    de: "Offline: Die letzten offiziellen Daten bleiben angezeigt.",
+    it: "Offline: gli ultimi dati ufficiali restano visualizzati.",
+  },
+  "Les services officiels ne répondent pas pour le moment. Les dernières données restent affichées ; réessayez plus tard.":
+    {
+      de: "Die offiziellen Dienste antworten im Moment nicht. Die letzten Daten bleiben angezeigt; versuchen Sie es später wieder.",
+      it: "I servizi ufficiali al momento non rispondono. Gli ultimi dati restano visualizzati; riprovate più tardi.",
+    },
+  "Une partie des données officielles n’a pas pu être chargée : les dernières reçues restent affichées.":
+    {
+      de: "Ein Teil der offiziellen Daten konnte nicht geladen werden: Die zuletzt erhaltenen bleiben angezeigt.",
+      it: "Una parte dei dati ufficiali non ha potuto essere caricata: gli ultimi ricevuti restano visualizzati.",
+    },
+  "Seuil de cours d’eau franchi : alerte créée dans Météo.": {
+    de: "Gewässer-Schwelle überschritten: Warnung im Wetter erstellt.",
+    it: "Soglia del corso d’acqua superata: allerta creata nella Meteo.",
+  },
+  "{n} seuils de cours d’eau franchis : alertes créées dans Météo.": {
+    de: "{n} Gewässer-Schwellen überschritten: Warnungen im Wetter erstellt.",
+    it: "{n} soglie dei corsi d’acqua superate: allerte create nella Meteo.",
+  },
+  "à l’instant": { de: "gerade eben", it: "adesso" },
+  "il y a {n} min": { de: "vor {n} Min.", it: "{n} min fa" },
+  "il y a {h} h {m} min": {
+    de: "vor {h} Std. {m} Min.",
+    it: "{h} h {m} min fa",
+  },
+  "il y a {h} h": { de: "vor {h} Std.", it: "{h} h fa" },
+  "il y a {n} jours": { de: "vor {n} Tagen", it: "{n} giorni fa" },
+  "Pas de degré publié": {
+    de: "Keine Gefahrenstufe veröffentlicht",
+    it: "Nessun grado pubblicato",
+  },
+  "Crues (région)": { de: "Hochwasser (Region)", it: "Piene (regione)" },
+  "Crues (lac)": { de: "Hochwasser (See)", it: "Piene (lago)" },
+  "Crues (cours d’eau)": {
+    de: "Hochwasser (Fliessgewässer)",
+    it: "Piene (corso d’acqua)",
+  },
+  Degré: { de: "Stufe", it: "Grado" },
+  "en hausse ({change} en {minutes} min)": {
+    de: "steigend ({change} in {minutes} Min.)",
+    it: "in aumento ({change} in {minutes} min)",
+  },
+  "en baisse ({change} en {minutes} min)": {
+    de: "sinkend ({change} in {minutes} Min.)",
+    it: "in calo ({change} in {minutes} min)",
+  },
+  "stable (depuis {minutes} min)": {
+    de: "gleichbleibend (seit {minutes} Min.)",
+    it: "stabile (da {minutes} min)",
+  },
+  "Alertes officielles et cours d’eau": {
+    de: "Offizielle Warnungen und Gewässer",
+    it: "Allerte ufficiali e corsi d’acqua",
+  },
+  "Dernière mise à jour {ago}": {
+    de: "Letzte Aktualisierung {ago}",
+    it: "Ultimo aggiornamento {ago}",
+  },
+  "Pas encore chargé": { de: "Noch nicht geladen", it: "Non ancora caricato" },
+  "Données anciennes : actualisez avant de décider.": {
+    de: "Alte Daten: Vor einem Entscheid aktualisieren.",
+    it: "Dati vecchi: aggiornate prima di decidere.",
+  },
+  "Données actuelles, pas celles de l’heure affichée.": {
+    de: "Aktuelle Daten, nicht jene der angezeigten Uhrzeit.",
+    it: "Dati attuali, non quelli dell’ora visualizzata.",
+  },
+  "Degrés de danger officiels (crues, incendies de forêt) et niveau des cours d’eau les plus proches, publiés par l’OFEV et les cantons. Chargés uniquement quand vous le demandez.":
+    {
+      de: "Offizielle Gefahrenstufen (Hochwasser, Waldbrand) und Pegel der nächsten Gewässer, veröffentlicht vom BAFU und den Kantonen. Nur auf Ihren Wunsch geladen.",
+      it: "Gradi di pericolo ufficiali (piene, incendi boschivi) e livello dei corsi d’acqua più vicini, pubblicati dall’UFAM e dai Cantoni. Caricati solo quando lo chiedete.",
+    },
+  "Charger les alertes officielles": {
+    de: "Offizielle Warnungen laden",
+    it: "Carica le allerte ufficiali",
+  },
+  "Aucun degré de danger officiel publié pour ce lieu.": {
+    de: "Für diesen Ort ist keine offizielle Gefahrenstufe veröffentlicht.",
+    it: "Nessun grado di pericolo ufficiale pubblicato per questo luogo.",
+  },
+  "Carte des crues : pas de réponse, les dernières données reçues sont gardées.":
+    {
+      de: "Hochwasserkarte: keine Antwort, die zuletzt erhaltenen Daten bleiben.",
+      it: "Carta delle piene: nessuna risposta, gli ultimi dati ricevuti sono mantenuti.",
+    },
+  "Danger d’incendie : pas de réponse, les dernières données reçues sont gardées.":
+    {
+      de: "Waldbrandgefahr: keine Antwort, die zuletzt erhaltenen Daten bleiben.",
+      it: "Pericolo d’incendio: nessuna risposta, gli ultimi dati ricevuti sono mantenuti.",
+    },
+  "Cours d’eau les plus proches": {
+    de: "Nächste Gewässer",
+    it: "Corsi d’acqua più vicini",
+  },
+  "Stations de mesure : pas de réponse pour le moment. Réessayez plus tard.": {
+    de: "Messstationen: im Moment keine Antwort. Versuchen Sie es später wieder.",
+    it: "Stazioni di misura: al momento nessuna risposta. Riprovate più tardi.",
+  },
+  "Aucune station de mesure fédérale à moins de 25 km de ce lieu.": {
+    de: "Keine eidgenössische Messstation im Umkreis von 25 km um diesen Ort.",
+    it: "Nessuna stazione di misura federale a meno di 25 km da questo luogo.",
+  },
+  "Alertes météo de MétéoSuisse": {
+    de: "Wetterwarnungen von MeteoSchweiz",
+    it: "Allerte meteo di MeteoSvizzera",
+  },
+  "Orages, pluie, vent, neige, chaleur, gel : MétéoSuisse ne les publie pas encore en données ouvertes. Consultez-les sur le site officiel.":
+    {
+      de: "Gewitter, Regen, Wind, Schnee, Hitze, Frost: MeteoSchweiz veröffentlicht sie noch nicht als offene Daten. Sehen Sie sie auf der offiziellen Website nach.",
+      it: "Temporali, pioggia, vento, neve, calore, gelo: MeteoSvizzera non le pubblica ancora come dati aperti. Consultatele sul sito ufficiale.",
+    },
+  "Alertes MétéoSuisse": {
+    de: "Warnungen MeteoSchweiz",
+    it: "Allerte MeteoSvizzera",
+  },
+  "Portail des dangers naturels": {
+    de: "Naturgefahrenportal",
+    it: "Portale dei pericoli naturali",
+  },
+  "Ce sont les degrés officiels de l’OFEV et des cantons, repris tels quels ; MétéoSuisse et l’OFEV restent la référence. Pour les charger, les coordonnées du lieu partent vers geo.admin.ch et les numéros des stations vers admin.ch (LINDAS), rien d’autre.":
+    {
+      de: "Es sind die offiziellen Stufen des BAFU und der Kantone, unverändert übernommen; massgebend bleiben MeteoSchweiz und das BAFU. Zum Laden gehen die Koordinaten des Ortes an geo.admin.ch und die Nummern der Stationen an admin.ch (LINDAS), sonst nichts.",
+      it: "Sono i gradi ufficiali dell’UFAM e dei Cantoni, ripresi tali e quali; il riferimento restano MeteoSvizzera e l’UFAM. Per caricarli, le coordinate del luogo vanno a geo.admin.ch e i numeri delle stazioni a admin.ch (LINDAS), nient’altro.",
+    },
+  "en vigueur depuis le {date}": {
+    de: "gültig seit {date}",
+    it: "in vigore dal {date}",
+  },
+  "publié le {date}": {
+    de: "veröffentlicht am {date}",
+    it: "pubblicato il {date}",
+  },
+  "cantons et OFEV": { de: "Kantone und BAFU", it: "Cantoni e UFAM" },
+  OFEV: { de: "BAFU", it: "UFAM" },
+  "{km} km": { de: "{km} km", it: "{km} km" },
+  "Débit {value} m³/s": {
+    de: "Abfluss {value} m³/s",
+    it: "Portata {value} m³/s",
+  },
+  "Niveau {value} m": {
+    de: "Pegel {value} m ü. M.",
+    it: "Livello {value} m s.l.m.",
+  },
+  "Pas de mesure reçue": {
+    de: "Keine Messung erhalten",
+    it: "Nessuna misura ricevuta",
+  },
+  "mesuré à {time} ({ago})": {
+    de: "gemessen um {time} ({ago})",
+    it: "misurato alle {time} ({ago})",
+  },
+  "station {id}": { de: "Station {id}", it: "stazione {id}" },
+  "Mesure ancienne : vérifiez sur la page de l’OFEV.": {
+    de: "Alte Messung: Prüfen Sie auf der Seite des BAFU.",
+    it: "Misura vecchia: verificate sulla pagina dell’UFAM.",
+  },
+  "Page officielle de la station {id}": {
+    de: "Offizielle Seite der Station {id}",
+    it: "Pagina ufficiale della stazione {id}",
+  },
+  "Cours d’eau · {name}": {
+    de: "Gewässer · {name}",
+    it: "Corso d’acqua · {name}",
+  },
+  "officiel, {ago}": { de: "offiziell, {ago}", it: "ufficiale, {ago}" },
+  "Débit mesuré d’un cours d’eau": {
+    de: "Gemessener Abfluss eines Gewässers",
+    it: "Portata misurata di un corso d’acqua",
+  },
+  "Niveau d’eau mesuré, en altitude": {
+    de: "Gemessener Wasserstand, als Höhe",
+    it: "Livello dell’acqua misurato, in altitudine",
+  },
+  "station à choisir": { de: "Station wählen", it: "stazione da scegliere" },
+  "Station de mesure (OFEV)": {
+    de: "Messstation (BAFU)",
+    it: "Stazione di misura (UFAM)",
+  },
+  "Les stations les plus proches du lieu météo, chargées avec les alertes officielles.":
+    {
+      de: "Die nächsten Stationen des Wetterorts, mit den offiziellen Warnungen geladen.",
+      it: "Le stazioni più vicine al luogo meteo, caricate con le allerte ufficiali.",
+    },
+  "Choisir une station…": {
+    de: "Station wählen …",
+    it: "Scegliere una stazione…",
+  },
+  "Numéro de la station OFEV": {
+    de: "Nummer der BAFU-Station",
+    it: "Numero della stazione UFAM",
+  },
+  "ex. 2170": { de: "z. B. 2170", it: "es. 2170" },
+  "Chargez d’abord les alertes officielles (Météo) pour choisir parmi les stations proches.":
+    {
+      de: "Laden Sie zuerst die offiziellen Warnungen (Wetter), um unter den nahen Stationen zu wählen.",
+      it: "Caricate prima le allerte ufficiali (Meteo) per scegliere tra le stazioni vicine.",
+    },
+  "dernière mesure {value} {unit} à {time}": {
+    de: "letzte Messung {value} {unit} um {time}",
+    it: "ultima misura {value} {unit} alle {time}",
+  },
+  "pas encore de mesure sur ce poste": {
+    de: "noch keine Messung auf diesem Arbeitsplatz",
+    it: "ancora nessuna misura su questa postazione",
+  },
 } satisfies Dict;
 
 export const { t, tn, tIn, dict } = translator(weather);

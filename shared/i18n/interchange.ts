@@ -39,9 +39,9 @@ export const { t, tn, tIn, dict } = translator({
   Motif: { de: "Grund", it: "Motivo" },
 
   // Reading a CSV file
-  "Fichier trop volumineux (32 Mo maximum).": {
-    de: "Datei zu gross (höchstens 32 MB).",
-    it: "File troppo grande (massimo 32 MB).",
+  "Fichier trop volumineux (96 Mo maximum).": {
+    de: "Datei zu gross (höchstens 96 MB).",
+    it: "File troppo grande (massimo 96 MB).",
   },
   "Trop de colonnes.": { de: "Zu viele Spalten.", it: "Troppe colonne." },
   "10 000 entrées maximum par import.": {

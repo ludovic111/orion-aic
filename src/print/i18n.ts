@@ -244,6 +244,10 @@ export const { t, tn, tIn, dict } = translator({
   },
   "Édité le {stamp}": { de: "Erstellt am {stamp}", it: "Emesso il {stamp}" },
   "{label} (suite)": { de: "{label} (Fortsetzung)", it: "{label} (seguito)" },
+  "{label} {number} · photos": {
+    de: "{label} {number} · Fotos",
+    it: "{label} {number} · foto",
+  },
   "{label} {number} · suite": {
     de: "{label} {number} · Fortsetzung",
     it: "{label} {number} · seguito",

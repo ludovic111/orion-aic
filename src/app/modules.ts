@@ -314,7 +314,7 @@ export const MODULES: ModuleInfo[] = [
       return t("Débriefing et exercice");
     },
     get short() {
-      return t("RETEX");
+      return t("Débriefing");
     },
     icon: ClipboardCheck,
     hue: 12,
@@ -342,6 +342,14 @@ export const MODULES: ModuleInfo[] = [
     },
   },
 ];
+/** Headings of the groups in « Plus d’outils » (by ModuleInfo.group). */
+export const groupLabel = (group: ModuleInfo["group"]) =>
+  [
+    t("Conduite"),
+    t("Moyens et liaisons"),
+    t("Contacts, météo, agenda"),
+    t("Suivi et analyse"),
+  ][group];
 export const moduleInfo = (id: string) =>
   MODULES.find((m) => m.id === id) ?? MODULES[0];
 export const MODULE_IDS = MODULES.map((m) => m.id);

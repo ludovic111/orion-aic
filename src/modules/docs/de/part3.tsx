@@ -130,7 +130,7 @@ export const PART3A: Topic[] = [
         <Steps>
           <li>
             <Path steps={["Operateur-Menü", "Synchronisation"]} />, oder ein
-            Klick auf die Anzeige <Ui>Allein</Ui> oben.
+            Klick auf die Anzeige <Ui>Nicht geteilt</Ui> oben.
           </li>
           <li>
             <Ui>Sitzungscode erstellen</Ui>. Ein Code wird angezeigt, etwa{" "}
@@ -144,16 +144,15 @@ export const PART3A: Topic[] = [
         <H>Auf den anderen Arbeitsplätzen: beitreten</H>
         <Steps>
           <li>
-            Öffnen Sie <a href={SITE}>orionaic.xyz</a> → <Ui>Beitreten</Ui>.
-            (Oder scannen Sie den QR-Code mit dem Telefon: Der Code ist bereits
-            ausgefüllt.)
+            Öffnen Sie <a href={SITE}>orionaic.xyz</a> →{" "}
+            <Ui>Einer Sitzung beitreten</Ui>. (Oder scannen Sie den QR-Code mit
+            dem Telefon: Der Code ist bereits ausgefüllt.)
           </li>
           <li>Geben Sie den Code und Ihren Namen oder Ihre Funktion ein.</li>
           <li>
-            Wenn Sie die Sitzung auf diesem Arbeitsplatz behalten möchten,
-            aktivieren Sie{" "}
-            <Ui>Verschlüsselte Sicherung auf diesem Arbeitsplatz</Ui> und wählen
-            Sie eine Passphrase.
+            Um die Sitzung auf diesem Arbeitsplatz zu behalten, lassen Sie{" "}
+            <Ui>Sitzung auf diesem Gerät behalten (empfohlen)</Ui> angekreuzt
+            und denken Sie sich einen Wiederherstellungssatz aus.
           </li>
           <li>
             <Ui>Sitzung beitreten</Ui>. Die Sitzung trifft ein, sobald ein
@@ -161,14 +160,58 @@ export const PART3A: Topic[] = [
           </li>
         </Steps>
         <p>
-          Oben zeigt die Anzeige <Ui>Allein</Ui>, <Ui>3 Plätze</Ui> (mit den
-          Initialen aller; beim Darüberfahren, wer in welchem Modul ist) oder{" "}
-          <Ui>Neu verbinden</Ui>.
+          Oben zeigt die Anzeige <Ui>Nicht geteilt</Ui>, <Ui>3 Plätze</Ui> (mit
+          den Initialen aller; beim Darüberfahren, wer in welchem Modul ist)
+          oder <Ui>Neu verbinden</Ui>.
         </p>
         <Note kind="warn">
           Der Code ist ein <strong>Passwort</strong>: Er öffnet die ganze
           Sitzung. Übermitteln Sie ihn mündlich, auf Papier oder über einen
           sicheren Kanal, nie über einen offenen Kanal.
+        </Note>
+        <H>Wer ist verbunden?</H>
+        <p>
+          <Path steps={["Einstellungen", "Synchronisation"]} />, Liste{" "}
+          <Ui>Verbundene Arbeitsplätze</Ui>: jeder Arbeitsplatz mit Namen und
+          Funktion.
+        </p>
+        <ul>
+          <li>
+            <Ui>Online</Ui> oder <Ui>Offline</Ui> (seit wann). Ein Arbeitsplatz,
+            der die Verbindung verliert, wird innert weniger Sekunden offline
+            angezeigt und steht zuoberst in der Liste.
+          </li>
+          <li>
+            <Ui>Aktuell</Ui>: Er hat alles. <Ui>Im Rückstand</Ui>: Ihm fehlen
+            seit über 2 Minuten Änderungen; prüfen Sie sein WLAN oder Netz.
+          </li>
+        </ul>
+        <H>Tablet verloren? Arbeitsplatz gegangen?</H>
+        <Steps>
+          <li>
+            In <Ui>Verbundene Arbeitsplätze</Ui>, auf der Zeile des
+            Arbeitsplatzes: <Ui>Diesen Arbeitsplatz entfernen</Ui>. (Oder unten
+            in der Liste <Ui>Sitzungscode ändern</Ui>.)
+          </li>
+          <li>
+            Lesen Sie das Fenster, das sich öffnet, dann{" "}
+            <Ui>Entfernen und Code ändern</Ui>.
+          </li>
+          <li>
+            Das ist alles: Die Arbeitsplätze, die online sind, wechseln von
+            selbst zum neuen Code. Der entfernte Arbeitsplatz behält, was er
+            schon hatte, erhält aber nichts Neues mehr.
+          </li>
+          <li>
+            Ein Arbeitsplatz, der offline war, muss den neuen Code von Hand
+            eingeben: Er wird wie gewohnt mit seinem QR-Code angezeigt.
+          </li>
+        </Steps>
+        <Note kind="info">
+          Die Änderung wird im Journal vermerkt. Der Code selbst wird nie
+          hineingeschrieben. Was ein verlorenes Gerät schon hatte, kann nicht
+          aus der Ferne gelöscht werden: Schützen Sie die Arbeitsplätze mit
+          einer Passphrase.
         </Note>
       </>
     ),
@@ -224,6 +267,16 @@ export const PART3A: Topic[] = [
             Der Code vermeidet verwechselbare Zeichen (0 und O, 1 und I oder L):
             weniger Lesefehler.
           </li>
+          <li>
+            Wenn sich der Code ändert, wird der neue Code für jeden
+            verbleibenden Arbeitsplatz einzeln verschlüsselt. Weder der
+            entfernte Arbeitsplatz noch der Server können ihn lesen.
+          </li>
+          <li>
+            Name und Funktion sind die Angaben jedes Arbeitsplatzes: Tragen zwei
+            Arbeitsplätze denselben Namen, weist orion aic darauf hin; prüfen
+            Sie vor dem Entfernen, um welches Gerät es sich handelt.
+          </li>
         </ul>
         <H>Ohne Internet: das lokale Netz</H>
         <Steps>
@@ -254,8 +307,8 @@ export const PART3A: Topic[] = [
         <ul>
           <li>
             <Path steps={["Einstellungen", "Synchronisation"]} /> zeigt den
-            Status (Verbunden, Neu verbinden …), die anderen Arbeitsplätze und
-            ihr Modul sowie die Zeit des letzten Austauschs.
+            Status (Verbunden, Neu verbinden …), die verbundenen Arbeitsplätze
+            (online, aktuell) sowie die Zeit des letzten Austauschs.
           </li>
           <li>
             <Ui>Mit einem Code beitreten</Ui> führt, aus einer bereits
@@ -566,8 +619,8 @@ export const PART3B: Topic[] = [
         <H>Präsentieren in 3 Schritten</H>
         <Steps>
           <li>
-            Bildschirm-Schaltfläche <Ui>Lage präsentieren</Ui> oben rechts (oder{" "}
-            <K>⌘K</K> → « Präsentieren »).
+            Operateur-Menü (Ihre Initialen, oben rechts) →{" "}
+            <Ui>Lage präsentieren</Ui> (oder <K>⌘K</K> → « Präsentieren »).
           </li>
           <li>
             Bereiten Sie in wenigen Sekunden vor: Ihren Namen, das Publikum («
@@ -679,8 +732,9 @@ export const PART3B: Topic[] = [
         <H>Zu einer bestimmten Uhrzeit zurückkehren</H>
         <Steps>
           <li>
-            Klicken Sie oben rechts auf die Uhr <Ui>Zeitreise</Ui> (oder{" "}
-            <K>⌘K</K> → « Zeitreise »). Unten erscheint eine Leiste.
+            Operateur-Menü (Ihre Initialen, oben rechts) → <Ui>Zeitreise</Ui>{" "}
+            (oder <K>⌘K</K> → « Zeitreise »). Unten erscheint eine Leiste;{" "}
+            <Ui>Zurück zur Live-Ansicht</Ui>, oben, führt zu jetzt zurück.
           </li>
           <li>
             Ziehen Sie den Schieberegler oder geben Sie ein Datum und eine
@@ -923,7 +977,7 @@ export const PART3B: Topic[] = [
           <li>
             Akzeptierte Dateien: <code>.orionaic</code>, <code>.orion</code>,{" "}
             <code>.json</code>, <code>.csv</code>, <code>.tsv</code>, höchstens
-            32 MB. Die Datei wird auf dem Arbeitsplatz gelesen und nirgendwohin
+            96 MB. Die Datei wird auf dem Arbeitsplatz gelesen und nirgendwohin
             gesendet.
           </li>
           <li>

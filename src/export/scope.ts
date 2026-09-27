@@ -1,4 +1,9 @@
-import { dateTime, needsFollowUp, type Journal } from "../../shared/journal.ts";
+import {
+  dateTime,
+  needsFollowUp,
+  withUsedBlobs,
+  type Journal,
+} from "../../shared/journal.ts";
 import { COLLECTIONS, emptyOps, type Collection } from "../../shared/ops.ts";
 import { emptyRadio } from "../../shared/radio.ts";
 import { journalAt } from "../../shared/history.ts";
@@ -234,7 +239,15 @@ export function scopedJournal(journal: Journal, scope: ExportScope): Journal {
   let entries = has("journal") ? pick("journal", base.entries) : [];
   if (!has("journal") && has("missions"))
     entries = pick("missions", base.entries.filter(needsFollowUp));
-  return {
+  // Photos follow the entries, messages and map objects they illustrate.
+  const shown = new Set([
+    ...entries.map((e) => `entry:${e.id}`),
+    ...ops.messages.map((m) => `message:${m.id}`),
+    ...ops.places.map((p) => `place:${p.id}`),
+  ]);
+  ops.photos = base.ops.photos.filter((p) => shown.has(p.target));
+  // Only the pictures of what is exported leave the post.
+  return withUsedBlobs({
     ...base,
     entries,
     deleted: has("journal") ? base.deleted : [],
@@ -242,7 +255,7 @@ export function scopedJournal(journal: Journal, scope: ExportScope): Journal {
     ops,
     // Traceability covers what the export covers.
     history: has("trace") ? historyInScope(base.history, scope) : [],
-  };
+  });
 }
 
 /** One line describing a scope, for titles, footers and the registry. */

@@ -30,8 +30,8 @@ export const EXERCISE_TOPICS: Topic[] = [
         <H>Rejouer l’opération</H>
         <Steps>
           <li>
-            Ouvrez <Ui>Débriefing et exercice</Ui> (icône presse-papiers, en bas
-            du dock).
+            Ouvrez <Ui>Débriefing</Ui> (sous <Ui>Plus d’outils</Ui>, dans la
+            barre des modules).
           </li>
           <li>
             Appuyez sur <Ui>Rejouer ×60</Ui> : une minute de l’opération passe

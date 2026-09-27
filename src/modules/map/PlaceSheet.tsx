@@ -18,6 +18,7 @@ import {
 } from "../../../shared/ops";
 import { useApp } from "../../app/context";
 import { RecordSheet, type FieldSpec } from "../../ui/records";
+import { PhotoStrip } from "../../photos/PhotoStrip";
 import { Segmented, Toggle } from "../../ui/fields";
 import { Modal } from "../../journal/Modal";
 import {
@@ -785,6 +786,7 @@ export function PlaceSheet({
             </div>
           </section>
           {place.kind === "line" && <ProfilePanel points={place.points} />}
+          <PhotoStrip target={`place:${place.id}`} />
           {viewAt !== null && <RestorePast place={place} viewAt={viewAt} />}
         </>
       )}

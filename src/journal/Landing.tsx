@@ -5,6 +5,7 @@ import {
   LockKeyhole,
   Moon,
   Play,
+  Plus,
   Sun,
   Wifi,
 } from "lucide-react";
@@ -13,7 +14,7 @@ import type { Journal } from "../../shared/journal";
 import { codeProblem, normalizeCode, validCode } from "../../shared/room";
 import type { SyncStatus } from "../sync/useSync";
 import { Brand } from "../ui/Mark";
-import { JournalSetup } from "./JournalSetup";
+import { JournalSetup, RecoveryHelp } from "./JournalSetup";
 import { CONTACT_EMAIL, feedbackLink } from "../app/contact";
 import { t } from "./i18n.ts";
 
@@ -78,8 +79,10 @@ export function Landing({
   onLang: (lang: Lang) => void;
   error: string;
 }) {
+  // Most people join a session another post opened: « Rejoindre » comes
+  // first, unless this post already keeps a session.
   const [tab, setTab] = useState<"resume" | "new" | "join">(
-    joinCode ? "join" : stored ? "resume" : "new",
+    joinCode ? "join" : stored ? "resume" : "join",
   );
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -93,7 +96,7 @@ export function Landing({
     <div className="landing">
       <header className="landing-bar">
         <Brand size={28} />
-        <span className="landing-version">{t("version 2.0")}</span>
+        <span className="landing-version">{t("version 2.1")}</span>
         <button className="link push" onClick={onPrivacy}>
           {t("Sécurité et données")}
         </button>
@@ -114,7 +117,7 @@ export function Landing({
           </h1>
           <p className="lead">
             {t(
-              "Le journal, les messages, la carte, les moyens, l’équipe et la radio d’un poste de conduite de protection civile, au même endroit. Tout reste dans le navigateur, chiffré et sans compte ; les postes d’un même PC se synchronisent en direct.",
+              "Le journal, les messages, la carte et les moyens d’un poste de conduite de protection civile, au même endroit. Sans compte, chiffré, aussi hors ligne.",
             )}
           </p>
           <dl className="hero-index stagger">
@@ -125,14 +128,17 @@ export function Landing({
               </div>
             ))}
           </dl>
-          <div className="hero-actions">
-            <button className="spark" onClick={onDemo}>
-              <Play size={14} />
-              {t("Ouvrir l’exercice de démonstration")}
-              <ArrowRight size={14} />
-            </button>
-          </div>
         </section>
+        <div className="hero-actions landing-demo">
+          <button className="spark" onClick={onDemo}>
+            <Play size={14} />
+            {t("Ouvrir l’exercice de démonstration")}
+            <ArrowRight size={14} />
+          </button>
+          <small>
+            {t("Pour essayer sans rien risquer : un exercice fictif.")}
+          </small>
+        </div>
         <section
           className="panel start spot reveal"
           style={{ animationDelay: "120ms" }}
@@ -147,15 +153,16 @@ export function Landing({
                 {t("Reprendre")}
               </button>
             )}
-            <button aria-pressed={tab === "new"} onClick={() => setTab("new")}>
-              {t("Nouvelle session")}
-            </button>
             <button
               aria-pressed={tab === "join"}
               onClick={() => setTab("join")}
             >
               <Wifi size={14} />
-              {t("Rejoindre")}
+              {t("Rejoindre une session")}
+            </button>
+            <button aria-pressed={tab === "new"} onClick={() => setTab("new")}>
+              <Plus size={14} />
+              {t("Nouvelle session")}
             </button>
           </div>
           <div className="start-body">
@@ -291,9 +298,9 @@ export function Landing({
                     });
                   }}
                 >
-                  <p className="muted">
+                  <p className="start-lead">
                     {t(
-                      "Un autre poste a partagé sa session (Réglages → Synchronisation). Saisissez son code ou scannez son QR code.",
+                      "Un autre poste a déjà ouvert la session ? Demandez-lui son code de session, ou scannez son QR code avec l’appareil photo : le code se remplit tout seul.",
                     )}
                   </p>
                   <label>
@@ -326,7 +333,9 @@ export function Landing({
                         checked={protect}
                         onChange={(e) => setProtect(e.target.checked)}
                       />
-                      <span>{t("Sauvegarde chiffrée sur ce poste")}</span>
+                      <span>
+                        {t("Garder la session sur cet appareil (recommandé)")}
+                      </span>
                     </label>
                   )}
                   {protect && !stored && (
@@ -357,6 +366,7 @@ export function Landing({
                       </label>
                     </div>
                   )}
+                  {protect && !stored && <RecoveryHelp />}
                   {stored && (
                     <p className="hint warn">
                       {t(
@@ -368,6 +378,16 @@ export function Landing({
                     {t("Rejoindre la session")}
                     <ArrowRight size={15} />
                   </button>
+                  <p className="start-switch">
+                    {t("Vous êtes le premier poste ?")}{" "}
+                    <button
+                      type="button"
+                      className="link"
+                      onClick={() => setTab("new")}
+                    >
+                      {t("Ouvrir une nouvelle session")}
+                    </button>
+                  </p>
                 </form>
               ))}
           </div>

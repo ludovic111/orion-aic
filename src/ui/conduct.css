@@ -316,16 +316,14 @@
   color: var(--text-3);
 }
 
-/* ---------- Reminders ---------- */
+/* ---------- Reminders ----------
+   In the page, at the top, like the diffusions: they never cover what is
+   being read or typed. */
 .rm-bar {
-  position: fixed;
-  left: max(16px, calc(var(--dock-width, 88px) + 16px));
-  bottom: 16px;
-  z-index: 60;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: min(440px, calc(100vw - 32px));
+  margin-bottom: 16px;
 }
 .rm-item {
   display: flex;
@@ -336,7 +334,6 @@
   border: 1px solid var(--line-2);
   border-radius: var(--radius);
   background: var(--solid);
-  box-shadow: var(--shadow-xl);
 }
 .rm-item > svg {
   color: var(--ember);
@@ -360,13 +357,8 @@
   gap: 6px;
   margin-left: auto;
 }
-@media (max-width: 760px) {
-  .rm-bar {
-    left: 16px;
-    right: 16px;
-    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
-    max-width: none;
-  }
+.rm-buttons button {
+  white-space: nowrap;
 }
 .rm-card {
   margin-top: 20px;

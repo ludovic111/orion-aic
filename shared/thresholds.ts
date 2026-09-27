@@ -13,13 +13,19 @@ import {
 } from "./ops.ts";
 import { stableId } from "./history.ts";
 import { zurichDate } from "./time.ts";
-import type { Threshold, ThresholdMetric } from "./conduct-schemas.ts";
+import {
+  isHydroMetric,
+  type Threshold,
+  type ThresholdMetric,
+} from "./conduct-schemas.ts";
 import { t } from "./i18n/thresholds.ts";
 
-export { THRESHOLD_METRICS } from "./conduct-schemas.ts";
+export { THRESHOLD_METRICS, isHydroMetric } from "./conduct-schemas.ts";
 
 // Weather thresholds of the journal, evaluated on the forecasts received
-// (Open-Meteo, already used by the weather module). A threshold crossed on a
+// (Open-Meteo, already used by the weather module), and discharge / water
+// level thresholds evaluated on the measurements of a FOEN gauging station
+// loaded by a post (applyHydroThresholds). A threshold crossed on a
 // day creates one weather alert, and optionally an entry "à suivre", once
 // per threshold and Zurich day: their ids derive from the threshold and the
 // day, so two posts evaluating the same forecast create the same records,
@@ -90,10 +96,34 @@ export const METRICS: Record<
       return t("Gel / froid");
     },
   },
+  discharge: {
+    get label() {
+      return t("Débit mesuré");
+    },
+    unit: "m³/s",
+    above: true,
+    get hazard() {
+      return t("Crue");
+    },
+  },
+  waterLevel: {
+    get label() {
+      return t("Niveau d’eau mesuré");
+    },
+    unit: "m",
+    above: true,
+    get hazard() {
+      return t("Crue");
+    },
+  },
 };
 
-export const thresholdLabel = (th: Pick<Threshold, "metric" | "value">) =>
-  `${METRICS[th.metric].label} ${METRICS[th.metric].above ? "≥" : "≤"} ${th.value} ${METRICS[th.metric].unit}`;
+export const thresholdLabel = (
+  th: Pick<Threshold, "metric" | "value" | "stationName">,
+) =>
+  `${METRICS[th.metric].label} ${METRICS[th.metric].above ? "≥" : "≤"} ${th.value} ${METRICS[th.metric].unit}${
+    isHydroMetric(th.metric) && th.stationName ? ` · ${th.stationName}` : ""
+  }`;
 
 export type Crossing = {
   /** Zurich day, "YYYY-MM-DD". */
@@ -112,6 +142,8 @@ function series(
   metric: ThresholdMetric,
   data: ForecastData,
 ): { at: number; value: number }[] {
+  // Discharge and water level are measured, never forecast.
+  if (isHydroMetric(metric)) return [];
   const hours = [...data.hours].sort((a, b) => a.at - b.at);
   if (metric === "rain24h")
     return hours.map((h) => ({
@@ -308,5 +340,156 @@ export function applyThresholds(
   return {
     journal: created.length ? journalSchema.parse(next) : journal,
     created,
+  };
+}
+
+// ---------- Discharge and water level (FOEN gauging stations) ----------
+
+/** A measurement of a gauging station, as loaded by a post. */
+export type HydroReading = {
+  station: string;
+  /** "Arve · Genève, Bout du Monde". */
+  name: string;
+  /** Time of the measurement (ms). */
+  at: number;
+  discharge: number | null;
+  waterLevel: number | null;
+};
+
+/** A measurement older than this is not compared with the thresholds. */
+export const HYDRO_MAX_AGE = 6 * HOUR;
+/** An alert stays in force this long after the last measurement above. */
+export const HYDRO_HOLD = 3 * HOUR;
+
+export type HydroCreated = {
+  threshold: Threshold;
+  reading: HydroReading;
+  value: number;
+  entry: boolean;
+};
+
+/**
+ * Alerts (and entries "à suivre") for the discharge and water level
+ * thresholds crossed by the measurements loaded. One alert per threshold
+ * and Zurich day, with the same ids as the forecast thresholds: two posts
+ * loading the same measurement create one alert. A later measurement still
+ * above extends the end of the alert. Returns the journal unchanged when
+ * there is nothing to do.
+ */
+export function applyHydroThresholds(
+  journal: Journal,
+  readings: HydroReading[],
+  author: string,
+  at = Date.now(),
+): { journal: Journal; created: HydroCreated[]; extended: number } {
+  const created: HydroCreated[] = [];
+  let extended = 0;
+  let next = journal;
+  const removed = journal.sync.removed;
+  const deleted = new Set(journal.deleted.map((d) => d.id));
+  for (const th of journal.ops.thresholds) {
+    if (!th.active || !isHydroMetric(th.metric) || !th.station) continue;
+    const r = readings.find((x) => x.station === th.station);
+    if (!r || r.at < at - HYDRO_MAX_AGE || r.at > at + HOUR) continue;
+    const value = th.metric === "discharge" ? r.discharge : r.waterLevel;
+    if (value === null || value < th.value) continue;
+    const info = METRICS[th.metric];
+    const day = zurichDate(r.at);
+    const alertId = alertIdFor(th.id, day);
+    if (removed[alertId]) continue;
+    const until = new Date(r.at + HYDRO_HOLD).toISOString();
+    const known = next.ops.alerts.find((a) => a.id === alertId);
+    if (known) {
+      // Still above: the alert stays in force.
+      if (known.to && Date.parse(known.to) < Date.parse(until)) {
+        next = {
+          ...next,
+          ops: upsert(next.ops, "alerts", { ...known, to: until }, author),
+        };
+        extended++;
+      }
+      continue;
+    }
+    const label = thresholdLabel(th);
+    const measured = t("{value} {unit} à {time}", {
+      value: Math.round(value * 100) / 100,
+      unit: info.unit,
+      time: time(new Date(r.at).toISOString()),
+    });
+    let ops = upsert(
+      next.ops,
+      "alerts",
+      {
+        id: alertId,
+        level: th.level,
+        hazard: (
+          th.label || t("{hazard} : {label}", { hazard: info.hazard, label })
+        ).slice(0, 120),
+        region: (th.region || r.name).slice(0, 200),
+        from: new Date(r.at).toISOString(),
+        to: until,
+        source: t("Seuil du journal · mesure OFEV, station {station}", {
+          station: r.station,
+        }).slice(0, 200),
+        notes: t(
+          "{label} : mesuré {measured} (station {station}, {name}). Les références restent l’OFEV et les autorités.",
+          { label, measured, station: r.station, name: r.name },
+        ).slice(0, 2000),
+      },
+      author,
+    );
+    next = { ...next, ops };
+    const entryId = entryIdFor(th.id, day);
+    const writes =
+      th.followUp &&
+      !deleted.has(entryId) &&
+      !next.entries.some((e) => e.id === entryId);
+    if (writes) {
+      const added = addEntry(
+        next,
+        {
+          ...emptyFields(),
+          happenedAt: new Date(r.at).toISOString(),
+          receivedAt: new Date(at).toISOString(),
+          type: "Renseignement",
+          priority: Number(th.level) >= 4 ? "Important" : "Normal",
+          status: "À traiter",
+          channel: "Autre",
+          reliability: "Non confirmé",
+          source: t("OFEV, station {station}", { station: r.station }),
+          message: t(
+            "Seuil de cours d’eau franchi : {label}, mesuré {measured}.",
+            { label, measured },
+          ),
+          action: t("Suivre l’évolution et décider des mesures."),
+          location: th.region || r.name,
+          dueAt: new Date(at + 30 * 60_000).toISOString(),
+          // Tags stay French: shared by every post, like a code.
+          tags: ["crue", "seuil"],
+        },
+        author,
+      );
+      const entries = added.entries.map((e, i, all) =>
+        i === all.length - 1 ? { ...e, id: entryId } : e,
+      );
+      ops = upsert(
+        added.ops,
+        "links",
+        {
+          id: linkIdFor(th.id, day),
+          a: `entry:${entryId}`,
+          b: `alert:${alertId}`,
+          label: t("seuil franchi"),
+        },
+        author,
+      );
+      next = { ...added, entries, ops };
+    }
+    created.push({ threshold: th, reading: r, value, entry: !!writes });
+  }
+  return {
+    journal: created.length || extended ? journalSchema.parse(next) : journal,
+    created,
+    extended,
   };
 }

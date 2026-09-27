@@ -355,7 +355,22 @@ export function Docs({ topic }: { topic: string }) {
                       onLevel={(l) =>
                         setLocal((prev) => ({ ...prev, [tp.id]: l }))
                       }
-                      onOpen={tp.module ? () => go(tp.module!) : undefined}
+                      onOpen={
+                        tp.module
+                          ? () => go(tp.module!)
+                          : tp.id === "start"
+                            ? () => {
+                                // « Par où commencer ? » on Situation again.
+                                setPrefs({ startDone: false });
+                                go("situation");
+                              }
+                            : undefined
+                      }
+                      openLabel={
+                        tp.id === "start"
+                          ? t("Revoir « Par où commencer ? »")
+                          : tp.openLabel
+                      }
                     />
                   ))}
               </div>
@@ -373,12 +388,14 @@ function TopicView({
   global,
   onLevel,
   onOpen,
+  openLabel = tp.openLabel,
 }: {
   topic: Topic;
   level: Level;
   global: Level;
   onLevel: (level: Level) => void;
   onOpen?: () => void;
+  openLabel?: string;
 }) {
   const Icon = tp.icon;
   const rank = RANK[level];
@@ -404,7 +421,7 @@ function TopicView({
         </div>
         {onOpen && (
           <button type="button" className="docs-open" onClick={onOpen}>
-            {tp.openLabel}
+            {openLabel}
             <ArrowRight size={14} aria-hidden />
           </button>
         )}

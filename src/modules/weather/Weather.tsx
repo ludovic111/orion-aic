@@ -71,6 +71,9 @@ import {
   type WeatherPlace,
 } from "./forecast";
 import { ThresholdsCard } from "./Thresholds";
+import { OfficialCard, useOfficial } from "./Official";
+import { OFFICIAL_PAGES } from "../../../shared/official.ts";
+import { getLang } from "../../../shared/i18n/core.ts";
 import "./weather.css";
 
 const HOUR = 3600000;
@@ -231,6 +234,9 @@ export function Weather() {
   const [alert, setAlert] = useState<AlertDraft | null>(null);
   const [pendingLog, setPendingLog] = useState<string | null>(null);
   const [online, setOnline] = useState(() => navigator.onLine);
+  // Official warnings and water levels: loaded with the forecast.
+  const official = useOfficial(place);
+  const officialAt = official.snapshot?.fetchedAt ?? 0;
 
   useEffect(() => {
     setData(readCachedForecast(journal.id));
@@ -312,12 +318,9 @@ export function Weather() {
   useEffect(() => {
     if (!auto || !place || viewAt !== null) return;
     const check = () => {
-      if (
-        document.visibilityState === "visible" &&
-        navigator.onLine &&
-        Date.now() - fetchedAt > AUTO_EVERY
-      )
-        void refresh();
+      if (document.visibilityState !== "visible" || !navigator.onLine) return;
+      if (Date.now() - fetchedAt > AUTO_EVERY) void refresh();
+      if (Date.now() - officialAt > AUTO_EVERY) void official.refresh();
     };
     check();
     const timer = setInterval(check, 60000);
@@ -326,7 +329,7 @@ export function Weather() {
       clearInterval(timer);
       document.removeEventListener("visibilitychange", check);
     };
-  }, [auto, place, fetchedAt, refresh, viewAt]);
+  }, [auto, place, fetchedAt, officialAt, refresh, official.refresh, viewAt]);
 
   useEffect(() => {
     if (!focus) return;
@@ -447,7 +450,7 @@ export function Weather() {
           <>
             <a
               className="button weather-extlink"
-              href={t("https://www.meteosuisse.admin.ch")}
+              href={OFFICIAL_PAGES[getLang()].meteoswiss}
               target="_blank"
               rel="noreferrer"
             >
@@ -457,7 +460,10 @@ export function Weather() {
             {place && viewAt === null && (
               <button
                 className="primary"
-                onClick={() => void refresh()}
+                onClick={() => {
+                  void refresh();
+                  void official.refresh();
+                }}
                 disabled={loading}
               >
                 <RefreshCw
@@ -531,7 +537,7 @@ export function Weather() {
               </div>
               <p className="weather-privacy">
                 {t(
-                  "Pour obtenir la prévision, les coordonnées du lieu sont envoyées à open-meteo.com (rien d’autre). Sans actualisation, aucune donnée ne quitte ce poste.",
+                  "« Actualiser » envoie les coordonnées du lieu à open-meteo.com et à geo.admin.ch, et les numéros des stations proches à admin.ch (rien d’autre). Sans actualisation, aucune donnée ne quitte ce poste.",
                 )}
               </p>
               {error && (
@@ -562,6 +568,9 @@ export function Weather() {
           )}
         </section>
 
+        {place && (
+          <OfficialCard state={official} place={place} archived={archived} />
+        )}
         {forecast && data && (
           <>
             <Current

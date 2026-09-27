@@ -823,6 +823,42 @@ export const PART2: Topic[] = [
             Un link apre il sito di MeteoSvizzera per le allerte ufficiali.
           </li>
         </ul>
+        <H>Allerte ufficiali e corsi d’acqua</H>
+        <ul>
+          <li>
+            <Ui>Aggiorna</Ui> carica anche i{" "}
+            <strong>gradi di pericolo ufficiali</strong> per il luogo: piene
+            (carta di allerta dell’UFAM: regione, fiumi e laghi vicini) e
+            incendi boschivi (Cantoni e UFAM). Il testo e il grado sono ripresi
+            tali e quali, con la data di pubblicazione.
+          </li>
+          <li>
+            Le <strong>tre stazioni di misura dell’UFAM</strong> più vicine
+            (meno di 25 km) mostrano la portata o il livello, l’ora della misura
+            e il grado di pericolo della stazione. La freccia dice se l’acqua
+            sale o scende da circa un’ora: appare dopo due caricamenti ad almeno
+            30 minuti di distanza (« Aggiorna ogni 30 min » lo fa da solo).
+          </li>
+          <li>
+            Dal <strong>grado 3</strong>, l’allerta appare anche nella pagina{" "}
+            <Ui>Situazione</Ui>, nella scheda Meteo.
+          </li>
+          <li>
+            « Ultimo aggiornamento … fa » indica l’età dei dati. Senza internet,
+            gli ultimi dati restano visualizzati con la loro ora; aggiornate
+            prima di decidere.
+          </li>
+          <li>
+            Le <strong>allerte meteo di MeteoSvizzera</strong> (temporali,
+            pioggia, vento, neve, calore, gelo) non sono ancora pubblicate come
+            dati aperti: il pulsante <Ui>Allerte MeteoSvizzera</Ui> apre la
+            pagina ufficiale.
+          </li>
+          <li>
+            Cosa viene inviato: le coordinate del luogo a geo.admin.ch e il
+            numero delle stazioni a admin.ch. Nient’altro.
+          </li>
+        </ul>
         <H>Previsioni ricevute: la meteo di prima</H>
         <ul>
           <li>
@@ -839,8 +875,9 @@ export const PART2: Topic[] = [
           </li>
         </ul>
         <Note kind="warn">
-          Le allerte ufficiali sono quelle di MeteoSvizzera e delle autorità.
-          orion aic aiuta ad annotarle e a condividerle, non le sostituisce.
+          Le allerte ufficiali sono quelle di MeteoSvizzera, dell’UFAM e delle
+          autorità: restano il riferimento. orion aic le riprende, aiuta ad
+          annotarle e a condividerle, non le sostituisce.
         </Note>
       </>
     ),
@@ -987,8 +1024,8 @@ export const PART2: Topic[] = [
         <H>Ritrovare chi ha fatto cosa</H>
         <Steps>
           <li>
-            Aprite <Ui>Tracciabilità</Ui> nella barra a sinistra (oppure{" "}
-            <K>⌘K</K> → « Tracciabilità »).
+            Aprite <Ui>Tracciabilità</Ui> sotto <Ui>Altri strumenti</Ui>, nella
+            barra a sinistra (oppure <K>⌘K</K> → « Tracciabilità »).
           </li>
           <li>
             La scheda <Ui>Chi ha fatto cosa</Ui> elenca tutte le modifiche,

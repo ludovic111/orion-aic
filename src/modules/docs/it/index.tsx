@@ -11,6 +11,8 @@ import {
 import { EXERCISE_TOPICS } from "./content-exercise";
 import { VALISE_TOPIC } from "./content-valise";
 import { DICTATION_TOPIC } from "./content-dictation";
+import { PHOTOS_TOPIC } from "./content-photos";
+import { NEWS_TOPIC } from "./content-news";
 
 // Same topics, same order as TOPICS in ../content.tsx.
 export const TOPICS: Topic[] = [
@@ -26,4 +28,6 @@ export const TOPICS: Topic[] = [
   ...EXERCISE_TOPICS,
   VALISE_TOPIC,
   DICTATION_TOPIC,
+  PHOTOS_TOPIC,
+  NEWS_TOPIC,
 ];

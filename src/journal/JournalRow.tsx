@@ -12,6 +12,7 @@ import {
 import { referencedNumbers } from "../../shared/workflow";
 import { enumLabel } from "../../shared/i18n/enums.ts";
 import { t } from "./i18n.ts";
+import { PhotoCount } from "../photos/PhotoCount";
 
 export const typeTone = (type: string) =>
   type === "Décision" || type === "Mission"
@@ -33,6 +34,7 @@ export function JournalRow({
   readOnly,
   at,
   fresh = false,
+  ops,
 }: {
   entry: Journal["entries"][number];
   newDay: boolean;
@@ -44,6 +46,8 @@ export function JournalRow({
   readOnly: boolean;
   at: number;
   fresh?: boolean;
+  /** Records of the journal: the photos of the entry are counted. */
+  ops?: Journal["ops"];
 }) {
   const f = current(entry);
   const late = overdue(entry, at);
@@ -96,6 +100,7 @@ export function JournalRow({
             {f.reliability !== "Confirmé" && (
               <span className="tag dim">{enumLabel(f.reliability)}</span>
             )}
+            {ops && <PhotoCount ops={ops} target={`entry:${entry.id}`} />}
             {referencedNumbers(f).map((n) => (
               <span className="tag dim link-tag" key={n}>
                 ↳ #{String(n).padStart(3, "0")}

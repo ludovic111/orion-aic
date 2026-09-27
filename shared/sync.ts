@@ -4,6 +4,7 @@ import {
   nodeOr,
   numberLabel,
   assignSuffixes,
+  withUsedBlobs,
   suffixes,
   workspaceSchema,
   type Deletion,
@@ -22,7 +23,7 @@ import {
   type Change,
 } from "./history.ts";
 import { eventKey, type HistoryEvent } from "./events.ts";
-import { blobsOf } from "./blobs.ts";
+import { LIVE_ONLY, blobsOf, refOf } from "./blobs.ts";
 import { later, localNode, tick } from "./hlc.ts";
 import {
   deletionStamp,
@@ -284,13 +285,18 @@ export function stampJournal(
   );
   if (withEntries !== next) changed = true;
   if (!changed) return next;
-  const result = appendHistory(
+  const recorded = appendHistory(
     { ...withEntries, sync: { ...next.sync, clock, removed } },
     changes,
     at,
     by,
     last,
   );
+  // A removed photo takes its picture with it at once, as every post that
+  // receives the removal does (normalizeJournal): the fingerprints agree.
+  const result = changes.some((c) => c.item === null && LIVE_ONLY.has(c.scope))
+    ? withUsedBlobs(recorded)
+    : recorded;
   setBound(result, tick(last, at));
   return result;
 }
@@ -510,6 +516,30 @@ export function repairRadio(radio: Radio): Radio {
   return radioSchema.parse({ ...radio, stations, terminals, checks });
 }
 
+/**
+ * Photos whose item is gone for good go with it: a photo added on one post
+ * to an entry, a message or a map object removed meanwhile on another
+ * would otherwise stay, shown nowhere, counted in the room of the session
+ * and carried in every archive. A photo whose item has not arrived yet
+ * (neither here nor removed) is kept.
+ */
+function livePhotos(
+  ops: Pick<Ops, "photos" | "messages" | "places">,
+  deleted: Deletion[],
+  removed: Record<string, string>,
+): Ops["photos"] {
+  const gone = new Set(deleted.map((d) => d.id));
+  const here = new Set([
+    ...ops.messages.map((m) => m.id),
+    ...ops.places.map((p) => p.id),
+  ]);
+  const kept = ops.photos.filter((p) => {
+    const [kind, id] = p.target.split(":");
+    return kind === "entry" ? !gone.has(id) : here.has(id) || !removed[id];
+  });
+  return kept.length === ops.photos.length ? ops.photos : kept;
+}
+
 /** Combine two versions of the same journal. Commutative and idempotent. */
 export function mergeJournal(mine: Journal, theirs: Journal): Journal {
   if (mine === theirs) return mine;
@@ -551,6 +581,7 @@ export function mergeJournal(mine: Journal, theirs: Journal): Journal {
     x.cellId && !members.has(x.cellId) ? { ...x, cellId: "" } : x,
   );
   const { entries, deleted } = mergeEntries(mine, theirs);
+  ops.photos = livePhotos(ops, deleted, removed);
   const compacted = later(a.compacted, b.compacted) || undefined;
   return journalSchema.parse({
     ...mine,
@@ -661,8 +692,11 @@ export function sliceJournal(
   )
     return null;
   const used = new Set<string>();
-  for (const e of history) blobsOf(e.scope, e.state, used);
+  // The pictures of photos travel with the live photos only.
+  for (const e of history)
+    if (!LIVE_ONLY.has(e.scope)) blobsOf(e.scope, e.state, used);
   for (const s of ops.symbols) blobsOf("ops.symbols", s, used);
+  for (const p of ops.photos) blobsOf("ops.photos", p, used);
   const blobs: Record<string, string> = {};
   for (const k of used) if (journal.blobs[k]) blobs[k] = journal.blobs[k];
   const slice: Journal = {
@@ -713,6 +747,17 @@ export function digest(journal: Journal): Promise<string> {
     value = (async () => {
       const light = {
         ...journal,
+        // Photos count by the hash of their picture (as stored).
+        ops: journal.ops.photos.length
+          ? {
+              ...journal.ops,
+              photos: journal.ops.photos.map((p) =>
+                p.image.startsWith("data:")
+                  ? { ...p, image: refOf(p.image) }
+                  : p,
+              ),
+            }
+          : journal.ops,
         history: journal.history.map((e) => ({
           id: e.id,
           r: e.rev,

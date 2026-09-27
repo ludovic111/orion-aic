@@ -1,23 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  decrypt,
-  deriveKey,
-  encryptVault,
-  type VaultKey,
-} from "../../shared/crypto";
-import {
-  packWorkspace,
-  workspaceSchema,
-  type Workspace,
-} from "../../shared/journal";
+import { deriveKey, type VaultKey } from "../../shared/crypto";
+import { workspaceSchema, type Workspace } from "../../shared/journal";
 import { localNode, setLocalNode } from "../../shared/hlc";
 import { stampWorkspace } from "../../shared/sync";
 import {
   deleteVault,
+  readPictureKeys,
   readVault,
-  writeVault,
   type StoredVault,
 } from "./storage";
+import { openVault, sealVault } from "./vault";
 import { t } from "./i18n.ts";
 /** The session keeps the id of this post in its stamps across reloads. */
 function withNode(value: Workspace): Workspace {
@@ -27,9 +19,6 @@ function withNode(value: Workspace): Workspace {
   }
   return { ...value, node: localNode() };
 }
-/** Compressed, encrypted; images once (see packWorkspace). */
-const sealVault = (value: Workspace, key: VaultKey) =>
-  encryptVault(packWorkspace(value), key);
 async function acquireWriter(): Promise<() => void> {
   if (!navigator.locks)
     throw new Error(
@@ -100,6 +89,8 @@ export function useWorkspace() {
   const latest = useRef(workspace);
   latest.current = workspace;
   const saved = useRef<Workspace | null>(null);
+  // Keys of the photo pictures already in the vault.
+  const pictures = useRef(new Set<string>());
   useEffect(() => {
     readVault()
       .then((value) => setStored(value ?? null))
@@ -116,8 +107,11 @@ export function useWorkspace() {
       queue.current = queue.current
         .catch(() => {})
         .then(async () => {
-          const ciphertext = await sealVault(workspace, vaultKey);
-          await writeVault(ciphertext);
+          const ciphertext = await sealVault(
+            workspace,
+            vaultKey,
+            pictures.current,
+          );
           saved.current = workspace;
           setStored(ciphertext);
           if (live) {
@@ -165,8 +159,8 @@ export function useWorkspace() {
           ),
         );
       const key = await deriveKey(password);
-      const ciphertext = await sealVault(parsed, key);
-      await writeVault(ciphertext);
+      pictures.current = new Set(await readPictureKeys());
+      const ciphertext = await sealVault(parsed, key, pictures.current);
       writer.current = release;
       saved.current = parsed;
       setStored(ciphertext);
@@ -192,8 +186,8 @@ export function useWorkspace() {
       const key = await deriveKey(password);
       const value = latest.current;
       if (!value) throw new Error(t("Aucun espace à sauvegarder."));
-      const ciphertext = await sealVault(value, key);
-      await writeVault(ciphertext);
+      pictures.current = new Set(await readPictureKeys());
+      const ciphertext = await sealVault(value, key, pictures.current);
       writer.current = release;
       saved.current = value;
       setStored(ciphertext);
@@ -210,10 +204,11 @@ export function useWorkspace() {
     try {
       const data = await readVault();
       if (!data) throw new Error(t("Aucun espace local enregistré."));
-      const { value, vault } = await decrypt(data, password);
+      const { value, vault, pictures: read } = await openVault(data, password);
       // Older sessions are brought up to date by the schema (stamps, images
       // kept once, message numbers).
       const parsed = withNode(workspaceSchema.parse(value));
+      pictures.current = new Set(Object.keys(read));
       writer.current = release;
       saved.current = parsed;
       setVaultKey(vault);
@@ -233,11 +228,11 @@ export function useWorkspace() {
     await queue.current;
     if (vaultKey && latest.current && latest.current !== saved.current) {
       const snapshot = latest.current;
-      const ciphertext = await sealVault(snapshot, vaultKey);
-      await writeVault(ciphertext);
+      const ciphertext = await sealVault(snapshot, vaultKey, pictures.current);
       saved.current = snapshot;
       setStored(ciphertext);
     }
+    pictures.current = new Set();
     setRaw(null);
     latest.current = null;
     saved.current = null;
@@ -253,6 +248,7 @@ export function useWorkspace() {
     }
     await queue.current;
     if (vaultKey) await deleteVault();
+    pictures.current = new Set();
     setRaw(null);
     latest.current = null;
     saved.current = null;

@@ -25,6 +25,7 @@ import { enumLabel } from "../../shared/i18n/enums.ts";
 import { Modal } from "./Modal";
 import { openAssign, openDiffusion } from "../post/bus";
 import { EntryForm } from "./EntryForm";
+import { PhotoStrip } from "../photos/PhotoStrip";
 import { ENUM_COLUMNS, t, tn } from "./i18n.ts";
 export function EntryDetail({
   entry,
@@ -94,6 +95,7 @@ export function EntryDetail({
             <span className="mono">{dateTime(f.happenedAt)}</span>
           </div>
           <p className="detail-message">{f.message}</p>
+          <PhotoStrip target={`entry:${entry.id}`} />
           <dl className="detail-grid">
             {columns
               .filter(

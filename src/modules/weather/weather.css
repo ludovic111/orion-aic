@@ -753,3 +753,174 @@
   border-color: var(--accent);
   box-shadow: 0 0 0 1px var(--accent) inset;
 }
+
+/* Official warnings and water levels (Official.tsx) */
+.official .lvl-1,
+.official-chips .lvl-1 {
+  --lvl: var(--ok);
+}
+.official .lvl-0,
+.official .weather-level.none {
+  --lvl: var(--text-3);
+}
+.official-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+.official-calm {
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-2);
+  color: var(--text-2);
+  font-size: 13px;
+}
+.official-empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+.official-empty p {
+  flex: 1 1 280px;
+  margin: 0;
+  color: var(--text-2);
+}
+.official-list {
+  margin-bottom: 10px;
+}
+a.official-row {
+  text-decoration: none;
+}
+.official-row .weather-alert-main > span {
+  color: var(--text);
+}
+.official-row > svg {
+  flex: none;
+  color: var(--text-3);
+}
+.official-calm-levels {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 10px;
+}
+.official-calm-levels > span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.official-calm-levels strong {
+  font-weight: 500;
+}
+.official-calm-levels small {
+  color: var(--text-3);
+}
+.official-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0 8px;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+.official-stations {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.official-station {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--lvl, var(--ok));
+  border-radius: var(--radius);
+  background: var(--bg-2);
+}
+.official-station-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+.official-station-main strong {
+  font-weight: 500;
+}
+.official-station-main > small {
+  color: var(--text-3);
+}
+.official-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  font-variant-numeric: tabular-nums;
+}
+.official-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-2);
+  font-size: 12px;
+}
+.official-trend.up {
+  color: var(--warn);
+}
+.official-old {
+  color: var(--warn) !important;
+}
+.official-station .button {
+  flex: none;
+}
+.official-meteoswiss {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.official-meteoswiss p {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 260px;
+  margin: 0;
+}
+.official-meteoswiss strong {
+  font-weight: 500;
+}
+.official-meteoswiss small {
+  color: var(--text-2);
+}
+.official-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.official-chips .weather-alert {
+  padding: 8px 12px;
+}
+.official-chips .weather-level {
+  width: 28px;
+  height: 28px;
+  font-size: 15px;
+}
+@media (max-width: 600px) {
+  .official-station {
+    align-items: flex-start;
+  }
+  .official-meteoswiss .button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}

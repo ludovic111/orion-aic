@@ -45,8 +45,8 @@ export const VALISE_TOPIC: Topic = {
           <Path
             steps={["Réglages", "Synchronisation", "Créer un code de session"]}
           />
-          ). Les autres choisissent <Ui>Rejoindre</Ui> et tapent le code, comme
-          d’habitude.
+          ). Les autres choisissent <Ui>Rejoindre une session</Ui> et tapent le
+          code, comme d’habitude.
         </li>
       </Steps>
       <H>La toute première fois sur un appareil</H>
@@ -93,6 +93,10 @@ export const VALISE_TOPIC: Topic = {
           ],
           ["Recherche de lieu (geo.admin.ch)", "Non : tapez des coordonnées"],
           ["Météo (Open-Meteo)", "Non"],
+          [
+            "Alertes officielles et cours d’eau (OFEV)",
+            "Non : les dernières données restent affichées",
+          ],
         ]}
       />
       <H>Le matériel</H>
@@ -269,7 +273,7 @@ export const VALISE_TOPIC: Topic = {
             "Pays du Wi-Fi CH sur le Pi ; redémarrez-le.",
           ],
           [
-            "Poste « Seul » alors que d’autres travaillent",
+            "Poste « Non partagé » alors que d’autres travaillent",
             "Vérifiez le code de session ; rechargez la page. Rien n’est perdu.",
           ],
           [

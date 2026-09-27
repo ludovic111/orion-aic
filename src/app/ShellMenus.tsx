@@ -2,9 +2,11 @@ import {
   BookOpen,
   Download,
   FileUp,
+  History,
   Lightbulb,
   LockKeyhole,
   LogOut,
+  MonitorPlay,
   MonitorSmartphone,
   Moon,
   Plus,
@@ -93,7 +95,11 @@ export function JournalMenu({
   );
 }
 
-/** Menu of the operator (top bar): settings, session, install, source. */
+/**
+ * Menu of the post (top bar, the operator's initials): settings, display
+ * (theme, time machine, presentation, wall screen), session, install,
+ * source.
+ */
 export function OperatorMenu({
   anchor,
   author,
@@ -101,11 +107,14 @@ export function OperatorMenu({
   installed,
   status,
   theme,
+  viewAt = null,
   onClose,
   onSettings,
   onPrivacy,
   onInstall,
   onTheme,
+  onTimeMachine,
+  onPresent,
   onEnd,
   onWall,
 }: {
@@ -115,11 +124,17 @@ export function OperatorMenu({
   installed: boolean;
   status: string;
   theme: string;
+  /** Moment shown by the time machine; null: live. */
+  viewAt?: number | null;
   onClose: () => void;
   onSettings: (tab: SettingsTab) => void;
   onPrivacy: () => void;
   onInstall: () => void;
   onTheme: () => void;
+  /** Enter or leave the time machine. */
+  onTimeMachine?: () => void;
+  /** Full-screen presentation of the situation. */
+  onPresent?: () => void;
   onEnd: () => void;
   /** Wall screen of the room (src/wall/WallScreen.tsx). */
   onWall?: () => void;
@@ -133,10 +148,6 @@ export function OperatorMenu({
           {t("Réglages du poste")}
           <small>{t("Thème, modules, impression automatique")}</small>
         </span>
-      </button>
-      <button data-close className="show-phone" onClick={onTheme}>
-        {theme === "light" ? <Moon size={15} /> : <Sun size={15} />}
-        {theme === "light" ? t("Thème sombre") : t("Thème clair")}
       </button>
       <button data-close onClick={() => onSettings("lists")}>
         <BookOpen size={15} />
@@ -163,6 +174,38 @@ export function OperatorMenu({
           </small>
         </span>
       </button>
+      <hr />
+      <button data-close onClick={onTheme}>
+        {theme === "light" ? <Moon size={15} /> : <Sun size={15} />}
+        <span>
+          {theme === "light" ? t("Thème sombre") : t("Thème clair")}
+          <small>
+            {theme === "light"
+              ? t("Pour la nuit ou une salle sombre")
+              : t("Pour le jour ou une salle éclairée")}
+          </small>
+        </span>
+      </button>
+      {onTimeMachine && (
+        <button data-close onClick={onTimeMachine}>
+          <History size={15} />
+          <span>
+            {viewAt !== null
+              ? t("Revenir à l’état actuel")
+              : t("Remonter le temps")}
+            <small>{t("Revoir l’opération à n’importe quelle heure")}</small>
+          </span>
+        </button>
+      )}
+      {onPresent && (
+        <button data-close onClick={onPresent}>
+          <MonitorPlay size={15} />
+          <span>
+            {t("Présenter la situation")}
+            <small>{t("Plein écran, pour un rapport")}</small>
+          </span>
+        </button>
+      )}
       {onWall && (
         <button data-close onClick={onWall}>
           <Tv size={15} />

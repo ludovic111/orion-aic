@@ -8,6 +8,7 @@ import "./motion.css";
 import "./theme.css";
 import "./atelier.css";
 import "./palettes.css";
+import "./shell.css";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <App />

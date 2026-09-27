@@ -13,12 +13,16 @@ import { upsert } from "../shared/ops.ts";
 import { digest, mergeWorkspace, stampWorkspace } from "../shared/sync.ts";
 import { setLocalNode } from "../shared/hlc.ts";
 import {
+  ASK_TIMEOUT,
   FULL_INTERVAL,
   answerHello,
+  asked,
+  dropAsks,
   localChanges,
   newMemory,
   noteReceived,
   partialIds,
+  pickAsks,
   summarise,
   usable,
 } from "../shared/protocol.ts";
@@ -273,4 +277,229 @@ test("a part of a journal a post lacks is not shown; the whole one follows", asy
   const announced = new Map([[second.id, {}]]);
   localChanges([a.ws.journals[0]], [], announced);
   assert.equal(announced.has(second.id), false);
+});
+
+// ---------- A post joining: each whole journal from one post only ----------
+
+/**
+ * A room as useSync runs it: hellos answered by answerHello, journals a
+ * post lacks asked of one post (`want`, pickAsks). Posts listed in `old`
+ * run the previous version: no `want` in their hellos, and they send every
+ * journal a post lacks. The last post joins with nothing.
+ */
+function room(count, { old = [] } = {}) {
+  let clock = Date.UTC(2026, 8, 27, 10);
+  const queue = [];
+  const wholes = [];
+  const journals = [newJournal("Crue"), newJournal("Photos")];
+  const posts = Array.from({ length: count }, (_, i) => ({
+    name: `p${i}`,
+    old: old.includes(i),
+    ws: {
+      version: 1,
+      author: `P${i}`,
+      journals: i === count - 1 ? [] : journals,
+      activeId: "",
+    },
+    memory: new Map(),
+    asks: new Map(),
+    parts: new Map(),
+    here: true,
+  }));
+  const lastPart = (p) => (peer) => p.parts.get(peer) ?? 0;
+  const send = (from, to, message) => {
+    for (const p of posts)
+      if (p !== from && p.here && (!to || p === to))
+        queue.push({ from, to: p, message });
+  };
+  const hello = async (p, reply, to = null, want = []) =>
+    send(p, to, {
+      type: "hello",
+      reply,
+      journals: await summarise(p.ws.journals),
+      gone: p.ws.gone,
+      ...(p.old ? {} : { want }),
+    });
+  const state = (p, list, to) => {
+    const partial = partialIds(list);
+    for (const j of list)
+      if (!partial.includes(j.id)) wholes.push({ from: p, to, id: j.id });
+    send(p, to, {
+      type: "state",
+      journals: list.map(packJournal),
+      partial,
+      gone: p.ws.gone,
+    });
+  };
+  /** Delivers everything; `leave(message)`: its recipient leaves first. */
+  async function deliver(leave = () => false) {
+    let steps = 0;
+    while (queue.length && steps++ < 2000) {
+      const m = queue.shift();
+      const { from, to, message } = m;
+      if (!to.here || !from.here) continue;
+      if (leave(m)) {
+        to.here = false;
+        continue;
+      }
+      if (message.type === "hello") {
+        const memory = to.memory.get(from) ?? newMemory();
+        to.memory.set(from, memory);
+        const {
+          send: out,
+          differ,
+          lacking,
+        } = await answerHello(
+          to.ws.journals,
+          to.ws.gone,
+          message.journals,
+          memory,
+          clock,
+          to.old ? undefined : message.want,
+          (id) => !!asked(to.asks, id, lastPart(to), clock),
+        );
+        if (out.length) state(to, out, from);
+        const ask = to.old
+          ? []
+          : pickAsks(lacking, from.name, to.asks, lastPart(to), clock);
+        if (ask.length || !message.reply || differ)
+          await hello(to, true, from, ask);
+      } else {
+        const received = message.journals.map((j) =>
+          journalSchema.parse(JSON.parse(JSON.stringify(j))),
+        );
+        const { journals: whole, missing } = usable(
+          to.ws.journals.map((j) => j.id),
+          received,
+          message.partial,
+        );
+        for (const j of whole) to.asks.delete(j.id);
+        to.ws = mergeWorkspace(to.ws, { journals: whole, gone: message.gone });
+        const ask = to.old
+          ? missing
+          : pickAsks(missing, from.name, to.asks, lastPart(to), clock);
+        if (ask.length) await hello(to, true, from, ask);
+      }
+    }
+  }
+  return {
+    posts,
+    newcomer: posts[count - 1],
+    journals,
+    hello,
+    deliver,
+    wholes,
+    tick: (ms) => (clock += ms),
+    now: () => clock,
+  };
+}
+const holds = async (post, journals) => {
+  for (const j of journals) {
+    const mine = post.ws.journals.find((x) => x.id === j.id);
+    if (!mine || (await digest(mine)) !== (await digest(j))) return false;
+  }
+  return true;
+};
+
+test("a post that joins gets each whole journal from one post only, not from all", async () => {
+  // Five posts hold two journals; a sixth joins with nothing.
+  const net = room(6);
+  const n = net.newcomer;
+  await net.hello(n, false);
+  await net.deliver();
+  assert.ok(await holds(n, net.journals));
+  const toNewcomer = net.wholes.filter((w) => w.to === n);
+  assert.equal(toNewcomer.length, 2, "each journal sent once");
+  assert.equal(new Set(toNewcomer.map((w) => w.from)).size, 1);
+  assert.equal(net.wholes.length, 2, "nothing else sent whole");
+  // Delta syncs are unchanged: once up to date, a hello costs no journal.
+  await net.hello(n, true);
+  await net.deliver();
+  assert.equal(net.wholes.length, 2);
+  // Before (every post of the previous version): all five sent everything.
+  const before = room(6, { old: [0, 1, 2, 3, 4, 5] });
+  await before.hello(before.newcomer, false);
+  await before.deliver();
+  assert.equal(
+    before.wholes.filter((w) => w.to === before.newcomer).length,
+    10,
+  );
+});
+
+test("if the post asked goes away, another one sends the journals at a later hello", async () => {
+  const net = room(5);
+  const n = net.newcomer;
+  let gone = null;
+  await net.hello(n, false);
+  // The post asked leaves before answering.
+  await net.deliver((m) => {
+    if (gone || m.message.type !== "hello" || !m.message.want?.length)
+      return false;
+    gone = m.to;
+    return true;
+  });
+  assert.ok(gone);
+  assert.equal(net.wholes.length, 0);
+  assert.equal(await holds(n, net.journals), false);
+  // A hello soon after: still awaited from the post asked, no one sends.
+  net.tick(10_000);
+  await net.hello(n, true);
+  await net.deliver();
+  assert.equal(net.wholes.length, 0, "the others stay quiet meanwhile");
+  // Nothing came for ASK_TIMEOUT: the next hello asks another post.
+  net.tick(ASK_TIMEOUT);
+  await net.hello(n, true);
+  await net.deliver();
+  assert.ok(await holds(n, net.journals));
+  assert.equal(net.wholes.length, 2);
+  const senders = new Set(net.wholes.map((w) => w.from));
+  assert.equal(senders.size, 1);
+  assert.ok(!senders.has(gone));
+});
+
+test("an ask lasts while parts arrive, and is dropped when its post leaves", () => {
+  const now = Date.UTC(2026, 8, 27, 10);
+  const later = now + ASK_TIMEOUT + 1;
+  const asks = new Map([["j", { peer: "p1", at: now }]]);
+  // Parts of a large message still arriving from p1: still awaited.
+  assert.ok(asked(asks, "j", () => later - 1000, later));
+  assert.deepEqual(
+    pickAsks(["j"], "p2", asks, () => later - 1000, later),
+    [],
+  );
+  // Nothing from p1 for ASK_TIMEOUT: given up, asked of the next post.
+  assert.equal(
+    asked(asks, "j", () => 0, later),
+    undefined,
+  );
+  assert.equal(asks.size, 0);
+  assert.deepEqual(
+    pickAsks(["j"], "p2", asks, () => 0, later),
+    ["j"],
+  );
+  assert.equal(asks.get("j").peer, "p2");
+  // A post that says goodbye: what was asked of it is asked again.
+  asks.set("k", { peer: "p3", at: later });
+  assert.equal(dropAsks(asks, "p2"), true);
+  assert.deepEqual([...asks.keys()], ["k"]);
+  assert.equal(dropAsks(asks, "p2"), false);
+});
+
+test("posts of the previous version in the same room still sync a post that joins", async () => {
+  // One post of the previous version sends everything, as before; the
+  // others then have nothing left to send.
+  const mixed = room(5, { old: [0] });
+  await mixed.hello(mixed.newcomer, false);
+  await mixed.deliver();
+  assert.ok(await holds(mixed.newcomer, mixed.journals));
+  assert.ok(mixed.wholes.every((w) => w.from === mixed.posts[0]));
+  assert.equal(mixed.wholes.length, 2);
+  // A post of the previous version joining (no `want`): every post sends
+  // it what it lacks, as before.
+  const legacy = room(4, { old: [3] });
+  await legacy.hello(legacy.newcomer, false);
+  await legacy.deliver();
+  assert.ok(await holds(legacy.newcomer, legacy.journals));
+  assert.equal(legacy.wholes.length, 6);
+  assert.ok(legacy.wholes.every((w) => w.to === legacy.newcomer));
 });

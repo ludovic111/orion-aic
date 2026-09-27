@@ -492,6 +492,43 @@ export const PART2: Topic[] = [
             Warnungen.
           </li>
         </ul>
+        <H>Offizielle Warnungen und Gewässer</H>
+        <ul>
+          <li>
+            <Ui>Aktualisieren</Ui> lädt auch die{" "}
+            <strong>offiziellen Gefahrenstufen</strong> für den Ort: Hochwasser
+            (Warnkarte des BAFU: Region, nahe Flüsse und Seen) und Waldbrand
+            (Kantone und BAFU). Text und Stufe werden unverändert übernommen,
+            mit dem Datum der Veröffentlichung.
+          </li>
+          <li>
+            Die <strong>drei nächsten Messstationen des BAFU</strong> (weniger
+            als 25 km) zeigen Abfluss oder Pegel, die Zeit der Messung und die
+            Gefahrenstufe der Station. Der Pfeil zeigt, ob das Wasser seit etwa
+            einer Stunde steigt oder sinkt: Er erscheint nach zwei Ladevorgängen
+            im Abstand von mindestens 30 Minuten (« Alle 30 Min. aktualisieren »
+            erledigt das von selbst).
+          </li>
+          <li>
+            Ab <strong>Stufe 3</strong> erscheint die Warnung auch auf der Seite{" "}
+            <Ui>Lage</Ui>, in der Karte Wetter.
+          </li>
+          <li>
+            « Letzte Aktualisierung vor … » zeigt das Alter der Daten. Ohne
+            Internet bleiben die letzten Daten mit ihrer Zeit angezeigt;
+            aktualisieren Sie vor einem Entscheid.
+          </li>
+          <li>
+            Die <strong>Wetterwarnungen von MeteoSchweiz</strong> (Gewitter,
+            Regen, Wind, Schnee, Hitze, Frost) werden noch nicht als offene
+            Daten veröffentlicht: Die Schaltfläche{" "}
+            <Ui>Warnungen MeteoSchweiz</Ui> öffnet die offizielle Seite.
+          </li>
+          <li>
+            Was gesendet wird: die Koordinaten des Orts an geo.admin.ch und die
+            Nummer der Stationen an admin.ch. Nichts anderes.
+          </li>
+        </ul>
         <H>Erhaltene Prognosen: das Wetter von vorher</H>
         <ul>
           <li>
@@ -508,8 +545,9 @@ export const PART2: Topic[] = [
           </li>
         </ul>
         <Note kind="warn">
-          Die offiziellen Warnungen sind jene von MeteoSchweiz und der Behörden.
-          orion aic hilft, sie zu erfassen und zu teilen, es ersetzt sie nicht.
+          Die offiziellen Warnungen sind jene von MeteoSchweiz, dem BAFU und der
+          Behörden: Sie bleiben massgebend. orion aic übernimmt sie, hilft sie
+          zu erfassen und zu teilen, es ersetzt sie nicht.
         </Note>
       </>
     ),
@@ -650,7 +688,8 @@ export const PART2: Topic[] = [
         <H>Herausfinden, wer was gemacht hat</H>
         <Steps>
           <li>
-            Öffnen Sie <Ui>Verlauf</Ui> in der linken Leiste (oder <K>⌘K</K> → «
+            Öffnen Sie <Ui>Nachvollziehbarkeit</Ui> unter{" "}
+            <Ui>Weitere Werkzeuge</Ui>, in der linken Leiste (oder <K>⌘K</K> → «
             Nachvollziehbarkeit »).
           </li>
           <li>

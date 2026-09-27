@@ -15,6 +15,8 @@ import { enumLabel } from "../../shared/i18n/enums.ts";
 import { rich } from "../i18n";
 import { fromInput, localInput } from "../ui/fields";
 import { DictationButton, insertDictation } from "../ui/DictationButton";
+import { PhotoPicker } from "../photos/PhotoPicker";
+import type { NewPhoto } from "../../shared/photos";
 import { t } from "./i18n.ts";
 export { localInput };
 export function EntryForm({
@@ -31,7 +33,8 @@ export function EntryForm({
   initial?: Fields;
   preset?: Fields;
   author: string;
-  onSave: (fields: Fields, reason: string) => void;
+  /** `photos`: taken while writing a new entry, to attach to it. */
+  onSave: (fields: Fields, reason: string, photos: NewPhoto[]) => void;
   onDraft?: (fields: Fields) => void;
   onCancel?: () => void;
   compact?: boolean;
@@ -45,6 +48,7 @@ export function EntryForm({
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
   const [tag, setTag] = useState("");
+  const [photos, setPhotos] = useState<NewPhoto[]>([]);
   const automaticTime = useRef(!initial && !preset);
   const message = useRef<HTMLTextAreaElement>(null);
   const update = <K extends keyof Fields>(key: K, value: Fields[K]) => {
@@ -128,11 +132,16 @@ export function EntryForm({
       return;
     }
     try {
-      onSave(result.data, reason.trim() || t("Modification par l’opérateur"));
+      onSave(
+        result.data,
+        reason.trim() || t("Modification par l’opérateur"),
+        photos,
+      );
       if (!initial) {
         const next = emptyFields();
         setFields({ ...next, source: fields.source, channel: fields.channel });
         setTag("");
+        setPhotos([]);
         automaticTime.current = true;
         message.current?.focus();
       }
@@ -219,6 +228,7 @@ export function EntryForm({
           }
         />
       </div>
+      {!initial && <PhotoPicker value={photos} onChange={setPhotos} />}
       <div className="form-pair">
         <label>
           {t("Heure de l’événement")}

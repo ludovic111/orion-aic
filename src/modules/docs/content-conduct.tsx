@@ -336,8 +336,11 @@ export const CONDUCT_MODULE_TOPICS: Topic[] = [
           </li>
           <li>Une alerte supprimée n’est pas recréée pour ce jour-là.</li>
           <li>
-            Le niveau des cours d’eau ne fait pas partie de la prévision (Open
-            Meteo, gratuite) : saisissez les alertes de crue à la main.
+            <strong>Débit ou niveau d’un cours d’eau</strong> : choisissez la
+            grandeur, puis une des stations OFEV proches (chargez d’abord les
+            alertes officielles dans Météo). Le seuil est comparé à la mesure
+            chaque fois que ce poste charge les alertes officielles ; tant que
+            l’eau reste au-dessus, l’alerte reste en vigueur.
           </li>
         </ul>
       </>
@@ -467,7 +470,8 @@ export const CONDUCT_TOGETHER_TOPICS: Topic[] = [
           <Ui>Préparer le point de situation</Ui> en un clic.
         </li>
         <li>
-          <Ui>Fait</Ui> le range ; l’horloge le repousse de 15 minutes.
+          <Ui>Fait</Ui> le range ; <Ui>Plus tard</Ui> le repousse de 15 minutes.
+          L’encart est en haut de la page : il ne cache rien.
         </li>
       </Steps>
     ),
