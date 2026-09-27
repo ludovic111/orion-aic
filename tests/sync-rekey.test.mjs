@@ -189,11 +189,17 @@ function permutations(list) {
 }
 
 test("concurrent changes of code: the same winner whatever the order", () => {
-  const change = (id, from, ms, removed = []) => ({
+  // Each change gives the code to every other post it knows of (all those
+  // of this test), except those it removes.
+  const everyone = ["aaaaaaaa", "bbbbbbbb", "cccccccc", "rrrrrrrr"];
+  const change = (id, from, ms, removed = [], known = everyone) => ({
     id: id.padEnd(32, "0"),
     from,
     stamp: stampAt(ms, from),
     removed,
+    boxes: known
+      .filter((to) => to !== from && !removed.includes(to))
+      .map((to) => ({ to })),
   });
   // Highest stamp wins, then highest id.
   const early = change("a1", "aaaaaaaa", T0);
@@ -206,18 +212,32 @@ test("concurrent changes of code: the same winner whatever the order", () => {
     assert.equal(pickRotation(order), tieB);
 
   // The chief removes R; R changes the code at the same time with a later
-  // stamp (even one far in the future): R's change is void.
+  // stamp (even one far in the future): R's change is void. So is B's,
+  // made at the same time, which would still give the code to R.
   const chief = change("e1", "cccccccc", T0, ["rrrrrrrr"]);
   const rogue = change("f1", "rrrrrrrr", T0 + 3_600_000);
   const other = change("a2", "bbbbbbbb", T0 - 1000);
   for (const order of permutations([chief, rogue, other]))
     assert.equal(pickRotation(order), chief);
 
-  // Two posts removing each other: nothing stands, the highest stamp wins.
-  const x = change("11", "xxxxxxxx", T0, ["yyyyyyyy"]);
-  const y = change("22", "yyyyyyyy", T0 + 10, ["xxxxxxxx"]);
+  // Two posts removing each other: nothing stands, no winner (each post
+  // keeps the change it already follows).
+  const x = change(
+    "11",
+    "xxxxxxxx",
+    T0,
+    ["yyyyyyyy"],
+    ["xxxxxxxx", "yyyyyyyy"],
+  );
+  const y = change(
+    "22",
+    "yyyyyyyy",
+    T0 + 10,
+    ["xxxxxxxx"],
+    ["xxxxxxxx", "yyyyyyyy"],
+  );
   for (const order of permutations([x, y]))
-    assert.equal(pickRotation(order), y);
+    assert.equal(pickRotation(order), undefined);
 
   // A change whose author removes itself is ignored.
   const self = change("33", "zzzzzzzz", T0 + 99_999, ["zzzzzzzz"]);
