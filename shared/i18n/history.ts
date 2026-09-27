@@ -120,6 +120,12 @@ export const { t, tn, tIn, dict } = translator({
   Inject: { de: "Einspielung", it: "Inject" },
   Injects: { de: "Einspielungen", it: "Inject" },
   "Point du débriefing": { de: "Debriefing-Punkt", it: "Punto del debriefing" },
+  Photo: { de: "Foto", it: "Foto" },
+  Photos: { de: "Fotos", it: "Foto" },
+  "Photo supprimée : l’image n’est plus conservée.": {
+    de: "Foto gelöscht: Das Bild wird nicht mehr aufbewahrt.",
+    it: "Foto eliminata: l’immagine non è più conservata.",
+  },
   Débriefing: { de: "Debriefing", it: "Debriefing" },
   Entrée: { de: "Eintrag", it: "Voce" },
   Journal: { de: "Journal", it: "Diario" },

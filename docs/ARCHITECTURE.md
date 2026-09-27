@@ -58,12 +58,14 @@ Workspace
    │  │                            rappels d’export et d’impression
    │  ├─ scenarios, injects        exercice : scénario (T0, fin), injects datés, remise, réaction
    │  ├─ retex                     débriefing : points positifs / à améliorer (registre)
+   │  ├─ photos                    photos d’une entrée, d’un message ou d’un objet de carte
+   │  │                            (target entry:… / message:… / place:…, image, taille, légende)
    │  └─ settings                  référentiels, lieu météo, vue de carte
    ├─ sync { clock, removed, compacted }
    │                               horodatages (horloge logique hybride) des changements,
    │                               suppressions, filigrane de compaction de l’historique
    ├─ history[]                    chaque changement de chaque élément : qui, quand, état après
-   └─ blobs                        images (signes personnalisés), une fois chacune, par SHA-256
+   └─ blobs                        images (signes personnalisés, photos), une fois chacune, par SHA-256
 ```
 
 Chaque élément des modules porte un identifiant, sa date de création, de modification et son auteur. Les anciens journaux (1.x) se chargent avec des modules vides.
@@ -75,7 +77,7 @@ Chaque élément des modules porte un identifiant, sa date de création, de modi
 `shared/events.ts` (schéma) et `shared/history.ts` (logique).
 
 - **Enregistrement.** `stampJournal` (appelé par `setWorkspace` pour tout changement local) compare l’ancienne et la nouvelle version, horodate les éléments touchés pour la synchronisation, puis `appendHistory` ajoute un événement par élément : `{ id, at, by, action: create | update | remove, scope, target, state, rev, note, hlc, base }`. `state` est l’élément complet après le changement (`null` s’il est supprimé), `by` l’opérateur du poste, `hlc` l’horodatage logique, `base` l’horodatage de la version modifiée (deux événements de même `base` sont simultanés). Les entrées du journal ne sont pas dupliquées : leurs versions (`revisions`, avec `hlc`, `base` et `refs`) et suppressions (`deleted`) jouent ce rôle.
-- **Images une seule fois.** Un signe personnalisé (jusqu’à 600 Ko) n’est pas recopié dans chaque événement : l’image est rangée dans `journal.blobs` sous son SHA-256 et les états de l’historique la désignent par `blob:<sha256>` (`shared/blobs.ts`). En mémoire, les signes vivants gardent l’image (les modules l’affichent directement) ; enregistrés ou transmis (`packJournal`), ils la désignent aussi par sa référence. Les images plus utilisées sont retirées.
+- **Images une seule fois.** Un signe personnalisé ou une photo (jusqu’à 600 Ko) n’est pas recopié dans chaque événement : l’image est rangée dans `journal.blobs` sous son SHA-256 et les états de l’historique la désignent par `blob:<sha256>` (`shared/blobs.ts`). En mémoire, les signes et photos vivants gardent l’image (les modules l’affichent directement) ; enregistrés ou transmis (`packJournal`), ils la désignent aussi par sa référence. Les images plus utilisées sont retirées. Une photo est une exception voulue (`LIVE_ONLY`) : son image ne vit que tant qu’une photo vivante la montre ; l’historique d’une photo supprimée garde la référence, pas l’image, et la machine à remonter le temps l’affiche « supprimée ». La décision ne dépend que de `ops.photos` et de l’historique, qui convergent : tous les postes retirent la même image.
 - **Compaction.** Au-delà de 5 000 événements, `appendHistory` avance le filigrane `sync.compacted` (maintenant − 24 h ; − 1 h au-delà de 500 000) : avant lui, chaque élément ne garde que la dernière version de chaque tranche de 15 minutes (2 heures après 7 jours, un jour après 30 jours). Les créations et suppressions sont toujours gardées. Les tranches sont alignées sur des heures fixes et le filigrane se fusionne par maximum : amincir est identique sur tous les postes et la fusion reste commutative, associative et idempotente.
 - **Regroupement.** Les retouches d’une même personne sur un même élément en moins de 20 s remplacent l’événement précédent (`rev` + 1) au lieu d’en créer un nouveau.
 - **Éléments antérieurs.** Un élément modifié pour la première fois depuis l’existence de l’historique reçoit d’abord un événement « état connu » dont l’identifiant est dérivé de l’élément (`stableId`) : deux postes produisent le même.
@@ -85,6 +87,19 @@ Chaque élément des modules porte un identifiant, sa date de création, de modi
 - **Registres.** Points figés, exports et présentations sont des collections ordinaires (`useApp().record`), écrites même sur un journal clôturé ou depuis la machine à remonter le temps.
 
 Interface : `src/timeline/` (barre du temps et relecture, fiche Historique, ligne « Créé par… » de chaque fiche, points figés), `src/modules/trace/` (module Traçabilité : qui a fait quoi, comparer, points figés, registres).
+
+## Photos
+
+`shared/photo-schema.ts` (schéma, limites), `shared/photos.ts` (logique), `shared/exif.ts` (position GPS), `src/photos/` (interface).
+
+- **Modèle.** Une photo est un enregistrement de `ops.photos` : `{ id, createdAt, updatedAt, by, target, image, width, height, caption }`. `target` désigne l’élément illustré (`entry:<id>`, `message:<id>`, `place:<id>`). Ajouter ou retirer une photo ne réécrit jamais l’élément : pas de nouvelle version d’entrée, pas de conflit avec une modification simultanée du texte. Synchronisation, fusion (dernier horodatage gagnant, suppression gagnante sur un changement antérieur), historique et restauration sont ceux de toute collection. `removeRecords` et `deleteEntry` retirent aussi les photos de l’élément supprimé.
+- **Image.** Réduite dans le navigateur (`src/photos/reduce.ts`) : canevas, JPEG, 1 600 px au plus sur le grand côté, qualité 0,82 puis moins, puis plus petit, jusqu’à environ 350 Ko ; le réencodage retire les métadonnées. Le schéma n’accepte qu’un JPEG en base64 (`DATA_PHOTO`) de 600 000 caractères au plus, ou une référence `blob:`.
+- **Limites.** Schéma : 1 000 photos par journal (au-dessus de ce qu’une session peut ajouter, pour que deux postes qui ajoutent en même temps fusionnent toujours). Interface (`photoRefusal`) : 12 photos par élément, 40 Mo pour toutes les photos de la session (chaque image comptée une fois), fichier d’origine de 40 Mo.
+- **Synchronisation.** `sliceJournal` envoie avec une photo nouvelle son image ; l’empreinte (`digest`) compte les photos par le hash de leur image.
+- **Sauvegarde locale.** La session est réécrite à chaque changement ; les images des photos, lourdes et jamais modifiées, en sont retirées (`splitPhotoBlobs`) et chiffrées une fois chacune dans l’enregistrement `photo:<sha256>` de la même base, avec la même clé (`decryptWith`). Session, nouvelles images et images plus utilisées sont écrites dans une seule transaction IndexedDB. À l’ouverture, `joinPhotoBlobs` remet les images avant la validation.
+- **Exports.** `scopedJournal` garde les photos des éléments exportés et `withUsedBlobs` seulement leurs images. Archive `.orionaic` et JSON : photos comprises (réimport et fusion les gardent). Fiche A4 d’une entrée et formule de message : pages de photos après la fiche (`FormSheet.photos`, quatre par page, aperçu et PDF). Dossier : tableau « Photos jointes » (nombre et légendes) dans les chapitres Journal, Messages et Cartes.
+- **Liaison entre PC.** Les messages envoyés à un autre PC partent sans leurs photos.
+- **Position.** `jpegPosition` lit la position GPS EXIF des premiers octets d’un JPEG, sur le poste qui ajoute la photo, pour proposer « Placer sur la carte » (objet de carte relié à l’élément). Elle n’est jamais gardée avec la photo.
 
 ## Liens
 

@@ -300,7 +300,7 @@ export async function makeExport(
     if (blob.size > MAX_IMPORT_BYTES)
       throw new Error(
         t(
-          "Cette archive dépasse la limite d’import de 32 Mo. Exportez les formats de lecture et répartissez le journal avant de créer une archive transférable.",
+          "Cette archive dépasse la limite d’import de 96 Mo. Exportez les formats de lecture et répartissez le journal avant de créer une archive transférable.",
         ),
       );
     return blob;

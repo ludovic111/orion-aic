@@ -66,7 +66,7 @@ export function ImportModal({
     setBusy(true);
     try {
       if (file.size > MAX_IMPORT_BYTES)
-        throw new Error(t("Ce fichier dépasse 32 Mo."));
+        throw new Error(t("Ce fichier dépasse 96 Mo."));
       const text = await file.text();
       if (/\.(csv|tsv)$/i.test(file.name)) {
         setCandidate(importCsv(text, file.name.replace(/\.[^.]+$/, "")));
@@ -109,7 +109,7 @@ export function ImportModal({
         <strong>{t("Choisir un fichier")}</strong>
         <span className="mono">
           {t(
-            ".orionaic · .orion · .json · .csv · .tsv · 32 Mo max · lu localement",
+            ".orionaic · .orion · .json · .csv · .tsv · 96 Mo max · lu localement",
           )}
         </span>
         <input

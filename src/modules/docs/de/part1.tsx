@@ -423,8 +423,9 @@ export const PART1: Topic[] = [
         <H>Grenzen</H>
         <p>
           10 000 Einträge pro Journal, 500 Versionen pro Eintrag, 12 000 Zeichen
-          pro Meldung, importierte Dateien von höchstens 32 MB. Keine Anhänge
-          (Fotos, PDF): Notieren Sie deren Referenz.
+          pro Meldung, importierte Dateien von höchstens 96 MB. Fotos: 12 pro
+          Eintrag, Meldung oder Kartenobjekt, 40 MB für die ganze Sitzung.
+          Andere Anhänge (PDF, Dokumente): Notieren Sie deren Referenz.
         </p>
       </>
     ),

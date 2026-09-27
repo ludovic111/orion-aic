@@ -20,6 +20,12 @@ import {
 import { useApp } from "../../app/context";
 import { intakeSheet } from "../../print/sheet";
 import { DictationButton, insertDictation } from "../../ui/DictationButton";
+import { PhotoPicker } from "../../photos/PhotoPicker";
+import {
+  attachPhotos,
+  photoRefusal,
+  type NewPhoto,
+} from "../../../shared/photos";
 import {
   ComboField,
   DateTimeField,
@@ -68,12 +74,15 @@ export function Capture({
     lists,
     updateOps,
     toast,
+    workspace,
     prefs,
     setPrefs,
     queuePrint,
   } = useApp();
   const [draft, setDraft] = useState<Draft>(() => blank());
   const [more, setMore] = useState(false);
+  // Photos taken while writing, attached when the message is saved.
+  const [photos, setPhotos] = useState<NewPhoto[]>([]);
   const [error, setError] = useState("");
   const body = useRef<HTMLTextAreaElement>(null);
   const templates = skeletons(journalLang(journal.ops));
@@ -143,8 +152,22 @@ export function Capture({
       number: nextMessageNumber(journal),
       node: localNode(),
     };
+    const refusal = photos.length
+      ? photoRefusal(workspace, { photos: [] }, "", photos)
+      : null;
+    if (refusal) {
+      setError(refusal);
+      return;
+    }
     try {
-      updateOps((ops) => upsert(ops, "messages", message, author));
+      updateOps((ops) =>
+        attachPhotos(
+          upsert(ops, "messages", message, author),
+          `message:${message.id}`,
+          photos,
+          author,
+        ),
+      );
     } catch (err) {
       setError((err as Error).message);
       return;
@@ -162,11 +185,23 @@ export function Capture({
       queuePrint({
         kind: "forms",
         journal,
-        sheets: [intakeSheet(message, number)],
+        sheets: [
+          intakeSheet(
+            message,
+            number,
+            photos.map((p) => ({
+              src: p.image,
+              caption: "",
+              width: p.width,
+              height: p.height,
+            })),
+          ),
+        ],
         title: t("Formule de message"),
         name: t("message (fichier)"),
       });
     setDraft(blank({ from: draft.from, via: draft.via }));
+    setPhotos([]);
     setMore(false);
     requestAnimationFrame(() =>
       boxRef.current?.querySelector<HTMLInputElement>("input")?.select(),
@@ -312,6 +347,13 @@ export function Capture({
                     update({ body: value }),
                   )
                 }
+              />
+            </div>
+            <div className="span-2">
+              <PhotoPicker
+                value={photos}
+                onChange={setPhotos}
+                disabled={readOnly}
               />
             </div>
             <TextField

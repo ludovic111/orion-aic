@@ -9,6 +9,7 @@ import {
 import { useApp } from "../../app/context";
 import { LinkChip } from "../../ui/links";
 import { RecordSheet, type FieldSpec } from "../../ui/records";
+import { PhotoStrip } from "../../photos/PhotoStrip";
 import type { MessageActions } from "./actions";
 import { partyOptions } from "./model";
 import { t } from "./i18n.ts";
@@ -88,30 +89,33 @@ export function MessageSheet({
       extraOptions={extra}
     >
       {() => (
-        <div className="msg-sheet-actions">
-          {message.entryId ? (
-            <LinkChip
-              target={ref("entry", message.entryId)}
-              label={t("au journal")}
-            />
-          ) : (
-            !readOnly && (
-              <button
-                onClick={() => {
-                  onClose();
-                  onSynth(message);
-                }}
-              >
-                <BookOpen size={14} />
-                {t("Inscrire au journal")}
-              </button>
-            )
-          )}
-          <button onClick={() => actions.printSheet([message])}>
-            <Printer size={14} />
-            {t("Fiche A4")}
-          </button>
-        </div>
+        <>
+          <PhotoStrip target={ref("message", message.id)} />
+          <div className="msg-sheet-actions">
+            {message.entryId ? (
+              <LinkChip
+                target={ref("entry", message.entryId)}
+                label={t("au journal")}
+              />
+            ) : (
+              !readOnly && (
+                <button
+                  onClick={() => {
+                    onClose();
+                    onSynth(message);
+                  }}
+                >
+                  <BookOpen size={14} />
+                  {t("Inscrire au journal")}
+                </button>
+              )
+            )}
+            <button onClick={() => actions.printSheet([message])}>
+              <Printer size={14} />
+              {t("Fiche A4")}
+            </button>
+          </div>
+        </>
       )}
     </RecordSheet>
   );

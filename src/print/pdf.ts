@@ -2,7 +2,8 @@ import type { jsPDF } from "jspdf";
 import type { Entry, Journal } from "../../shared/journal.ts";
 import { radioTables, type SheetTable } from "./radio-sheet.ts";
 import {
-  messageSheet,
+  entrySheet,
+  PHOTOS_PER_PAGE,
   printedAt,
   sheetHeader,
   type FormSheet,
@@ -317,6 +318,44 @@ function drawForm(doc: Doc, header: SheetHeader, sheet: FormSheet) {
   color(doc, INK);
 }
 
+/** The photos of a form, four per page, after it. */
+function drawPhotos(doc: Doc, header: SheetHeader, sheet: FormSheet) {
+  const photos = sheet.photos ?? [];
+  for (let i = 0; i < photos.length; i += PHOTOS_PER_PAGE) {
+    doc.addPage();
+    let y = drawBand(doc, header, sheet.kind) + 6;
+    font(doc, 8, true);
+    doc.text(
+      t("{label} {number} · photos", {
+        label: sheet.idLabel.toUpperCase(),
+        number: sheet.number,
+      }),
+      PAGE.m,
+      y,
+    );
+    y += 4;
+    const gap = 6;
+    const legend = 6;
+    const cw = (WIDTH - gap) / 2;
+    const ch = (BOTTOM - y - gap - legend * 2) / 2;
+    photos.slice(i, i + PHOTOS_PER_PAGE).forEach((p, k) => {
+      const x0 = PAGE.m + (k % 2) * (cw + gap);
+      const y0 = y + Math.floor(k / 2) * (ch + legend + gap);
+      const scale = Math.min(cw / p.width, ch / p.height);
+      const w = p.width * scale;
+      const h = p.height * scale;
+      doc.addImage(p.src, "JPEG", x0 + (cw - w) / 2, y0 + (ch - h) / 2, w, h);
+      doc.setDrawColor(...RULE);
+      doc.setLineWidth(0.2);
+      doc.rect(x0, y0, cw, ch);
+      font(doc, 7.5, false, MUTED);
+      const text = `${i + k + 1}${p.caption ? ` · ${p.caption}` : ""}`;
+      doc.text(doc.splitTextToSize(text, cw)[0] as string, x0, y0 + ch + 4);
+    });
+  }
+  color(doc, INK);
+}
+
 export async function formsPdf(
   journal: Journal,
   sheets: FormSheet[],
@@ -328,6 +367,7 @@ export async function formsPdf(
   sheets.forEach((sheet, i) => {
     if (i) doc.addPage();
     drawForm(doc, header, sheet);
+    drawPhotos(doc, header, sheet);
   });
   drawFooters(
     doc,
@@ -340,7 +380,7 @@ export async function messagesPdf(journal: Journal, entries: Entry[]) {
   if (!entries.length) throw new Error(t("Aucune entrée sélectionnée."));
   return formsPdf(
     journal,
-    entries.map(messageSheet),
+    entries.map((e) => entrySheet(journal, e)),
     t("{n} messages", { n: entries.length }),
   );
 }

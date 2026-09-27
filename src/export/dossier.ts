@@ -5,6 +5,7 @@ import {
   needsFollowUp,
   numberLabel,
   overdue,
+  withUsedBlobs,
   type Entry,
   type Fields,
   type Journal,
@@ -30,6 +31,7 @@ import {
   KIND_INFO,
 } from "../../shared/links.ts";
 import { radioSummary } from "../../shared/radio.ts";
+import { photosOf } from "../../shared/photos.ts";
 import { radioTables } from "../print/radio-sheet.ts";
 import { debriefChapter, debriefCount } from "./debrief.ts";
 import { symbolName } from "../modules/map/builtins.ts";
@@ -151,7 +153,11 @@ export function resolveScope(live: Journal, scope: ExportScope) {
  */
 export function archiveJournal(live: Journal, scope: ExportScope): Journal {
   const { base, journal } = resolveScope(live, scope);
-  return { ...journal, history: historyInScope(base.history, scope) };
+  return withUsedBlobs({
+    ...journal,
+    history: historyInScope(base.history, scope),
+    blobs: base.blobs,
+  });
 }
 
 // ---------- Formatting ----------
@@ -332,6 +338,44 @@ type Ctx = {
 type Built = { kpis: Kpi[]; blocks: Block[] };
 const table = (t: Table): Block => ({ kind: "table", table: t });
 
+/**
+ * Photos of the items of a chapter: how many, and their legends. The
+ * pictures themselves are in the A4 forms and the orion aic archive.
+ */
+function photosTable(
+  journal: Journal,
+  id: string,
+  sheet: string,
+  items: [label: string, target: string][],
+): Block[] {
+  const rows = items.flatMap(([label, target]) => {
+    const list = photosOf(journal.ops, target);
+    return list.length
+      ? [
+          [
+            label,
+            String(list.length),
+            list
+              .map((p) => p.caption)
+              .filter(Boolean)
+              .join(" · "),
+          ],
+        ]
+      : [];
+  });
+  if (!rows.length) return [];
+  return [
+    table({
+      id,
+      title: t("Photos jointes"),
+      sheet,
+      caption: t("Les images figurent dans les fiches A4 et dans l’archive"),
+      columns: cols(["Élément", 1.6], ["Photos", 0.7], ["Légendes", 5]),
+      rows,
+    }),
+  ];
+}
+
 function situation({ journal }: Ctx): Built {
   const { facts, boards, snapshots } = journal.ops;
   const blocks: Block[] = [];
@@ -499,6 +543,14 @@ function journalChapter({ journal, options }: Ctx): Built {
         }),
       },
     }),
+  );
+  blocks.push(
+    ...photosTable(
+      journal,
+      "entries-photos",
+      t("Photos du journal"),
+      entries.map((e) => [numberLabel(e), `entry:${e.id}`]),
+    ),
   );
   if (options.versions) {
     const rows: string[][] = [];
@@ -764,6 +816,15 @@ function messagesChapter({ journal }: Ctx): Built {
           ]),
         },
       }),
+      ...photosTable(
+        journal,
+        "messages-photos",
+        t("Photos des messages"),
+        list.map((m, i) => [
+          `M${String(i + 1).padStart(3, "0")}`,
+          `message:${m.id}`,
+        ]),
+      ),
     ],
   };
 }
@@ -845,6 +906,17 @@ function mapChapter({ journal, base }: Ctx): Built {
       }),
     );
   }
+  blocks.push(
+    ...photosTable(
+      journal,
+      "places-photos",
+      t("Photos de la carte"),
+      journal.ops.places.map((p) => [
+        p.label || t("(sans nom)"),
+        `place:${p.id}`,
+      ]),
+    ),
+  );
   return {
     kpis: [
       count(maps.length, "carte", "cartes"),

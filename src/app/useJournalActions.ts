@@ -18,6 +18,7 @@ import { opsSchema, thinForecasts, upsert, type Ops } from "../../shared/ops";
 import { addLink, ref, type Ref } from "../../shared/links";
 import type { Radio } from "../../shared/radio";
 import { closableBy, snooze } from "../../shared/workflow";
+import { attachPhotos, photoRefusal, type NewPhoto } from "../../shared/photos";
 import { ReadOnlyError, writeRefusal } from "./gate";
 import { t } from "./i18n.ts";
 import type { AppContext, LogCollection } from "./context";
@@ -211,15 +212,37 @@ export function useJournalActions({
     [gate, setWorkspace],
   );
 
-  /** Entry form submitted: returns the new entry and the entries it may close. */
+  /**
+   * Entry form submitted (with the photos taken meanwhile): returns the new
+   * entry and the entries it may close.
+   */
   const consign = useCallback(
     (
       fields: Fields,
+      photos: NewPhoto[] = [],
     ): { entry: Entry; closable: string[]; journal: Journal } | null => {
       const { live: base, workspace: ws } = state.current;
       if (!base || !ws || !gate()) return null;
       const closable = closableBy(base, fields).map((e) => e.id);
-      const updated = changeJournal((j) => addEntry(j, fields, ws.author));
+      // Checked when they were taken; if the room ran out since (another
+      // post), the entry is still recorded, without them, and the operator
+      // is told why.
+      const refusal = photos.length
+        ? photoRefusal(ws, { photos: [] }, "", photos)
+        : null;
+      if (refusal) {
+        state.current.refuse(refusal);
+        photos = [];
+      }
+      const updated = changeJournal((j) => {
+        const next = addEntry(j, fields, ws.author);
+        if (!photos.length) return next;
+        const target = `entry:${next.entries.at(-1)!.id}`;
+        return journalSchema.parse({
+          ...next,
+          ops: attachPhotos(next.ops, target, photos, ws.author),
+        });
+      });
       if (!updated) return null;
       return { entry: updated.entries.at(-1)!, closable, journal: updated };
     },

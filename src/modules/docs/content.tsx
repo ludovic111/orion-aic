@@ -47,6 +47,7 @@ import { CONDUCT_TOPICS } from "./conduct";
 import { EXERCISE_TOPICS } from "./content-exercise";
 import { VALISE_TOPIC } from "./content-valise";
 import { DICTATION_TOPIC } from "./content-dictation";
+import { PHOTOS_TOPIC } from "./content-photos";
 import { t } from "./i18n-content.ts";
 import type { Lang } from "../../i18n";
 
@@ -506,8 +507,9 @@ export const TOPICS: Topic[] = [
         <H>Limites</H>
         <p>
           10 000 entrées par journal, 500 versions par entrée, 12 000 caractères
-          par message, fichiers importés de 32 Mo au plus. Pas de pièces jointes
-          (photos, PDF) : notez leur référence.
+          par message, fichiers importés de 96 Mo au plus. Photos : 12 par
+          entrée, message ou objet de la carte, 40 Mo pour toute la session. Les
+          autres pièces jointes (PDF, documents) : notez leur référence.
         </p>
       </>
     ),
@@ -2973,7 +2975,7 @@ export const TOPICS: Topic[] = [
         <ul>
           <li>
             Fichiers acceptés : <code>.orionaic</code>, <code>.orion</code>,{" "}
-            <code>.json</code>, <code>.csv</code>, <code>.tsv</code>, 32 Mo au
+            <code>.json</code>, <code>.csv</code>, <code>.tsv</code>, 96 Mo au
             plus. Le fichier est lu sur le poste, il n’est envoyé nulle part.
           </li>
           <li>
@@ -3553,8 +3555,9 @@ export const TOPICS: Topic[] = [
           organisation.
         </Faq>
         <Faq q="Puis-je joindre une photo à une entrée ?">
-          Non, orion aic ne garde pas de fichiers joints. Notez la référence de
-          la photo ou du document.
+          Oui : ouvrez l’entrée et appuyez sur <Ui>Photo</Ui> (aussi dans une
+          nouvelle entrée, un message ou un objet de la carte). Voir « Photos ».
+          Pour un PDF ou un autre document, notez sa référence.
         </Faq>
       </div>
     ),
@@ -3684,10 +3687,12 @@ export const TOPICS: Topic[] = [
       </dl>
     ),
   },
-  // Exercises, debriefing, wall screen, signatures, suitcase PC, dictation.
+  // Exercises, debriefing, wall screen, signatures, suitcase PC, dictation,
+  // photos.
   ...EXERCISE_TOPICS,
   VALISE_TOPIC,
   DICTATION_TOPIC,
+  PHOTOS_TOPIC,
 ];
 
 /** Resolve a help topic (module id, docs topic or unknown) to an existing topic. */

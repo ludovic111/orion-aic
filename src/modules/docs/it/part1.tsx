@@ -414,8 +414,9 @@ export const PART1: Topic[] = [
         <H>Limiti</H>
         <p>
           10 000 voci per diario, 500 versioni per voce, 12 000 caratteri per
-          messaggio, file importati di 32 MB al massimo. Niente allegati (foto,
-          PDF): annotatene il riferimento.
+          messaggio, file importati di 96 MB al massimo. Foto: 12 per voce,
+          messaggio od oggetto della carta, 40 MB per tutta la sessione. Gli
+          altri allegati (PDF, documenti): annotatene il riferimento.
         </p>
       </>
     ),

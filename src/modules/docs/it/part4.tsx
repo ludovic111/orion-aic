@@ -575,8 +575,9 @@ export const PART4: Topic[] = [
           organizzazione.
         </Faq>
         <Faq q="Posso allegare una foto a una voce?">
-          No, orion aic non conserva file allegati. Annotate il riferimento
-          della foto o del documento.
+          Sì: aprite la voce e toccate <Ui>Foto</Ui> (anche in una nuova voce,
+          un messaggio o un oggetto della carta). Vedere «Foto». Per un PDF o un
+          altro documento, annotatene il riferimento.
         </Faq>
       </div>
     ),

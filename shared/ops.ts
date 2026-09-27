@@ -19,6 +19,7 @@ import {
   shiftSchema,
   thresholdSchema,
 } from "./conduct-schemas.ts";
+import { MAX_PHOTOS, photoSchema } from "./photo-schema.ts";
 import { getLang, isLang, type Lang } from "./i18n/core.ts";
 import { BOARDS, EMERGENCY, FACTS, LIST_VALUES } from "./i18n/seeds.ts";
 import { enumLabel } from "./i18n/enums.ts";
@@ -647,6 +648,8 @@ export const opsSchema = z
     scenarios: z.array(scenarioSchema).max(50).default([]),
     injects: z.array(injectSchema).max(2000).default([]),
     retex: z.array(retexSchema).max(1000).default([]),
+    // Photos of entries, messages and map objects (shared/photo-schema.ts).
+    photos: z.array(photoSchema).max(MAX_PHOTOS).default([]),
     settings: settingsSchema.default({
       lists: {},
       weatherPlace: null,
@@ -680,6 +683,7 @@ export type Inject = z.infer<typeof injectSchema>;
 export type InjectEffect = z.infer<typeof injectEffectSchema>;
 export type RetexNote = z.infer<typeof retexSchema>;
 export type Ops = z.infer<typeof opsSchema>;
+export type { Photo } from "./photo-schema.ts";
 
 /** Collections of records with an id, in a fixed order. */
 export const COLLECTIONS = [
@@ -718,6 +722,7 @@ export const COLLECTIONS = [
   "scenarios",
   "injects",
   "retex",
+  "photos",
 ] as const;
 export type Collection = (typeof COLLECTIONS)[number];
 export type RecordOf<C extends Collection> = Ops[C][number];
@@ -759,6 +764,7 @@ export const RECORD_SCHEMAS = {
   scenarios: scenarioSchema,
   injects: injectSchema,
   retex: retexSchema,
+  photos: photoSchema,
 } as const satisfies Record<Collection, z.ZodType>;
 /** A record as written by a form: optional fields may be left out. */
 export type InputOf<C extends Collection> = z.input<(typeof RECORD_SCHEMAS)[C]>;
@@ -1033,7 +1039,10 @@ export function upsert<C extends Collection>(
   };
 }
 
-/** Remove records and every explicit link that points to them. */
+/**
+ * Remove records, every explicit link that points to them and the photos
+ * that illustrate them.
+ */
 export function removeRecords(ops: Ops, ids: string[]): Ops {
   const gone = new Set(ids);
   const next = { ...ops } as Ops;
@@ -1041,6 +1050,7 @@ export function removeRecords(ops: Ops, ids: string[]): Ops {
     (next as Record<Collection, { id: string }[]>)[collection] = ops[
       collection
     ].filter((r) => !gone.has(r.id));
+  next.photos = next.photos.filter((p) => !gone.has(p.target.split(":")[1]));
   next.links = next.links.filter(
     (l) => !gone.has(l.a.split(":")[1]) && !gone.has(l.b.split(":")[1]),
   );

@@ -20,6 +20,7 @@ import {
   type Journal,
   type Workspace,
 } from "../shared/journal";
+import type { NewPhoto } from "../shared/photos";
 import { listValues } from "../shared/ops";
 import { KIND_INFO, parseRef, type Module, type Ref } from "../shared/links";
 import { mergeJournal } from "../shared/sync";
@@ -486,8 +487,8 @@ export default function App() {
     if (entries.length) queuePrint({ kind: "messages", journal: j, entries });
   }
   /** The entry form was submitted. */
-  function add(fields: Fields) {
-    const done = actions.consign(fields);
+  function add(fields: Fields, photos?: NewPhoto[]) {
+    const done = actions.consign(fields, photos);
     if (!done) return false;
     drafts.clear(done.journal.id);
     setFormGeneration((value) => value + 1);

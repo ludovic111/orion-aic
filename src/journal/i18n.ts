@@ -611,9 +611,9 @@ export const { t, tn, tIn, dict } = translator({
     },
   "Effacer la session": { de: "Sitzung löschen", it: "Cancella la sessione" },
   // ---------- Import ----------
-  "Ce fichier dépasse 32 Mo.": {
-    de: "Diese Datei ist grösser als 32 MB.",
-    it: "Questo file supera 32 MB.",
+  "Ce fichier dépasse 96 Mo.": {
+    de: "Diese Datei ist grösser als 96 MB.",
+    it: "Questo file supera 96 MB.",
   },
   "CSV : entrées recréées sans leurs versions antérieures.": {
     de: "CSV: Einträge ohne ihre früheren Versionen neu erstellt.",
@@ -634,9 +634,9 @@ export const { t, tn, tIn, dict } = translator({
       it: "Un archivio orion aic (.orionaic o JSON reimportabile) contiene tutta l’operazione e la sua cronologia. Importato in un diario separato, permette a ciascuno di ripercorrerla passo per passo con la macchina del tempo.",
     },
   "Choisir un fichier": { de: "Datei auswählen", it: "Scegli un file" },
-  ".orionaic · .orion · .json · .csv · .tsv · 32 Mo max · lu localement": {
-    de: ".orionaic · .orion · .json · .csv · .tsv · max. 32 MB · lokal gelesen",
-    it: ".orionaic · .orion · .json · .csv · .tsv · max 32 MB · letto localmente",
+  ".orionaic · .orion · .json · .csv · .tsv · 96 Mo max · lu localement": {
+    de: ".orionaic · .orion · .json · .csv · .tsv · max. 96 MB · lokal gelesen",
+    it: ".orionaic · .orion · .json · .csv · .tsv · max 96 MB · letto localmente",
   },
   "Phrase de l’archive": { de: "Satz des Archivs", it: "Frase dell’archivio" },
   Déchiffrer: { de: "Entschlüsseln", it: "Decifra" },
@@ -744,10 +744,10 @@ export const { t, tn, tIn, dict } = translator({
     it: "Stato attuale delle voci; cronologia completa nell’archivio orion aic.",
   },
   "{label} : {value}": { de: "{label}: {value}", it: "{label}: {value}" },
-  "Cette archive dépasse la limite d’import de 32 Mo. Exportez les formats de lecture et répartissez le journal avant de créer une archive transférable.":
+  "Cette archive dépasse la limite d’import de 96 Mo. Exportez les formats de lecture et répartissez le journal avant de créer une archive transférable.":
     {
-      de: "Dieses Archiv überschreitet die Importgrenze von 32 MB. Exportieren Sie die Leseformate und teilen Sie das Journal auf, bevor Sie ein übertragbares Archiv erstellen.",
-      it: "Questo archivio supera il limite d’importazione di 32 MB. Esportare i formati di lettura e suddividere il diario prima di creare un archivio trasferibile.",
+      de: "Dieses Archiv überschreitet die Importgrenze von 96 MB. Exportieren Sie die Leseformate und teilen Sie das Journal auf, bevor Sie ein übertragbares Archiv erstellen.",
+      it: "Questo archivio supera il limite d’importazione di 96 MB. Esportare i formati di lettura e suddividere il diario prima di creare un archivio trasferibile.",
     },
   "Export {date} · Europe/Zurich": {
     de: "Export {date} · Europe/Zurich",

@@ -6,7 +6,8 @@ import { terminalUrl, type Terminal } from "../../shared/radio";
 import { download, fileName } from "../journal/exports";
 import {
   handoutSheet,
-  messageSheet,
+  entrySheet,
+  PHOTOS_PER_PAGE,
   printedAt,
   sheetHeader,
   type FormSheet,
@@ -116,63 +117,95 @@ function FormSheetView({
   sheet: FormSheet;
   stamp: string;
 }) {
+  const photos = sheet.photos ?? [];
+  const pages: (typeof photos)[] = [];
+  for (let i = 0; i < photos.length; i += PHOTOS_PER_PAGE)
+    pages.push(photos.slice(i, i + PHOTOS_PER_PAGE));
+  const foot = (
+    <footer className="sheet-foot">
+      <span>
+        {journal.title} · {sheet.footer}
+      </span>
+      <span>{t("Édité le {stamp} · Europe/Zurich", { stamp })}</span>
+    </footer>
+  );
   return (
-    <article className="sheet portrait">
-      <Band header={sheetHeader(journal)} kind={sheet.kind} />
-      <div className="sheet-id">
-        <div>
-          <span className="cell-label">{sheet.idLabel}</span>
-          <strong>{sheet.number}</strong>
-        </div>
-        <dl>
-          {sheet.boxes.map((box) => (
-            <div key={box.label} className={box.alert ? "alert" : ""}>
-              <dt>{box.label}</dt>
-              <dd>{box.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-      {sheet.note && (
-        <p className={`sheet-note ${sheet.note.alert ? "alert" : ""}`}>
-          {sheet.note.text}
-        </p>
-      )}
-      {sheet.sections.map((section) => (
-        <section key={section.title} className="sheet-section">
-          <h2>{section.title}</h2>
-          {section.rows.map((row, i) => (
-            <div className="sheet-row" key={i}>
-              {row.map((field) => (
-                <Cell key={field.label} field={field} />
-              ))}
-            </div>
-          ))}
-        </section>
-      ))}
-      {sheet.visa.map((visa) => (
-        <section className="sheet-section" key={visa.title}>
-          <h2>{visa.title}</h2>
-          <div className="sheet-row">
-            {visa.labels.map((label) => (
-              <div
-                className="cell visa"
-                key={label}
-                style={{ flexGrow: 1, flexBasis: 0 }}
-              >
-                <span className="cell-label">{label}</span>
+    <>
+      <article className="sheet portrait">
+        <Band header={sheetHeader(journal)} kind={sheet.kind} />
+        <div className="sheet-id">
+          <div>
+            <span className="cell-label">{sheet.idLabel}</span>
+            <strong>{sheet.number}</strong>
+          </div>
+          <dl>
+            {sheet.boxes.map((box) => (
+              <div key={box.label} className={box.alert ? "alert" : ""}>
+                <dt>{box.label}</dt>
+                <dd>{box.value}</dd>
               </div>
             ))}
+          </dl>
+        </div>
+        {sheet.note && (
+          <p className={`sheet-note ${sheet.note.alert ? "alert" : ""}`}>
+            {sheet.note.text}
+          </p>
+        )}
+        {sheet.sections.map((section) => (
+          <section key={section.title} className="sheet-section">
+            <h2>{section.title}</h2>
+            {section.rows.map((row, i) => (
+              <div className="sheet-row" key={i}>
+                {row.map((field) => (
+                  <Cell key={field.label} field={field} />
+                ))}
+              </div>
+            ))}
+          </section>
+        ))}
+        {sheet.visa.map((visa) => (
+          <section className="sheet-section" key={visa.title}>
+            <h2>{visa.title}</h2>
+            <div className="sheet-row">
+              {visa.labels.map((label) => (
+                <div
+                  className="cell visa"
+                  key={label}
+                  style={{ flexGrow: 1, flexBasis: 0 }}
+                >
+                  <span className="cell-label">{label}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+        {foot}
+      </article>
+      {pages.map((page, n) => (
+        <article className="sheet portrait" key={n}>
+          <Band header={sheetHeader(journal)} kind={sheet.kind} />
+          <h2 className="sheet-photos-title">
+            {t("{label} {number} · photos", {
+              label: sheet.idLabel,
+              number: sheet.number,
+            })}
+          </h2>
+          <div className="sheet-photos">
+            {page.map((p, k) => (
+              <figure key={k}>
+                <img src={p.src} alt="" />
+                <figcaption>
+                  {n * PHOTOS_PER_PAGE + k + 1}
+                  {p.caption ? ` · ${p.caption}` : ""}
+                </figcaption>
+              </figure>
+            ))}
           </div>
-        </section>
+          {foot}
+        </article>
       ))}
-      <footer className="sheet-foot">
-        <span>
-          {journal.title} · {sheet.footer}
-        </span>
-        <span>{t("Édité le {stamp} · Europe/Zurich", { stamp })}</span>
-      </footer>
-    </article>
+    </>
   );
 }
 
@@ -297,7 +330,8 @@ function LabelsView({ journal, stamp }: { journal: Journal; stamp: string }) {
 }
 
 function forms(job: PrintJob): FormSheet[] {
-  if (job.kind === "messages") return job.entries.map(messageSheet);
+  if (job.kind === "messages")
+    return job.entries.map((e) => entrySheet(job.journal, e));
   if (job.kind === "forms") return job.sheets;
   if (job.kind === "handout") {
     const terminal = job.journal.radio.terminals.find(

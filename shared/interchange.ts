@@ -17,7 +17,7 @@ import {
 import { LANGS, locale } from "./i18n/core.ts";
 import { enumLabel } from "./i18n/enums.ts";
 import { t, tIn, type Key } from "./i18n/interchange.ts";
-export const MAX_IMPORT_BYTES = 32 * 1024 * 1024;
+export const MAX_IMPORT_BYTES = 96 * 1024 * 1024;
 type Column = { key: Key; value: (entry: Entry) => string; fixed?: boolean };
 // Columns of the exports. `key` is the French name (the CSV import accepts it
 // in the three languages); `fixed` marks the schema values (z.enum), shown
@@ -105,7 +105,7 @@ export function delimited(table: string[][], separator = ";") {
 export function parseDelimited(text: string, separator?: string): string[][] {
   text = text.replace(/^\uFEFF/, "");
   if (text.length > MAX_IMPORT_BYTES)
-    throw new Error(t("Fichier trop volumineux (32 Mo maximum)."));
+    throw new Error(t("Fichier trop volumineux (96 Mo maximum)."));
   if (!separator) {
     const first = text.split(/\r?\n/, 1)[0];
     separator = [";", ",", "\t"].sort(

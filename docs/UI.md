@@ -84,6 +84,7 @@ const {
 | `ui/Popover.tsx`    | `Popover` (menu ancré, classe `.menu`)                                                                                                  |
 | `ui/effects.tsx`    | `CountUp` (affiche la valeur telle quelle), `DecryptText`, `useSpotlight`, `ClickSparks` : signatures gardées, sans effet visuel        |
 | `journal/Modal.tsx` | `Modal` (boîte de dialogue)                                                                                                             |
+| `photos/*.tsx`      | `PhotoStrip target="entry:<id>"` (photos d’un élément enregistré), `PhotoPicker` (photos d’un élément en cours de saisie), `PhotoCount` |
 
 ### Fiche générique
 
