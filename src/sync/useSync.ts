@@ -49,9 +49,10 @@ import {
   sealFrames,
   type RoomKeys,
 } from "../../shared/room";
-import { localNode, tick } from "../../shared/hlc";
+import { localNode } from "../../shared/hlc";
 import {
   newExchangeKey,
+  nextRotationStamp,
   openRekey,
   pickRotation,
   rekeySchema,
@@ -70,6 +71,7 @@ import {
   noteComparison,
   notePost,
   postsView,
+  removedRelays,
   rotationRecipients,
   type PostRecord,
 } from "../../shared/posts";
@@ -546,10 +548,13 @@ export function useSync(options: {
       if (state.candidates.has(candidate.id) || state.candidates.size >= 32)
         return;
       state.candidates.set(candidate.id, candidate);
-      if (candidate.stamp > lastRotation.current)
-        lastRotation.current = candidate.stamp;
+      // No winner (changes that void each other): keep the one followed.
       const winner = pickRotation([...state.candidates.values()]);
       if (!winner || winner.id === state.chosen) return;
+      // Only a change followed counts for the stamp of the next one (a void
+      // one, stamped at the end of time, must not block it).
+      if (winner.stamp > lastRotation.current)
+        lastRotation.current = winner.stamp;
       const first = !state.chosen;
       state.chosen = winner.id;
       // This room is left: nothing more is sent to it, and only changes of
@@ -985,15 +990,25 @@ export function useSync(options: {
       if (!ch || !ch.relay)
         throw new Error(t("Pas de connexion : réessayez dans un instant."));
       const now = Date.now();
-      const relays = (remove.relays ?? []).filter((r) => r !== ch.relay);
+      const nodes = (remove.nodes ?? []).filter((n) => n !== localNode());
+      // Every connection of a removed post, not only the row clicked.
+      const relays = removedRelays(records.current.values(), now, {
+        relays: remove.relays,
+        nodes,
+      }).filter((r) => r !== ch.relay);
       const code = newRoomCode();
       const body = await sealRekey({
         code,
-        stamp: tick(lastRotation.current, now, localNode()),
+        stamp: nextRotationStamp(lastRotation.current, now, localNode()),
         from: ch.relay,
-        recipients: rotationRecipients(records.current.values(), now, relays),
+        recipients: rotationRecipients(
+          records.current.values(),
+          now,
+          relays,
+          nodes,
+        ),
         removed: relays,
-        nodes: (remove.nodes ?? []).filter((n) => n !== localNode()),
+        nodes,
         names: remove.names ?? [],
       });
       // The code may have changed meanwhile (a change received): stop.

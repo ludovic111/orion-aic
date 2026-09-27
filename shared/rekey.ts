@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { fromB64url, toB64url } from "./signature.ts";
 import { PEER_ID, normalizeCode, validCode } from "./room.ts";
-import { NODE, canonicalStamp } from "./hlc.ts";
+import { NODE, canonicalStamp, tick } from "./hlc.ts";
 
 // Changing the session code while working (« Changer le code de session »,
 // « Retirer ce poste »): a new code is drawn and handed to the posts that
@@ -36,10 +36,13 @@ import { NODE, canonicalStamp } from "./hlc.ts";
 //
 // Concurrent changes. Every post applies pickRotation() to all the `rekey`
 // messages seen in the room, and keeps listening to the old room for a
-// while, so that all come to the same winner: a change made by a post that
-// another change removes is void; then the highest stamp wins (then the
-// highest id). A post that is not given the winning code stops
-// synchronising: removed, or missed (it must type the new code).
+// while, so that all come to the same winner: a change whose author another
+// change does not keep (removed, back on a new connection, unknown to it),
+// or that keeps a post another change removes, is void; then the highest
+// stamp wins (then the highest id). A removed post that answers within that
+// while, even from a new connection, cannot win. A post that is not given
+// the winning code stops synchronising: removed, or missed (it must type
+// the new code).
 
 export const REKEY_INFO = "orion-aic/rekey/v1";
 const ECDH = { name: "ECDH", namedCurve: "P-256" } as const;
@@ -202,8 +205,15 @@ export async function sealRekey(options: {
       !isExchangeKey(r.kx)
     )
       continue;
+    let key: CryptoKey;
+    try {
+      key = await boxKey(one.privateKey, r.kx, infoOf(body, r.relay, r.kx));
+    } catch {
+      // Not a point of the curve: that connection gets nothing, and cannot
+      // stop the others from getting the code.
+      continue;
+    }
     seen.add(r.relay);
-    const key = await boxKey(one.privateKey, r.kx, infoOf(body, r.relay, r.kx));
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const ct = await crypto.subtle.encrypt(
       { name: "AES-GCM", iv, additionalData: aad(body, r.relay) },
@@ -259,25 +269,44 @@ export async function openRekey(
 }
 
 /** What decides between concurrent changes of code. */
-export type RotationMeta = Pick<RekeyBody, "id" | "stamp" | "from" | "removed">;
+export type RotationMeta = Pick<
+  RekeyBody,
+  "id" | "stamp" | "from" | "removed"
+> & { boxes: readonly { to: string }[] };
+
+/** The connections a change keeps: its author and those given the code. */
+const kept = (c: RotationMeta) =>
+  new Set([
+    c.from,
+    ...c.boxes.map((b) => b.to).filter((to) => !c.removed.includes(to)),
+  ]);
 
 /**
  * The change of code every post keeps among those seen in one room, the
  * same whatever the order they arrived in. A change whose author removes
- * itself is ignored; a change made by a post that another change removes is
- * void (unless every change is, e.g. two posts removing each other); then
- * the highest stamp, then the highest id, wins.
+ * itself is ignored. A change is void when another change does not keep its
+ * author (a post removed, or that came back on a new connection, or that
+ * was not known to it), or removes a post it keeps. Among those that stand,
+ * the highest stamp, then the highest id, wins. When none stands (e.g. two
+ * posts removing each other), there is no winner: each post keeps the
+ * change it already follows. A removed post that answers a change cannot
+ * win, whatever its stamp.
  */
 export function pickRotation<C extends RotationMeta>(
   list: readonly C[],
 ): C | undefined {
   const sane = list.filter((c) => !c.removed.includes(c.from));
-  const standing = sane.filter(
-    (c) => !sane.some((d) => d !== c && d.removed.includes(c.from)),
+  const keeps = new Map(sane.map((c) => [c, kept(c)]));
+  const standing = sane.filter((c) =>
+    sane.every(
+      (d) =>
+        d === c ||
+        (keeps.get(d)!.has(c.from) &&
+          ![...keeps.get(c)!].some((x) => d.removed.includes(x))),
+    ),
   );
-  const pool = standing.length ? standing : sane;
   let best: C | undefined;
-  for (const c of pool)
+  for (const c of standing)
     if (
       !best ||
       c.stamp > best.stamp ||
@@ -285,6 +314,20 @@ export function pickRotation<C extends RotationMeta>(
     )
       best = c;
   return best;
+}
+
+/**
+ * Stamp of a new change after `last` (the latest change followed): later
+ * than it, or a fresh one if it is so far in the future that the next
+ * stamp would not be a stamp any more.
+ */
+export function nextRotationStamp(
+  last: string,
+  now: number,
+  node: string,
+): string {
+  const next = tick(last || undefined, now, node);
+  return hlcStamp.safeParse(next).success ? next : tick(undefined, now, node);
 }
 
 /**

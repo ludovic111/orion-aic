@@ -300,15 +300,43 @@ export function postsView(
   );
 }
 
-/** The posts a change of code is given to: online, with a key, not removed. */
+/**
+ * The posts a change of code is given to: online, with a key, not removed
+ * (by connection, or by node: every connection of a removed post).
+ */
 export function rotationRecipients(
   records: Iterable<PostRecord>,
   now: number,
   removed: string[] = [],
+  nodes: string[] = [],
 ): { relay: string; kx: string }[] {
   return [...records]
-    .filter((r) => isOnline(r, now) && r.kx && !removed.includes(r.relay))
+    .filter(
+      (r) =>
+        isOnline(r, now) &&
+        r.kx &&
+        !removed.includes(r.relay) &&
+        !(r.node && nodes.includes(r.node)),
+    )
     .map((r) => ({ relay: r.relay, kx: r.kx }));
+}
+
+/**
+ * The connections a removal leaves out: those chosen, and every connection
+ * online of the posts removed (same node), so that a post connected twice
+ * (a reconnection, or on purpose) gets nothing on its other connection.
+ * At most 64, like the room.
+ */
+export function removedRelays(
+  records: Iterable<PostRecord>,
+  now: number,
+  remove: { relays?: string[]; nodes?: string[] },
+): string[] {
+  const nodes = remove.nodes ?? [];
+  const out = new Set(remove.relays ?? []);
+  for (const r of records)
+    if (r.node && nodes.includes(r.node) && isOnline(r, now)) out.add(r.relay);
+  return [...out].slice(0, 64);
 }
 
 /**
