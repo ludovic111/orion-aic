@@ -48,6 +48,7 @@ import { EXERCISE_TOPICS } from "./content-exercise";
 import { VALISE_TOPIC } from "./content-valise";
 import { DICTATION_TOPIC } from "./content-dictation";
 import { PHOTOS_TOPIC } from "./content-photos";
+import { NEWS_TOPIC } from "./content-news";
 import { t } from "./i18n-content.ts";
 import type { Lang } from "../../i18n";
 
@@ -3841,11 +3842,12 @@ export const TOPICS: Topic[] = [
     ),
   },
   // Exercises, debriefing, wall screen, signatures, suitcase PC, dictation,
-  // photos.
+  // photos, what is new.
   ...EXERCISE_TOPICS,
   VALISE_TOPIC,
   DICTATION_TOPIC,
   PHOTOS_TOPIC,
+  NEWS_TOPIC,
 ];
 
 /** Resolve a help topic (module id, docs topic or unknown) to an existing topic. */
@@ -3875,8 +3877,14 @@ export async function loadTopics(lang: Lang): Promise<Topic[]> {
   return list;
 }
 
-/** Titles of the module topics in the language of the post. */
+/**
+ * Titles of the module topics in the language of the post. Only a module's
+ * own topic takes the module name: « Demandes de moyens » or « Seuils météo »
+ * open a module too, but keep their title.
+ */
 export const localized = (list: Topic[]): Topic[] =>
   list.map((tp) =>
-    tp.module ? { ...tp, title: moduleInfo(tp.module).label } : tp,
+    tp.module && tp.id === tp.module
+      ? { ...tp, title: moduleInfo(tp.module).label }
+      : tp,
   );
