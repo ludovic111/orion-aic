@@ -10,6 +10,8 @@ public/source/
 .DS_Store
 *.log
 coverage/
+test-results/
+playwright-report/
 __pycache__/
 *.pyc
 

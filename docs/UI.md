@@ -80,6 +80,14 @@ const {
 - **Rappels et bandeaux** : dans le flux de `main` (`ConductLayer`, `ReminderBar`), jamais en position fixe par-dessus le contenu.
 - **Premiers pas** : `StartCard` (`src/modules/situation/StartCard.tsx`), montrée tant que `prefs.startDone` est faux ; l’aide « Bien démarrer » la remet.
 
+### Tests de bout en bout (`e2e/`)
+
+Les parcours principaux sont joués dans Chromium par Playwright (`npm run e2e`, voir le README) : démonstration et barre des modules, nouvelle session et journal, message inscrit au journal, deux postes synchronisés, archive `.orionaic`, téléphone, changement de langue. Ils cherchent l’interface comme un utilisateur : rôle et nom accessible (`getByRole("button", { name: "Nouvelle entrée" })`), libellé des champs, textes français. Conséquences pour un écran :
+
+- **Un nom accessible à chaque commande** : un bouton d’icône seule garde son `aria-label`, un champ son `<label>`, une région son `aria-label` ; la barre des modules reste un `nav` « Modules » dont le module ouvert porte `aria-current="page"`.
+- **Renommer un libellé français** utilisé par un parcours (« Nouvelle entrée », « Consigner », « Inscrire au journal », « Non partagé », « Créer un code de session », « Rejoindre la session »…) : mettre à jour `e2e/` dans le même changement.
+- Les tests ne sortent jamais du poste : tuiles, swisstopo, geo.admin.ch, open-meteo et avertissements officiels reçoivent une réponse vide (`e2e/fixtures.ts`). Une erreur JavaScript non rattrapée dans la page fait échouer le test.
+
 ## Composants
 
 | Fichier             | Composants                                                                                                                              |

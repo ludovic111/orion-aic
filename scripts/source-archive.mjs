@@ -15,6 +15,7 @@ execFileSync(
       "server",
       "scripts",
       "tests",
+      "e2e",
       "docs",
       "package.json",
       "package-lock.json",
