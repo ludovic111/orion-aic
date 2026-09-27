@@ -554,8 +554,14 @@ export const PART4: Topic[] = [
           cifrati. Non conserva nulla.
         </Faq>
         <Faq q="Il codice di sessione è stato divulgato. Che cosa fare?">
-          Su ogni postazione, <Ui>Interrompi su questa postazione</Ui>. Poi una
-          postazione crea un nuovo codice e le altre si uniscono.
+          <Path steps={["Impostazioni", "Sincronizzazione"]} /> →{" "}
+          <Ui>Cambia il codice di sessione</Ui>. Le postazioni online passano da
+          sole al nuovo codice; datelo a mano alle postazioni offline.
+        </Faq>
+        <Faq q="È stata persa una tablet. Che cosa fare?">
+          In <Ui>Postazioni collegate</Ui>, sulla sua riga,{" "}
+          <Ui>Rimuovi questa postazione</Ui>. Conserva ciò che aveva già, ma non
+          riceve più nulla di nuovo.
         </Faq>
         <Faq q="Si può sincronizzare via Bluetooth?">
           No, i browser non lo permettono per questo uso. Senza internet, usate

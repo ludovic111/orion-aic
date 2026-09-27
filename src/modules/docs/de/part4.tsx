@@ -566,9 +566,15 @@ export const PART4: Topic[] = [
           Nachrichten. Er speichert nichts.
         </Faq>
         <Faq q="Der Sitzungscode ist bekannt geworden. Was tun?">
-          Auf jedem Arbeitsplatz <Ui>Auf diesem Arbeitsplatz stoppen</Ui>. Dann
-          erstellt ein Arbeitsplatz einen neuen Code, und die anderen treten ihm
-          bei.
+          <Path steps={["Einstellungen", "Synchronisation"]} /> →{" "}
+          <Ui>Sitzungscode ändern</Ui>. Die Arbeitsplätze, die online sind,
+          wechseln von selbst zum neuen Code; geben Sie ihn den Arbeitsplätzen,
+          die offline sind, von Hand weiter.
+        </Faq>
+        <Faq q="Ein Tablet ist verloren gegangen. Was tun?">
+          In <Ui>Verbundene Arbeitsplätze</Ui>, auf seiner Zeile,{" "}
+          <Ui>Diesen Arbeitsplatz entfernen</Ui>. Es behält, was es schon hatte,
+          erhält aber nichts Neues mehr.
         </Faq>
         <Faq q="Kann man über Bluetooth synchronisieren?">
           Nein, die Browser erlauben das für diesen Zweck nicht. Ohne Internet

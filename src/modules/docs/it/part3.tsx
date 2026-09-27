@@ -165,6 +165,50 @@ export const PART3A: Topic[] = [
           Trasmettetelo a voce, su carta o tramite un canale sicuro, mai su un
           canale aperto.
         </Note>
+        <H>Chi è collegato?</H>
+        <p>
+          <Path steps={["Impostazioni", "Sincronizzazione"]} />, elenco{" "}
+          <Ui>Postazioni collegate</Ui>: ogni postazione con il suo nome e la
+          sua funzione.
+        </p>
+        <ul>
+          <li>
+            <Ui>Online</Ui> o <Ui>Offline</Ui> (da quanto tempo). Una postazione
+            che perde la connessione passa offline in pochi secondi e sale in
+            cima all’elenco.
+          </li>
+          <li>
+            <Ui>Aggiornata</Ui>: ha tutto. <Ui>In ritardo</Ui>: le mancano
+            modifiche da più di 2 minuti; verificate il suo Wi-Fi o la sua rete.
+          </li>
+        </ul>
+        <H>Tablet persa? Postazione partita?</H>
+        <Steps>
+          <li>
+            In <Ui>Postazioni collegate</Ui>, sulla riga della postazione:{" "}
+            <Ui>Rimuovi questa postazione</Ui>. (Oppure, in fondo all’elenco,{" "}
+            <Ui>Cambia il codice di sessione</Ui>.)
+          </li>
+          <li>
+            Leggete la finestra che si apre, poi{" "}
+            <Ui>Rimuovi e cambia il codice</Ui>.
+          </li>
+          <li>
+            È tutto: le postazioni online passano da sole al nuovo codice. La
+            postazione rimossa conserva ciò che aveva già, ma non riceve più
+            nulla di nuovo.
+          </li>
+          <li>
+            Una postazione che era offline deve inserire il nuovo codice a mano:
+            viene visualizzato con il suo codice QR, come al solito.
+          </li>
+        </Steps>
+        <Note kind="info">
+          Il cambiamento è annotato nel diario. Il codice, invece, non vi viene
+          mai scritto. Ciò che un apparecchio perso aveva già non può essere
+          cancellato a distanza: proteggete le postazioni con una frase di
+          recupero.
+        </Note>
       </>
     ),
     full: (
@@ -219,6 +263,17 @@ export const PART3A: Topic[] = [
             Il codice evita i caratteri che si confondono (0 e O, 1 e I o L):
             meno errori di lettura.
           </li>
+          <li>
+            Quando il codice cambia, il nuovo codice è cifrato separatamente per
+            ogni postazione che resta. Né la postazione rimossa né il server
+            possono leggerlo.
+          </li>
+          <li>
+            Nome e funzione visualizzati sono quelli indicati da ogni
+            postazione: se due postazioni hanno lo stesso nome, orion aic lo
+            segnala; verificate di quale apparecchio si tratta prima di
+            rimuoverla.
+          </li>
         </ul>
         <H>Senza internet: la rete locale</H>
         <Steps>
@@ -249,8 +304,8 @@ export const PART3A: Topic[] = [
         <ul>
           <li>
             <Path steps={["Impostazioni", "Sincronizzazione"]} /> mostra lo
-            stato (Connesso, Riconnessione…), le altre postazioni e il loro
-            modulo, l’ora dell’ultimo scambio.
+            stato (Connesso, Riconnessione…), le postazioni collegate (online,
+            aggiornate), l’ora dell’ultimo scambio.
           </li>
           <li>
             <Ui>Unisciti con un codice</Ui>, da una sessione già aperta, unisce

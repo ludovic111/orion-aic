@@ -170,6 +170,50 @@ export const PART3A: Topic[] = [
           Sitzung. Übermitteln Sie ihn mündlich, auf Papier oder über einen
           sicheren Kanal, nie über einen offenen Kanal.
         </Note>
+        <H>Wer ist verbunden?</H>
+        <p>
+          <Path steps={["Einstellungen", "Synchronisation"]} />, Liste{" "}
+          <Ui>Verbundene Arbeitsplätze</Ui>: jeder Arbeitsplatz mit Namen und
+          Funktion.
+        </p>
+        <ul>
+          <li>
+            <Ui>Online</Ui> oder <Ui>Offline</Ui> (seit wann). Ein Arbeitsplatz,
+            der die Verbindung verliert, wird innert weniger Sekunden offline
+            angezeigt und steht zuoberst in der Liste.
+          </li>
+          <li>
+            <Ui>Aktuell</Ui>: Er hat alles. <Ui>Im Rückstand</Ui>: Ihm fehlen
+            seit über 2 Minuten Änderungen; prüfen Sie sein WLAN oder Netz.
+          </li>
+        </ul>
+        <H>Tablet verloren? Arbeitsplatz gegangen?</H>
+        <Steps>
+          <li>
+            In <Ui>Verbundene Arbeitsplätze</Ui>, auf der Zeile des
+            Arbeitsplatzes: <Ui>Diesen Arbeitsplatz entfernen</Ui>. (Oder unten
+            in der Liste <Ui>Sitzungscode ändern</Ui>.)
+          </li>
+          <li>
+            Lesen Sie das Fenster, das sich öffnet, dann{" "}
+            <Ui>Entfernen und Code ändern</Ui>.
+          </li>
+          <li>
+            Das ist alles: Die Arbeitsplätze, die online sind, wechseln von
+            selbst zum neuen Code. Der entfernte Arbeitsplatz behält, was er
+            schon hatte, erhält aber nichts Neues mehr.
+          </li>
+          <li>
+            Ein Arbeitsplatz, der offline war, muss den neuen Code von Hand
+            eingeben: Er wird wie gewohnt mit seinem QR-Code angezeigt.
+          </li>
+        </Steps>
+        <Note kind="info">
+          Die Änderung wird im Journal vermerkt. Der Code selbst wird nie
+          hineingeschrieben. Was ein verlorenes Gerät schon hatte, kann nicht
+          aus der Ferne gelöscht werden: Schützen Sie die Arbeitsplätze mit
+          einer Passphrase.
+        </Note>
       </>
     ),
     full: (
@@ -224,6 +268,16 @@ export const PART3A: Topic[] = [
             Der Code vermeidet verwechselbare Zeichen (0 und O, 1 und I oder L):
             weniger Lesefehler.
           </li>
+          <li>
+            Wenn sich der Code ändert, wird der neue Code für jeden
+            verbleibenden Arbeitsplatz einzeln verschlüsselt. Weder der
+            entfernte Arbeitsplatz noch der Server können ihn lesen.
+          </li>
+          <li>
+            Name und Funktion sind die Angaben jedes Arbeitsplatzes: Tragen zwei
+            Arbeitsplätze denselben Namen, weist orion aic darauf hin; prüfen
+            Sie vor dem Entfernen, um welches Gerät es sich handelt.
+          </li>
         </ul>
         <H>Ohne Internet: das lokale Netz</H>
         <Steps>
@@ -254,8 +308,8 @@ export const PART3A: Topic[] = [
         <ul>
           <li>
             <Path steps={["Einstellungen", "Synchronisation"]} /> zeigt den
-            Status (Verbunden, Neu verbinden …), die anderen Arbeitsplätze und
-            ihr Modul sowie die Zeit des letzten Austauschs.
+            Status (Verbunden, Neu verbinden …), die verbundenen Arbeitsplätze
+            (online, aktuell) sowie die Zeit des letzten Austauschs.
           </li>
           <li>
             <Ui>Mit einem Code beitreten</Ui> führt, aus einer bereits
