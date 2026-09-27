@@ -13,6 +13,7 @@ import {
   type Terminal,
 } from "../../shared/radio.ts";
 import { enumLabel } from "../../shared/i18n/enums.ts";
+import { photosOf, pictureOf } from "../../shared/photos.ts";
 import { t } from "./i18n.ts";
 
 export type SheetField = {
@@ -34,7 +35,29 @@ export type FormSheet = {
   sections: SheetSection[];
   visa: { title: string; labels: string[] }[];
   footer: string;
+  /** Photos of the item, printed on the following pages. */
+  photos?: SheetPhoto[];
 };
+export type SheetPhoto = {
+  src: string;
+  caption: string;
+  width: number;
+  height: number;
+};
+/** Photos per printed page (two by two). */
+export const PHOTOS_PER_PAGE = 4;
+
+/** Photos of an item as printed: the pictures still kept. */
+export function sheetPhotos(journal: Journal, target: string): SheetPhoto[] {
+  return photosOf(journal.ops, target)
+    .map((p) => ({
+      src: pictureOf(p, journal.blobs),
+      caption: p.caption,
+      width: p.width,
+      height: p.height,
+    }))
+    .filter((p) => p.src);
+}
 
 export type SheetHeader = {
   title: string;
@@ -55,7 +78,14 @@ export const sheetHeader = (journal: Journal): SheetHeader => ({
 
 const or = (value: string) => value.trim() || "—";
 
-export function messageSheet(entry: Entry): FormSheet {
+/** Fiche message of an entry, with its photos. */
+export const entrySheet = (journal: Journal, entry: Entry) =>
+  messageSheet(entry, sheetPhotos(journal, `entry:${entry.id}`));
+
+export function messageSheet(
+  entry: Entry,
+  photos: SheetPhoto[] = [],
+): FormSheet {
   const f = current(entry);
   const last = entry.revisions.at(-1)!;
   const revised = entry.revisions.length > 1;
@@ -93,6 +123,7 @@ export function messageSheet(entry: Entry): FormSheet {
       },
     ],
     footer: t("message {n}", { n: numberLabel(entry) }),
+    photos,
     sections: [
       {
         title: t("Transmission"),
@@ -345,6 +376,7 @@ export const printedAt = () => dateTime(new Date().toISOString());
 export function intakeSheet(
   message: Message,
   number: number | string,
+  photos: SheetPhoto[] = [],
 ): FormSheet {
   const urgent = message.priority === "Urgent";
   return {
@@ -440,5 +472,6 @@ export function intakeSheet(
       },
     ],
     footer: t("message {n}", { n: `M${String(number).padStart(3, "0")}` }),
+    photos,
   };
 }

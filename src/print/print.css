@@ -356,3 +356,32 @@ body.previewing {
   font-size: 7pt;
   color: var(--ink-2);
 }
+.sheet-photos-title {
+  margin: 4mm 0 3mm;
+  font-size: 8pt;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.sheet-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 118mm;
+  gap: 6mm;
+}
+.sheet-photos figure {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 1.5mm;
+  margin: 0;
+}
+.sheet-photos img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border: 0.2mm solid var(--rule);
+}
+.sheet-photos figcaption {
+  font-size: 7.5pt;
+  color: var(--ink-2);
+}

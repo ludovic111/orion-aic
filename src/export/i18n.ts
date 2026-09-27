@@ -694,6 +694,16 @@ export const { t, tn, tIn, dict } = translator({
     it: "{kind} (assente a quest’ora)",
   },
   Élément: { de: "Element", it: "Elemento" },
+  "Photos jointes": { de: "Beigefügte Fotos", it: "Foto allegate" },
+  Photos: { de: "Fotos", it: "Foto" },
+  Légendes: { de: "Legenden", it: "Didascalie" },
+  "Photos du journal": { de: "Fotos Journal", it: "Foto del diario" },
+  "Photos des messages": { de: "Fotos Meldungen", it: "Foto dei messaggi" },
+  "Photos de la carte": { de: "Fotos Karte", it: "Foto della carta" },
+  "Les images figurent dans les fiches A4 et dans l’archive": {
+    de: "Die Bilder befinden sich in den A4-Blättern und im Archiv",
+    it: "Le immagini figurano nelle schede A4 e nell’archivio",
+  },
   "Élément lié": { de: "Verknüpftes Element", it: "Elemento collegato" },
   Lien: { de: "Verknüpfung", it: "Collegamento" },
   Liens: { de: "Verknüpfungen", it: "Collegamenti" },
@@ -925,10 +935,10 @@ export const { t, tn, tIn, dict } = translator({
   },
 
   // ---------- Production (produce.ts) ----------
-  "Cette archive dépasse la limite d’import de 32 Mo. Choisissez moins de parties, ou les formats de lecture.":
+  "Cette archive dépasse la limite d’import de 96 Mo. Choisissez moins de parties, ou les formats de lecture.":
     {
-      de: "Dieses Archiv überschreitet die Importgrenze von 32 MB. Wählen Sie weniger Teile oder die Leseformate.",
-      it: "Questo archivio supera il limite d’importazione di 32 MB. Scegliere meno parti o i formati di lettura.",
+      de: "Dieses Archiv überschreitet die Importgrenze von 96 MB. Wählen Sie weniger Teile oder die Leseformate.",
+      it: "Questo archivio supera il limite d’importazione di 96 MB. Scegliere meno parti o i formati di lettura.",
     },
   "Carte {n} / {total}": {
     de: "Karte {n} / {total}",

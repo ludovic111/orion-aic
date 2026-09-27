@@ -20,6 +20,7 @@ import {
   BLOB_KEY,
   DATA_IMAGE,
   IMAGE_FIELDS,
+  LIVE_ONLY,
   blobKey,
   blobsOf,
   internState,
@@ -403,6 +404,11 @@ export function deleteEntry(
   return journalSchema.parse({
     ...journal,
     entries: journal.entries.filter((e) => e.id !== id),
+    // Its photos go with it (their pictures too, see storeImages).
+    ops: {
+      ...journal.ops,
+      photos: journal.ops.photos.filter((p) => p.target !== `entry:${id}`),
+    },
     deleted: [
       ...journal.deleted,
       {
@@ -736,9 +742,24 @@ function numberMessages(j: JournalData): JournalData {
 
 // ---------- Images ----------
 
+type Imaged = { image: string };
+/** Keys of the images a journal still needs (see LIVE_ONLY). */
+function usedBlobs(
+  history: HistoryEvent[],
+  ops: { symbols: Imaged[]; photos: Imaged[] },
+): Set<string> {
+  const used = new Set<string>();
+  for (const e of history)
+    if (!LIVE_ONLY.has(e.scope)) blobsOf(e.scope, e.state, used);
+  for (const s of ops.symbols) blobsOf("ops.symbols", s, used);
+  for (const p of ops.photos) blobsOf("ops.photos", p, used);
+  return used;
+}
+
 /**
- * Images kept once: history states refer to them by hash, live symbols show
- * them. Images nothing refers to any more are dropped.
+ * Images kept once: history states refer to them by hash, live symbols and
+ * photos show them. Images nothing refers to any more are dropped, and so
+ * is the picture of a removed photo (its history keeps the reference only).
  */
 function storeImages(j: JournalData): JournalData {
   let blobs = j.blobs;
@@ -759,31 +780,55 @@ function storeImages(j: JournalData): JournalData {
       history[i] = { ...e, state };
     }
   }
-  let symbols = j.ops.symbols;
-  symbols.forEach((s, i) => {
-    if (s.image.startsWith("data:")) {
-      const key = blobKey(s.image);
-      if (blobs[key] === undefined) own()[key] = s.image;
-      return;
-    }
-    const resolved = resolveState("ops.symbols", s, blobs) as typeof s;
-    if (resolved !== s) {
-      if (symbols === j.ops.symbols) symbols = [...symbols];
-      symbols[i] = resolved;
-    }
-  });
-  const used = new Set<string>();
-  for (const e of history) blobsOf(e.scope, e.state, used);
-  for (const s of symbols) blobsOf("ops.symbols", s, used);
+  const live = <T extends Imaged>(scope: string, list: T[]): T[] => {
+    let out = list;
+    list.forEach((s, i) => {
+      if (s.image.startsWith("data:")) {
+        const key = blobKey(s.image);
+        if (blobs[key] === undefined) own()[key] = s.image;
+        return;
+      }
+      const resolved = resolveState(scope, s, blobs) as T;
+      if (resolved !== s) {
+        if (out === list) out = [...list];
+        out[i] = resolved;
+      }
+    });
+    return out;
+  };
+  const symbols = live("ops.symbols", j.ops.symbols);
+  const photos = live("ops.photos", j.ops.photos);
+  const used = usedBlobs(history, { symbols, photos });
   for (const key of Object.keys(blobs)) if (!used.has(key)) delete own()[key];
-  if (blobs === j.blobs && history === j.history && symbols === j.ops.symbols)
+  if (
+    blobs === j.blobs &&
+    history === j.history &&
+    symbols === j.ops.symbols &&
+    photos === j.ops.photos
+  )
     return j;
   return {
     ...j,
     blobs,
     history,
-    ops: symbols === j.ops.symbols ? j.ops : { ...j.ops, symbols },
+    ops:
+      symbols === j.ops.symbols && photos === j.ops.photos
+        ? j.ops
+        : { ...j.ops, symbols, photos },
   };
+}
+
+/**
+ * The journal without the images it no longer needs (a part of a journal
+ * chosen for an export keeps only the pictures of what it contains).
+ */
+export function withUsedBlobs(journal: Journal): Journal {
+  const used = usedBlobs(journal.history, journal.ops);
+  const keys = Object.keys(journal.blobs);
+  if (keys.every((k) => used.has(k))) return journal;
+  const blobs: Record<string, string> = {};
+  for (const k of keys) if (used.has(k)) blobs[k] = journal.blobs[k];
+  return { ...journal, blobs };
 }
 
 /**
@@ -806,23 +851,23 @@ export function normalizeJournal(j: JournalData): JournalData {
 }
 
 /**
- * A journal as stored or sent: images only in journal.blobs, symbols refer
- * to them. Parsing it (journalSchema) puts the images back.
+ * A journal as stored or sent: images only in journal.blobs, symbols and
+ * photos refer to them. Parsing it (journalSchema) puts the images back.
  */
 export function packJournal(journal: Journal): Journal {
-  if (!journal.ops.symbols.some((s) => s.image.startsWith("data:")))
+  const pack = <T extends Imaged>(list: T[]): T[] =>
+    list.some((s) => s.image.startsWith("data:"))
+      ? list.map((s) => {
+          if (!s.image.startsWith("data:")) return s;
+          const key = blobKey(s.image);
+          return journal.blobs[key] ? { ...s, image: `blob:${key}` } : s;
+        })
+      : list;
+  const symbols = pack(journal.ops.symbols);
+  const photos = pack(journal.ops.photos);
+  if (symbols === journal.ops.symbols && photos === journal.ops.photos)
     return journal;
-  return {
-    ...journal,
-    ops: {
-      ...journal.ops,
-      symbols: journal.ops.symbols.map((s) => {
-        if (!s.image.startsWith("data:")) return s;
-        const key = blobKey(s.image);
-        return journal.blobs[key] ? { ...s, image: `blob:${key}` } : s;
-      }),
-    },
-  };
+  return { ...journal, ops: { ...journal.ops, symbols, photos } };
 }
 export const packWorkspace = (workspace: Workspace): Workspace => ({
   ...workspace,

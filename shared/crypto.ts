@@ -262,3 +262,32 @@ export async function decrypt(
     throw new Error(t("Phrase secrète incorrecte ou fichier endommagé."));
   }
 }
+
+/**
+ * Open a vault record with a key already derived (the photos of a session
+ * are sealed one by one with the key of the session).
+ */
+export async function decryptWith(
+  input: unknown,
+  vault: VaultKey,
+): Promise<unknown> {
+  const record = vaultRecordSchema.safeParse(input);
+  if (!record.success || record.data.salt !== vault.salt)
+    throw new Error(t("Fichier chiffré invalide ou version inconnue."));
+  try {
+    const plain = new Uint8Array(
+      await crypto.subtle.decrypt(
+        {
+          name: "AES-GCM",
+          iv: record.data.iv as BufferSource,
+          additionalData: aad(2),
+        },
+        vault.key,
+        record.data.data as BufferSource,
+      ),
+    );
+    return JSON.parse(new TextDecoder().decode(await gunzip(plain)));
+  } catch {
+    throw new Error(t("Phrase secrète incorrecte ou fichier endommagé."));
+  }
+}

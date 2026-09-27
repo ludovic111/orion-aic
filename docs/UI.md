@@ -103,6 +103,7 @@ Les parcours principaux sont joués dans Chromium par Playwright (`npm run e2e`,
 | `ui/Dock.tsx`       | `Dock` (barre des modules avec leurs noms, « Plus d’outils », barre du téléphone)                                                       |
 | `ui/effects.tsx`    | `CountUp` (affiche la valeur telle quelle), `DecryptText`, `useSpotlight`, `ClickSparks` : signatures gardées, sans effet visuel        |
 | `journal/Modal.tsx` | `Modal` (boîte de dialogue)                                                                                                             |
+| `photos/*.tsx`      | `PhotoStrip target="entry:<id>"` (photos d’un élément enregistré), `PhotoPicker` (photos d’un élément en cours de saisie), `PhotoCount` |
 
 ### Fiche générique
 

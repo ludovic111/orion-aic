@@ -606,8 +606,10 @@ export const PART4: Topic[] = [
           Verwenden Sie echte Daten nur mit der Erlaubnis Ihrer Organisation.
         </Faq>
         <Faq q="Kann ich einem Eintrag ein Foto anhängen?">
-          Nein, orion aic speichert keine Dateianhänge. Notieren Sie die
-          Referenz des Fotos oder Dokuments.
+          Ja: Öffnen Sie den Eintrag und tippen Sie auf <Ui>Foto</Ui> (auch in
+          einem neuen Eintrag, einer Meldung oder einem Kartenobjekt). Siehe «
+          Fotos ». Für ein PDF oder ein anderes Dokument notieren Sie die
+          Referenz.
         </Faq>
       </div>
     ),

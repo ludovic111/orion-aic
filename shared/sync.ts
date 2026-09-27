@@ -4,6 +4,7 @@ import {
   nodeOr,
   numberLabel,
   assignSuffixes,
+  withUsedBlobs,
   suffixes,
   workspaceSchema,
   type Deletion,
@@ -22,7 +23,7 @@ import {
   type Change,
 } from "./history.ts";
 import { eventKey, type HistoryEvent } from "./events.ts";
-import { blobsOf } from "./blobs.ts";
+import { LIVE_ONLY, blobsOf, refOf } from "./blobs.ts";
 import { later, localNode, tick } from "./hlc.ts";
 import {
   deletionStamp,
@@ -284,13 +285,18 @@ export function stampJournal(
   );
   if (withEntries !== next) changed = true;
   if (!changed) return next;
-  const result = appendHistory(
+  const recorded = appendHistory(
     { ...withEntries, sync: { ...next.sync, clock, removed } },
     changes,
     at,
     by,
     last,
   );
+  // A removed photo takes its picture with it at once, as every post that
+  // receives the removal does (normalizeJournal): the fingerprints agree.
+  const result = changes.some((c) => c.item === null && LIVE_ONLY.has(c.scope))
+    ? withUsedBlobs(recorded)
+    : recorded;
   setBound(result, tick(last, at));
   return result;
 }
@@ -661,8 +667,11 @@ export function sliceJournal(
   )
     return null;
   const used = new Set<string>();
-  for (const e of history) blobsOf(e.scope, e.state, used);
+  // The pictures of photos travel with the live photos only.
+  for (const e of history)
+    if (!LIVE_ONLY.has(e.scope)) blobsOf(e.scope, e.state, used);
   for (const s of ops.symbols) blobsOf("ops.symbols", s, used);
+  for (const p of ops.photos) blobsOf("ops.photos", p, used);
   const blobs: Record<string, string> = {};
   for (const k of used) if (journal.blobs[k]) blobs[k] = journal.blobs[k];
   const slice: Journal = {
@@ -713,6 +722,17 @@ export function digest(journal: Journal): Promise<string> {
     value = (async () => {
       const light = {
         ...journal,
+        // Photos count by the hash of their picture (as stored).
+        ops: journal.ops.photos.length
+          ? {
+              ...journal.ops,
+              photos: journal.ops.photos.map((p) =>
+                p.image.startsWith("data:")
+                  ? { ...p, image: refOf(p.image) }
+                  : p,
+              ),
+            }
+          : journal.ops,
         history: journal.history.map((e) => ({
           id: e.id,
           r: e.rev,

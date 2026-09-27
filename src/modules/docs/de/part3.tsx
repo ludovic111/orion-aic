@@ -977,7 +977,7 @@ export const PART3B: Topic[] = [
           <li>
             Akzeptierte Dateien: <code>.orionaic</code>, <code>.orion</code>,{" "}
             <code>.json</code>, <code>.csv</code>, <code>.tsv</code>, höchstens
-            32 MB. Die Datei wird auf dem Arbeitsplatz gelesen und nirgendwohin
+            96 MB. Die Datei wird auf dem Arbeitsplatz gelesen und nirgendwohin
             gesendet.
           </li>
           <li>

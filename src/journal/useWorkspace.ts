@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   decrypt,
+  decryptWith,
   deriveKey,
   encryptVault,
   type VaultKey,
+  type VaultRecord,
 } from "../../shared/crypto";
 import {
   packWorkspace,
@@ -12,8 +14,11 @@ import {
 } from "../../shared/journal";
 import { localNode, setLocalNode } from "../../shared/hlc";
 import { stampWorkspace } from "../../shared/sync";
+import { joinPhotoBlobs, splitPhotoBlobs } from "../../shared/photos";
 import {
   deleteVault,
+  readPictureKeys,
+  readPictures,
   readVault,
   writeVault,
   type StoredVault,
@@ -27,9 +32,40 @@ function withNode(value: Workspace): Workspace {
   }
   return { ...value, node: localNode() };
 }
-/** Compressed, encrypted; images once (see packWorkspace). */
-const sealVault = (value: Workspace, key: VaultKey) =>
-  encryptVault(packWorkspace(value), key);
+/**
+ * Write a session to the vault: compressed, encrypted, images once (see
+ * packWorkspace). Photo pictures, large and never changed, are sealed apart,
+ * each once: `pictures` holds the keys already in the vault and is updated.
+ */
+async function sealVault(
+  value: Workspace,
+  key: VaultKey,
+  pictures: Set<string>,
+): Promise<VaultRecord> {
+  const { workspace, pictures: all } = splitPhotoBlobs(packWorkspace(value));
+  const record = await encryptVault(workspace, key);
+  const add: [string, VaultRecord][] = [];
+  for (const [k, picture] of Object.entries(all))
+    if (!pictures.has(k)) add.push([k, await encryptVault(picture, key)]);
+  const drop = [...pictures].filter((k) => all[k] === undefined);
+  await writeVault(record, add, drop);
+  pictures.clear();
+  for (const k of Object.keys(all)) pictures.add(k);
+  return record;
+}
+/** A session read from the vault, with its photo pictures put back. */
+async function openVault(data: StoredVault, password: string) {
+  const { value, vault } = await decrypt(data, password);
+  const pictures: Record<string, string> = {};
+  for (const [k, sealed] of await readPictures())
+    try {
+      const picture = await decryptWith(sealed, vault);
+      if (typeof picture === "string") pictures[k] = picture;
+    } catch {
+      // A damaged picture: its photo shows as missing, the session opens.
+    }
+  return { value: joinPhotoBlobs(value, pictures), vault, pictures };
+}
 async function acquireWriter(): Promise<() => void> {
   if (!navigator.locks)
     throw new Error(
@@ -100,6 +136,8 @@ export function useWorkspace() {
   const latest = useRef(workspace);
   latest.current = workspace;
   const saved = useRef<Workspace | null>(null);
+  // Keys of the photo pictures already in the vault.
+  const pictures = useRef(new Set<string>());
   useEffect(() => {
     readVault()
       .then((value) => setStored(value ?? null))
@@ -116,8 +154,11 @@ export function useWorkspace() {
       queue.current = queue.current
         .catch(() => {})
         .then(async () => {
-          const ciphertext = await sealVault(workspace, vaultKey);
-          await writeVault(ciphertext);
+          const ciphertext = await sealVault(
+            workspace,
+            vaultKey,
+            pictures.current,
+          );
           saved.current = workspace;
           setStored(ciphertext);
           if (live) {
@@ -165,8 +206,8 @@ export function useWorkspace() {
           ),
         );
       const key = await deriveKey(password);
-      const ciphertext = await sealVault(parsed, key);
-      await writeVault(ciphertext);
+      pictures.current = new Set(await readPictureKeys());
+      const ciphertext = await sealVault(parsed, key, pictures.current);
       writer.current = release;
       saved.current = parsed;
       setStored(ciphertext);
@@ -192,8 +233,8 @@ export function useWorkspace() {
       const key = await deriveKey(password);
       const value = latest.current;
       if (!value) throw new Error(t("Aucun espace à sauvegarder."));
-      const ciphertext = await sealVault(value, key);
-      await writeVault(ciphertext);
+      pictures.current = new Set(await readPictureKeys());
+      const ciphertext = await sealVault(value, key, pictures.current);
       writer.current = release;
       saved.current = value;
       setStored(ciphertext);
@@ -210,10 +251,11 @@ export function useWorkspace() {
     try {
       const data = await readVault();
       if (!data) throw new Error(t("Aucun espace local enregistré."));
-      const { value, vault } = await decrypt(data, password);
+      const { value, vault, pictures: read } = await openVault(data, password);
       // Older sessions are brought up to date by the schema (stamps, images
       // kept once, message numbers).
       const parsed = withNode(workspaceSchema.parse(value));
+      pictures.current = new Set(Object.keys(read));
       writer.current = release;
       saved.current = parsed;
       setVaultKey(vault);
@@ -233,11 +275,11 @@ export function useWorkspace() {
     await queue.current;
     if (vaultKey && latest.current && latest.current !== saved.current) {
       const snapshot = latest.current;
-      const ciphertext = await sealVault(snapshot, vaultKey);
-      await writeVault(ciphertext);
+      const ciphertext = await sealVault(snapshot, vaultKey, pictures.current);
       saved.current = snapshot;
       setStored(ciphertext);
     }
+    pictures.current = new Set();
     setRaw(null);
     latest.current = null;
     saved.current = null;
@@ -253,6 +295,7 @@ export function useWorkspace() {
     }
     await queue.current;
     if (vaultKey) await deleteVault();
+    pictures.current = new Set();
     setRaw(null);
     latest.current = null;
     saved.current = null;

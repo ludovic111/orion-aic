@@ -32,6 +32,7 @@ import { formatDayMonth, formatTime } from "./i18n/core.ts";
 import { t, type HistoryKey } from "./i18n/history.ts";
 
 export type { HistoryEvent } from "./events.ts";
+type Imaged = { image?: unknown };
 
 // Traceability and versions of everything.
 //
@@ -115,6 +116,7 @@ const OPS_SCOPES: Record<Collection, ScopeInfo> = {
   scenarios: named("Scénario d’exercice", "Scénarios d’exercice", "debrief"),
   injects: named("Inject", "Injects", "debrief"),
   retex: named("Point du débriefing", "Débriefing", "debrief"),
+  photos: named("Photo", "Photos", "journal"),
 };
 export const SCOPES: Record<string, ScopeInfo> = {
   entries: named("Entrée", "Journal", "journal"),
@@ -609,6 +611,7 @@ export function titleOf(scope: string, state: unknown): string {
     );
   if (scope === "ops.exports")
     return clip(String(v.name || v.format || t("Export")));
+  if (scope === "ops.photos") return clip(String(v.caption || t("Photo")));
   for (const key of ["label", "name", "title", "subject", "callsign", "hazard"])
     if (typeof v[key] === "string" && v[key]) return clip(v[key] as string);
   if (scope === "ops.observations")
@@ -756,8 +759,15 @@ export function restoreState(
   if (item.scope.startsWith("ops.")) {
     const c = item.scope.slice(4) as Collection;
     if (!COLLECTIONS.includes(c)) throw new Error(t("Élément inconnu."));
+    const resolved = resolveState(item.scope, item.state, journal.blobs);
+    // A removed photo has lost its picture: nothing to put back.
+    if (
+      c === "photos" &&
+      !String((resolved as Imaged).image).startsWith("data:")
+    )
+      throw new Error(t("Photo supprimée : l’image n’est plus conservée."));
     const parsed = RECORD_SCHEMAS[c].safeParse({
-      ...(resolveState(item.scope, item.state, journal.blobs) as object),
+      ...(resolved as object),
       updatedAt: now,
     });
     if (!parsed.success)

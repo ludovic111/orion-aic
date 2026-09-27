@@ -108,12 +108,12 @@ export function exportName(
   return `orion-aic-${kind}-${slug(journal.title)}-${day.slice(0, 4)}-${day.slice(4, 6)}-${day.slice(6, 8)}${scope.viewAt === null ? "" : `-version-${zurich(scope.viewAt).slice(0, 8)}-${zurich(scope.viewAt).slice(8)}`}${extension}`;
 }
 
-/** Archives stay importable: the import refuses files over 32 Mo. */
+/** Archives stay importable: the import refuses files over 96 Mo. */
 function checkArchiveSize(text: string) {
   if (new TextEncoder().encode(text).length > MAX_IMPORT_BYTES)
     throw new Error(
       t(
-        "Cette archive dépasse la limite d’import de 32 Mo. Choisissez moins de parties, ou les formats de lecture.",
+        "Cette archive dépasse la limite d’import de 96 Mo. Choisissez moins de parties, ou les formats de lecture.",
       ),
     );
 }
@@ -408,13 +408,13 @@ export async function produce(o: ProduceOptions): Promise<Produced> {
       }
       case "sheets": {
         const { formsPdf } = await import("../print/pdf.ts");
-        const { messageSheet } = await import("../print/sheet.ts");
+        const { entrySheet } = await import("../print/sheet.ts");
         const entries = chronological(journal.entries);
         if (!entries.length)
           throw new Error(t("Aucune entrée du journal à cette heure."));
         const blob = await formsPdf(
           journal,
-          entries.map(messageSheet),
+          entries.map((e) => entrySheet(journal, e)),
           t("{n} messages · export {id} · {fingerprint}", {
             n: entries.length,
             id: shortId(id),

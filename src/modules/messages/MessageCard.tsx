@@ -22,6 +22,7 @@ import type { MessageActions } from "./actions";
 import { PRIORITY_TONE, countdown } from "./model";
 import { enumLabel } from "../../../shared/i18n/enums.ts";
 import { t } from "./i18n.ts";
+import { PhotoCount } from "../../photos/PhotoCount";
 
 export type CardHandlers = {
   onEdit: (m: Message) => void;
@@ -150,7 +151,7 @@ export function MessageCard({
   onSynth,
   fresh,
 }: CardHandlers & { m: Message; actions: MessageActions; fresh: boolean }) {
-  const { readOnly } = useApp();
+  const { readOnly, journal } = useApp();
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const leave = () => {
@@ -194,6 +195,11 @@ export function MessageCard({
           {m.category && (
             <span className="pill plain msg-cat">{m.category}</span>
           )}
+          <PhotoCount
+            ops={journal.ops}
+            target={`message:${m.id}`}
+            className="pill plain"
+          />
         </span>
         <span className="msg-route">
           <strong>{m.from || "—"}</strong>

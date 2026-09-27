@@ -3,7 +3,7 @@ import { lastNumber, type Fields } from "../../../shared/journal";
 import { upsert, type Message } from "../../../shared/ops";
 import { ref } from "../../../shared/links";
 import { useApp } from "../../app/context";
-import { intakeSheet } from "../../print/sheet";
+import { intakeSheet, sheetPhotos } from "../../print/sheet";
 import {
   entryFrom,
   mLabel,
@@ -96,7 +96,11 @@ export function useMessageActions() {
         kind: "forms",
         journal,
         sheets: list.map((m) =>
-          intakeSheet(m, labels.get(m.id) ?? numbers.get(m.id) ?? 0),
+          intakeSheet(
+            m,
+            labels.get(m.id) ?? numbers.get(m.id) ?? 0,
+            sheetPhotos(journal, `message:${m.id}`),
+          ),
         ),
         title:
           list.length > 1 ? t("Formules de message") : t("Formule de message"),

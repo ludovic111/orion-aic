@@ -26,6 +26,7 @@ import {
   searchEntries,
   type Fields,
 } from "../../../shared/journal";
+import type { NewPhoto } from "../../../shared/photos";
 import { radioSummary } from "../../../shared/radio";
 import { useApp } from "../../app/context";
 import { EntryForm } from "../../journal/EntryForm";
@@ -60,7 +61,7 @@ export function JournalView({
   draftLabel: string;
   suggestions: string[];
   onDraft: (fields: Fields) => void;
-  onAdd: (fields: Fields) => void;
+  onAdd: (fields: Fields, photos?: NewPhoto[]) => void;
   onDialog: (
     dialog: "report" | "handover" | "export" | "deleted" | "settings",
   ) => void;
@@ -429,6 +430,7 @@ export function JournalView({
                       onDelete={() => openEntry(entry.id, "delete")}
                       readOnly={readOnly}
                       at={now}
+                      ops={journal.ops}
                     />
                   );
                 })}
@@ -499,7 +501,7 @@ export function JournalView({
                 author={author}
                 preset={draft}
                 onDraft={onDraft}
-                onSave={(fields) => onAdd(fields)}
+                onSave={(fields, _reason, photos) => onAdd(fields, photos)}
                 suggestions={suggestions}
                 compact
                 draftLabel={draftLabel}
