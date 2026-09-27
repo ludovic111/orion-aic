@@ -31,8 +31,8 @@ export const EXERCISE_TOPICS: Topic[] = [
         <H>Den Einsatz erneut abspielen</H>
         <Steps>
           <li>
-            Öffnen Sie <Ui>Debriefing und Übung</Ui> (Klemmbrett-Symbol, unten
-            im Dock).
+            Öffnen Sie <Ui>Debriefing</Ui> (unter <Ui>Weitere Werkzeuge</Ui>, in
+            der Modulleiste).
           </li>
           <li>
             Tippen Sie auf <Ui>Abspielen ×60</Ui>: Eine Minute des Einsatzes

@@ -30,8 +30,8 @@ export const EXERCISE_TOPICS: Topic[] = [
         <H>Rigiocare l’operazione</H>
         <Steps>
           <li>
-            Aprite <Ui>Debriefing ed esercizio</Ui> (icona appunti, in fondo al
-            dock).
+            Aprite <Ui>Debriefing</Ui> (sotto <Ui>Altri strumenti</Ui>, nella
+            barra dei moduli).
           </li>
           <li>
             Premete <Ui>Rigiocare ×60</Ui>: un minuto dell’operazione passa in

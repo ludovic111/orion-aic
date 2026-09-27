@@ -650,7 +650,8 @@ export const PART2: Topic[] = [
         <H>Herausfinden, wer was gemacht hat</H>
         <Steps>
           <li>
-            Öffnen Sie <Ui>Verlauf</Ui> in der linken Leiste (oder <K>⌘K</K> → «
+            Öffnen Sie <Ui>Nachvollziehbarkeit</Ui> unter{" "}
+            <Ui>Weitere Werkzeuge</Ui>, in der linken Leiste (oder <K>⌘K</K> → «
             Nachvollziehbarkeit »).
           </li>
           <li>

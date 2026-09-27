@@ -126,7 +126,7 @@ export const PART3A: Topic[] = [
         <Steps>
           <li>
             <Path steps={["Menu operatore", "Sincronizzazione"]} />, oppure un
-            clic sull’indicatore <Ui>Da solo</Ui> in alto.
+            clic sull’indicatore <Ui>Non condivisa</Ui> in alto.
           </li>
           <li>
             <Ui>Crea un codice di sessione</Ui>. Appare un codice del tipo{" "}
@@ -140,15 +140,15 @@ export const PART3A: Topic[] = [
         <H>Sulle altre postazioni: unirsi</H>
         <Steps>
           <li>
-            Aprite <a href={SITE}>orionaic.xyz</a> → <Ui>Unisciti</Ui>. (Oppure
-            scansionate il codice QR con il telefono: il codice è già
-            compilato.)
+            Aprite <a href={SITE}>orionaic.xyz</a> →{" "}
+            <Ui>Unirsi a una sessione</Ui>. (Oppure scansionate il codice QR con
+            il telefono: il codice è già compilato.)
           </li>
           <li>Digitate il codice e il vostro nome o la vostra funzione.</li>
           <li>
-            Se volete conservare la sessione su questa postazione, spuntate{" "}
-            <Ui>Salvataggio cifrato su questa postazione</Ui> e scegliete una
-            frase.
+            Per conservare la sessione su questa postazione, lasciate spuntato{" "}
+            <Ui>Conservare la sessione su questo dispositivo (consigliato)</Ui>{" "}
+            e inventate una frase.
           </li>
           <li>
             <Ui>Unisciti alla sessione</Ui>. La sessione arriva non appena una
@@ -156,9 +156,9 @@ export const PART3A: Topic[] = [
           </li>
         </Steps>
         <p>
-          In alto, l’indicatore mostra <Ui>Da solo</Ui>, <Ui>3 postazioni</Ui>{" "}
-          (con le iniziali di ciascuno; al passaggio del mouse, chi si trova su
-          quale modulo) oppure <Ui>Riconnessione</Ui>.
+          In alto, l’indicatore mostra <Ui>Non condivisa</Ui>,{" "}
+          <Ui>3 postazioni</Ui> (con le iniziali di ciascuno; al passaggio del
+          mouse, chi si trova su quale modulo) oppure <Ui>Riconnessione</Ui>.
         </p>
         <Note kind="warn">
           Il codice è una <strong>password</strong>: apre l’intera sessione.
@@ -554,8 +554,8 @@ export const PART3B: Topic[] = [
         <H>Presentare in 3 passi</H>
         <Steps>
           <li>
-            Pulsante schermo <Ui>Presentazione della situazione</Ui> in alto a
-            destra (oppure <K>⌘K</K> → « Presenta »).
+            Menu operatore (le vostre iniziali, in alto a destra) →{" "}
+            <Ui>Presentare la situazione</Ui> (oppure <K>⌘K</K> → « Presenta »).
           </li>
           <li>
             Preparate in pochi secondi: il vostro nome, il pubblico (« Sindaco,
@@ -664,9 +664,10 @@ export const PART3B: Topic[] = [
         <H>Tornare a un’ora precisa</H>
         <Steps>
           <li>
-            Fate clic sull’orologio <Ui>Macchina del tempo</Ui> in alto a destra
-            (oppure <K>⌘K</K> → « Macchina del tempo »). In basso appare una
-            barra.
+            Menu operatore (le vostre iniziali, in alto a destra) →{" "}
+            <Ui>Macchina del tempo</Ui> (oppure <K>⌘K</K> → « Macchina del tempo
+            »). In basso appare una barra; <Ui>Tornare alla diretta</Ui>, in
+            alto, riporta ad adesso.
           </li>
           <li>
             Trascinate il cursore, oppure digitate una data e un’ora. Le piccole

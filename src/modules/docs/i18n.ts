@@ -114,9 +114,9 @@ export const { t, tn, tIn, dict } = translator({
       it: "Passate sopra l’argine sulla carta: il messaggio che lo ha segnalato, la voce del diario e la motopompa impiegata compaiono subito.",
     },
   // Screen
-  "Rechercher ou agir…": { de: "Suchen oder handeln …", it: "Cerca o agisci…" },
+  "Rechercher…": { de: "Suchen …", it: "Cerca…" },
   "{n} postes": { de: "{n} Arbeitsplätze", it: "{n} postazioni" },
-  Chiffré: { de: "Verschlüsselt", it: "Cifrato" },
+  Enregistré: { de: "Gespeichert", it: "Salvato" },
   "L’écran d’orion aic, simplifié. Les numéros renvoient à la liste ci-dessous.":
     {
       de: "Der Bildschirm von orion aic, vereinfacht. Die Nummern verweisen auf die Liste unten.",

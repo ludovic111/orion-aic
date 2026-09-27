@@ -987,8 +987,8 @@ export const PART2: Topic[] = [
         <H>Ritrovare chi ha fatto cosa</H>
         <Steps>
           <li>
-            Aprite <Ui>Tracciabilità</Ui> nella barra a sinistra (oppure{" "}
-            <K>⌘K</K> → « Tracciabilità »).
+            Aprite <Ui>Tracciabilità</Ui> sotto <Ui>Altri strumenti</Ui>, nella
+            barra a sinistra (oppure <K>⌘K</K> → « Tracciabilità »).
           </li>
           <li>
             La scheda <Ui>Chi ha fatto cosa</Ui> elenca tutte le modifiche,

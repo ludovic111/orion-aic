@@ -50,8 +50,8 @@ export const VALISE_TOPIC: Topic = {
               "Sitzungscode erstellen",
             ]}
           />
-          ). Die anderen wählen <Ui>Beitreten</Ui> und geben den Code ein, wie
-          gewohnt.
+          ). Die anderen wählen <Ui>Einer Sitzung beitreten</Ui> und geben den
+          Code ein, wie gewohnt.
         </li>
       </Steps>
       <H>Das allererste Mal auf einem Gerät</H>
@@ -291,7 +291,7 @@ export const VALISE_TOPIC: Topic = {
             "WLAN-Land CH auf dem Pi; starten Sie ihn neu.",
           ],
           [
-            "Arbeitsplatz « Allein », obwohl andere arbeiten",
+            "Arbeitsplatz « Nicht geteilt », obwohl andere arbeiten",
             "Prüfen Sie den Sitzungscode; laden Sie die Seite neu. Nichts geht verloren.",
           ],
           [

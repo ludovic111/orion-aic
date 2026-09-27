@@ -2,7 +2,7 @@
 
 > Un outil de poste de conduite, pas une page de lancement. Papier, encre, un seul point orange pour ce qui est en direct. Les chiffres se lisent du premier coup d’œil, à 3 h du matin, sous néon ou à la lampe frontale.
 
-Ce document est la référence de toute l’interface. Il est lu avant d’écrire un écran. Les jetons vivent dans `src/styles.css` (Papier et Graphite), `src/palettes.css` (les autres thèmes) et la couche globale `src/atelier.css`. Le kit de composants est décrit dans [UI.md](UI.md).
+Ce document est la référence de toute l’interface. Il est lu avant d’écrire un écran. Les jetons vivent dans `src/styles.css` (Papier et Graphite), `src/palettes.css` (les autres thèmes), la couche globale `src/atelier.css` et la coque `src/shell.css` (chargée en dernier). Le kit de composants est décrit dans [UI.md](UI.md).
 
 ## Parti pris
 
@@ -11,24 +11,27 @@ Ce document est la référence de toute l’interface. Il est lu avant d’écri
 3. **Le chiffre d’abord.** Un compteur affiche la vraie valeur immédiatement : pas de nombre qui défile depuis zéro, pas d’animation avant l’information.
 4. **Une seule couleur d’emphase par écran.** Le point braise `--ember` marque ce qui est en direct (engagement en cours, synchronisation). Les états (`--ok`, `--warn`, `--crit`) servent aux états, jamais à la décoration.
 5. **Le mot dit l’état.** Une étiquette n’a pas de pastille décorative devant ; un point n’apparaît que pour ce qui demande une action maintenant (`.pill.crit`).
+6. **Pour quelqu’un qui n’est pas informaticien.** Beaucoup d’utilisateurs sont des miliciens peu à l’aise avec l’informatique, sur tablette ou téléphone, sous stress. Un bouton porte un mot, pas seulement une icône ; un état se dit en français courant (« Non partagé », pas « Seul ») ; l’essentiel est visible, le reste est à un toucher, jamais supprimé.
 
 ## Ce qu’on ne fait pas
 
 Ces motifs signalent une interface « vibe codée » (générée sans direction). Ils sont proscrits :
 
-| Motif                                                      | À la place                                                                             |
-| ---------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Inter partout, ou police système sans choix                | IBM Plex Sans / Plex Mono, la police des fiches imprimées                              |
-| Dégradés violet-bleu, halos, lueurs colorées, verre dépoli | Aplats, une ombre douce unique, filets fins                                            |
-| Rangée de 4 à 6 cartes « statistique » identiques          | Une ligne de chiffres réglée (filets, chiffres en mono, zéros grisés) — voir Situation |
-| Grille de pilules à icône « fonctionnalités »              | Un sommaire : terme + une ligne factuelle (écran d’accueil)                            |
-| Icône étincelles ✨ pour « magique », « standard », « IA » | L’icône du geste réel (ajouter une liste, document, lecture)                           |
-| Pastille de couleur devant chaque étiquette                | Le mot seul ; un point seulement pour l’urgent                                         |
-| Décors animés (électrocardiogramme, anneaux qui pulsent)   | Rien. Le mouvement accompagne un changement d’état, il ne décore pas                   |
-| Nombres qui comptent depuis zéro                           | La valeur, tout de suite                                                               |
-| Accroches vagues (« tout relié », « sans limites »)        | Ce que fait l’outil, avec les mots du métier (« Tenir la conduite. »)                  |
-| Majuscules espacées sur tous les libellés                  | Libellés en casse normale, `--text-2`                                                  |
-| Emoji en guise d’icônes                                    | Icônes Lucide au trait, monochromes                                                    |
+| Motif                                                      | À la place                                                                                 |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Inter partout, ou police système sans choix                | IBM Plex Sans / Plex Mono, la police des fiches imprimées                                  |
+| Dégradés violet-bleu, halos, lueurs colorées, verre dépoli | Aplats, une ombre douce unique, filets fins                                                |
+| Rangée de 4 à 6 cartes « statistique » identiques          | Une ligne de chiffres réglée (filets, chiffres en mono, zéros grisés) — voir Situation     |
+| Grille de pilules à icône « fonctionnalités »              | Un sommaire : terme + une ligne factuelle (écran d’accueil)                                |
+| Icône étincelles ✨ pour « magique », « standard », « IA » | L’icône du geste réel (ajouter une liste, document, lecture)                               |
+| Pastille de couleur devant chaque étiquette                | Le mot seul ; un point seulement pour l’urgent                                             |
+| Décors animés (électrocardiogramme, anneaux qui pulsent)   | Rien. Le mouvement accompagne un changement d’état, il ne décore pas                       |
+| Nombres qui comptent depuis zéro                           | La valeur, tout de suite                                                                   |
+| Accroches vagues (« tout relié », « sans limites »)        | Ce que fait l’outil, avec les mots du métier (« Tenir la conduite. »)                      |
+| Rangée d’icônes sans nom, puces en jargon                  | L’icône et son nom ; l’état en mots, qui ouvre son réglage d’un toucher                    |
+| Panneau flottant posé sur le contenu (rappels, bulles)     | Dans le flux de la page, au-dessus du contenu ; une confirmation brève se ferme au toucher |
+| Majuscules espacées sur tous les libellés                  | Libellés en casse normale, `--text-2`                                                      |
+| Emoji en guise d’icônes                                    | Icônes Lucide au trait, monochromes                                                        |
 
 Sources de cette liste : [Fountain Institute — 7 signs a UI has been vibe coded](https://www.thefountaininstitute.com/blog/signs-vibe-coded-ui), [Developers Digest — 16 AI design slop patterns](https://www.developersdigest.tech/blog/ai-design-slop-and-how-to-spot-it), [Spot the slop (Kosta C.)](https://world.hey.com/kostac/spot-the-slop-a-ui-designer-s-guide-to-fixing-ai-defaults-4c448c9c), [MindStudio — design system approach](https://www.mindstudio.ai/blog/claude-design-avoid-ai-slop-design-system).
 
@@ -53,7 +56,7 @@ Plex a été dessinée pour la documentation technique : elle se lit bien en pet
 | `--bg-1` / `--solid`                           | `#ffffff`                    | Cartes, fiches, champs           |
 | `--bg-2` / `--bg-3`                            | encre à 4,5 % / 8,5 %        | Survol, zones en retrait         |
 | `--text`                                       | `#050505`                    | Encre                            |
-| `--text-2` / `--text-3`                        | `#737373` / `#86827e`        | Texte secondaire, métadonnées    |
+| `--text-2` / `--text-3`                        | `#5d5a56` / `#6a6661`        | Texte secondaire, métadonnées    |
 | `--line` / `--line-2`                          | encre à 10 % / `#c7c7c7`     | Filets                           |
 | `--accent` / `--on-accent`                     | `#171717` / `#ffffff`        | Bouton principal                 |
 | `--ember`                                      | `#ff6a1f`                    | Le point de ce qui est en direct |
@@ -65,7 +68,7 @@ Les écrans n’utilisent que ces variables : un thème ne redéfinit que les je
 
 ## Thèmes de couleur
 
-`data-theme` (`light` / `dark`) fixe le mode ; `data-palette` choisit le thème dans ce mode. Chaque poste garde un thème clair et un thème sombre (`prefs.lightPalette`, `prefs.darkPalette`, `src/app/prefs.ts`) ; le bouton soleil / lune et le mode « comme le système » passent de l’un à l’autre.
+`data-theme` (`light` / `dark`) fixe le mode ; `data-palette` choisit le thème dans ce mode. Chaque poste garde un thème clair et un thème sombre (`prefs.lightPalette`, `prefs.darkPalette`, `src/app/prefs.ts`) ; le menu opérateur (« Thème sombre » / « Thème clair ») et le mode « comme le système » passent de l’un à l’autre.
 
 | Thème       | Mode   | Fond      | Encre     | Accent    | Point     | Usage                                                      |
 | ----------- | ------ | --------- | --------- | --------- | --------- | ---------------------------------------------------------- |
@@ -81,6 +84,7 @@ Règles :
 
 - **Nuit tactique** n’émet que des grandes longueurs d’onde : pas de blanc, pas de bleu. Les états se distinguent par la luminosité et par leur mot, pas par la teinte. Les tuiles de carte sont inversées puis teintées (`.leaflet-tile-pane`), les tracés, signes et photos passent par le même filtre rouge.
 - **Contraste élevé** vise au-delà de WCAG AA : texte noir pur, bordures noires sur les cartes, anneau de focus jaune.
+- **Textes secondaires lisibles** : `--text-2` atteint 4,5:1 sur le fond et sur les cartes dans les thèmes clairs et sombres ; `--text-3` (métadonnées) au moins 4:1 sur le fond papier. Nuit tactique reste plus sombre (vision nocturne) mais garde `--text-2` au-dessus de 4,3:1.
 - Un nouveau thème s’ajoute en deux endroits : une entrée dans `PALETTES` (`src/app/palettes.ts`, avec son nuancier) et un bloc `:root[data-palette="…"]` dans `src/palettes.css`.
 
 ## Composants
@@ -92,6 +96,17 @@ Règles :
 - **Ligne de chiffres** (`Figures`, `src/ui/Figures.tsx`, classe `.figures` ; `.metrics` prend la même forme) : filets haut et bas, chiffre en Plex Mono 26 px, libellé dessous, zéro en `--text-3`, retard en `--crit`. Situation, Journal, Missions, Messages, Équipe et la comparaison de Traçabilité l’utilisent.
 - **Sommaire** (`.hero-index`) : deux colonnes, filet au-dessus de chaque terme, une ligne factuelle.
 - **Point en direct** : 8 px, `--ember`, à gauche du libellé.
+
+## Coque : barre des modules, barre du haut, accueil
+
+`src/ui/Dock.tsx`, `src/app/dock.ts`, `src/app/TopBar.tsx`, `src/app/ShellMenus.tsx`, `src/journal/Landing.tsx`, styles dans `src/shell.css`.
+
+- **Barre des modules** (à gauche, en bas sur téléphone) : chaque icône a son nom dessous (Plex Sans 11,5 px, `--text-2`, module courant en `--accent` / `--on-accent`). D’office : Situation, Journal, Messages, Mes tâches, Carte, Moyens, Équipe, plus les modules de la fonction du poste (`roleProfile().focus`). Les autres sont derrière **Plus d’outils** : un panneau à droite de la barre, groupé (Conduite, Moyens et liaisons, Contacts / météo / agenda, Suivi et analyse), chaque module avec sa phrase. **Aide** est toujours au pied. Un module ouvert depuis « Plus d’outils » apparaît dans la barre tant qu’il est affiché (filet pointillé). Réglage « noms sous les icônes » coupé : barre compacte d’icônes, avec l’effet de loupe.
+- **Téléphone** : quatre modules en bas (Situation, Journal, Messages, Carte, selon ce qui est dans la barre) avec leur nom, puis **Plus** qui ouvre tous les modules en grille.
+- **Barre du haut** : journal actif, **Rechercher** (le mot reste jusqu’à la tablette ; `⌘K` n’est affiché qu’avec un clavier), puces d’état en mots qui ouvrent leur réglage (`Non partagé` / `N postes` → Synchronisation ; `Non enregistré` / `Enregistré` → Session et sauvegarde), heure, menu opérateur (initiales et chevron). Aucun bouton d’icône seule : thème, machine à remonter le temps et présentation sont dans le menu opérateur, avec une ligne d’explication ; dans le passé, un bouton **Revenir au direct** s’ajoute.
+- **Accueil** : sur tablette et téléphone, le formulaire vient d’abord, puis l’exercice de démonstration, puis le sommaire. L’onglet **Rejoindre une session** est ouvert d’office (la plupart des postes rejoignent) ; la phrase de récupération est expliquée en une phrase.
+- **Situation** : vue simple d’office, tout le tableau de bord à un toucher (retenu par poste) ; carte **Par où commencer ?** jusqu’à ce qu’on la ferme.
+- **Cibles tactiles** : sur écran tactile (`pointer: coarse`), boutons, champs, listes et puces de la barre du haut font au moins 44 px ; cases à cocher 22 px.
 
 ## Mouvement
 

@@ -457,13 +457,13 @@ export function ScreenMap() {
             {n(2)} {t("Crue de l’Arve")} ▾
           </span>
           <span className="docs-screen-pill grow">
-            {n(3)} {t("Rechercher ou agir…")} <kbd>⌘K</kbd>
+            {n(3)} {t("Rechercher…")} <kbd>⌘K</kbd>
           </span>
           <span className="docs-screen-pill">
             {n(4)} {t("{n} postes", { n: 3 })}
           </span>
           <span className="docs-screen-pill hide-small">
-            {n(5)} {t("Chiffré")}
+            {n(5)} {t("Enregistré")}
           </span>
           <span className="docs-screen-pill hide-small">{n(6)} 14:05</span>
           <span className="docs-screen-pill">{n(7)} SM</span>

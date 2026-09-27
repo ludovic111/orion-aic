@@ -50,8 +50,8 @@ export const VALISE_TOPIC: Topic = {
               "Crea un codice di sessione",
             ]}
           />
-          ). Le altre scelgono <Ui>Unisciti</Ui> e digitano il codice, come al
-          solito.
+          ). Le altre scelgono <Ui>Unirsi a una sessione</Ui> e digitano il
+          codice, come al solito.
         </li>
       </Steps>
       <H>La primissima volta su un apparecchio</H>
@@ -284,7 +284,7 @@ export const VALISE_TOPIC: Topic = {
           ],
           ["Il Wi-Fi non appare", "Paese del Wi-Fi CH sul Pi; riavviatelo."],
           [
-            "Postazione « Da solo » mentre altre lavorano",
+            "Postazione « Non condivisa » mentre altre lavorano",
             "Verificate il codice di sessione; ricaricate la pagina. Nulla va perso.",
           ],
           [

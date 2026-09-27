@@ -83,8 +83,9 @@ export const PART4: Topic[] = [
             <strong>Tema scuro</strong>: <em>Grafite</em> (predefinito),{" "}
             <em>Mezzanotte</em> (blu notte) o <em>Notte tattica</em>: tutto in
             rosso su nero, carta compresa, per preservare la visione notturna
-            sul terreno. Il pulsante sole / luna passa dall’uno all’altro; i
-            temi si possono provare anche dalla ricerca (<kbd>⌘K</kbd>, «tema»).
+            sul terreno. Il menu operatore (<Ui>Tema scuro</Ui> /{" "}
+            <Ui>Tema chiaro</Ui>) passa dall’uno all’altro; i temi si possono
+            provare anche dalla ricerca (<kbd>⌘K</kbd>, «tema»).
           </li>
           <li>
             <strong>Animazioni</strong>: Tutte, o Ridotte (postazione lenta,
@@ -95,8 +96,9 @@ export const PART4: Topic[] = [
             delle altre postazioni, messaggi.
           </li>
           <li>
-            <strong>Moduli visualizzati</strong>: nascondete ciò che non usate.
-            I dati restano intatti.
+            <strong>Moduli della barra</strong>: per ogni modulo, nella barra,
+            sotto <Ui>Altri strumenti</Ui> o nascosto; nomi sotto le icone o
+            barra stretta. I dati restano intatti.
           </li>
         </ul>
         <H>Elenchi di riferimento</H>
@@ -271,14 +273,21 @@ export const PART4: Topic[] = [
         />
         <H>Che cosa cambia su uno schermo piccolo</H>
         <ul>
-          <li>Il dock dei moduli passa in basso sullo schermo.</li>
+          <li>
+            La barra dei moduli passa in basso sullo schermo: Situazione,
+            Diario, Messaggi, Carta e <Ui>Altro</Ui> per tutti gli altri.
+          </li>
           <li>
             Un pulsante rotondo <Ui>+</Ui> in basso a destra apre una nuova
             voce.
           </li>
           <li>
-            I pulsanti sono più grandi, l’inserimento avviene in una finestra
-            dedicata.
+            I pulsanti sono più grandi (almeno 44 px), l’inserimento avviene in
+            una finestra dedicata.
+          </li>
+          <li>
+            Nella pagina iniziale, il modulo viene per primo, poi l’esercizio
+            dimostrativo.
           </li>
         </ul>
       </>
@@ -462,9 +471,9 @@ export const PART4: Topic[] = [
           l’intera operazione: modulo <Ui>Tracciabilità</Ui>.
         </Faq>
         <Faq q="Si può rivedere la situazione com’era alle 10?">
-          Sì: l’orologio <Ui>Macchina del tempo</Ui> in alto a destra, poi
-          scegliete 10:00. Tutti i moduli mostrano lo stato di quel momento,
-          meteo compresa.
+          Sì: menu operatore (le vostre iniziali, in alto a destra) →{" "}
+          <Ui>Macchina del tempo</Ui>, poi scegliete 10:00. Tutti i moduli
+          mostrano lo stato di quel momento, meteo compresa.
         </Faq>
         <Faq q="Come proporre un miglioramento?">
           Scrivete a <a href={feedbackLink("FAQ")}>{CONTACT_EMAIL}</a> (menu
@@ -497,8 +506,8 @@ export const PART4: Topic[] = [
               "Crea un codice di sessione",
             ]}
           />
-          , poi sulle altre postazioni: <Ui>Unisciti</Ui> e il codice. Vedere
-          «Sincronizzazione tra postazioni».
+          , poi sulle altre postazioni: <Ui>Unirsi a una sessione</Ui> e il
+          codice. Vedere «Sincronizzazione tra postazioni».
         </Faq>
         <Faq q="Funziona senza internet?">
           Sì, dopo un primo caricamento. La sincronizzazione ha bisogno di
@@ -533,10 +542,11 @@ export const PART4: Topic[] = [
           Esportate un archivio <code>.orionaic</code>, inviatelo e comunicate
           la frase attraverso un altro canale. L’altra postazione lo importa.
         </Faq>
-        <Faq q="Non trovo più un modulo nel dock.">
-          Forse è nascosto:{" "}
+        <Faq q="Non trovo più un modulo nella barra.">
+          Guardate sotto <Ui>Altri strumenti</Ui> (<Ui>Altro</Ui> sul telefono):
+          lì stanno i moduli meno frequenti. Se non c’è, è nascosto:{" "}
           <Path
-            steps={["Impostazioni", "Questa postazione", "Moduli visualizzati"]}
+            steps={["Impostazioni", "Questa postazione", "Moduli della barra"]}
           />
           .
         </Faq>
@@ -561,9 +571,10 @@ export const PART4: Topic[] = [
           No, i browser non lo permettono per questo uso. Senza internet, usate
           la rete locale.
         </Faq>
-        <Faq q="Che cosa significano i bollini sul dock?">
-          Rosso: ci sono scadenze superate. Viola: nuovi messaggi attendono di
-          essere trattati.
+        <Faq q="Che cosa significano i bollini sulla barra dei moduli?">
+          Rosso: ci sono scadenze superate. Scuro: nuovi messaggi attendono di
+          essere trattati. Un punto su <Ui>Altri strumenti</Ui>: un modulo
+          riposto lì richiede attenzione.
         </Faq>
         <Faq q="Quale browser usare?">
           Un browser recente: Chrome, Edge, Firefox o Safari. La pagina deve
@@ -641,8 +652,8 @@ export const PART4: Topic[] = [
           Portata corta, ma funziona ovunque.
         </Gloss>
         <Gloss term="Modulo">
-          Una parte di orion aic: diario, carta, radio… Ognuno ha la sua icona
-          nel dock.
+          Una parte di orion aic: diario, carta, radio… Ognuno ha la sua icona e
+          il suo nome nella barra dei moduli, o sotto <Ui>Altri strumenti</Ui>.
         </Gloss>
         <Gloss term="Nominativo">
           Il nome usato alla radio. Designa una funzione («PC Carouge»), mai una
