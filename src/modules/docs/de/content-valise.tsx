@@ -99,6 +99,10 @@ export const VALISE_TOPIC: Topic = {
           ],
           ["Ortssuche (geo.admin.ch)", "Nein: Koordinaten eingeben"],
           ["Wetter (Open-Meteo)", "Nein"],
+          [
+            "Offizielle Warnungen und Gewässer (BAFU)",
+            "Nein: Die letzten Daten bleiben angezeigt",
+          ],
         ]}
       />
       <H>Das Material</H>

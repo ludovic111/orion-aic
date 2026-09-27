@@ -1825,6 +1825,11 @@ export const TOPICS: Topic[] = [
           <li>
             Noter une <strong>alerte</strong> avec son degré, de 1 à 5.
           </li>
+          <li>
+            Regarder les <strong>alertes officielles</strong> et les{" "}
+            <strong>cours d’eau les plus proches</strong> : degré de danger,
+            débit, niveau et s’il monte ou descend.
+          </li>
         </Steps>
         <Example>
           <p>
@@ -1863,7 +1868,43 @@ export const TOPICS: Topic[] = [
             Un lien ouvre le site de MétéoSuisse pour les alertes officielles.
           </li>
         </ul>
-        <H>Prévisions reçues : la météo d’avant</H>
+        <H>Alertes officielles et cours d’eau</H>
+        <ul>
+          <li>
+            <Ui>Actualiser</Ui> charge aussi les{" "}
+            <strong>degrés de danger officiels</strong> pour le lieu : crues
+            (carte de vigilance de l’OFEV : région, rivières et lacs proches) et
+            incendies de forêt (cantons et OFEV). Le texte et le degré sont
+            repris tels quels, avec la date de publication.
+          </li>
+          <li>
+            Les <strong>trois stations de mesure de l’OFEV</strong> les plus
+            proches (moins de 25 km) montrent le débit ou le niveau, l’heure de
+            la mesure et le degré de danger de la station. La flèche dit si
+            l’eau monte ou descend depuis environ une heure : elle apparaît
+            après deux chargements espacés d’au moins 30 minutes (« Actualiser
+            toutes les 30 min » le fait tout seul).
+          </li>
+          <li>
+            À partir du <strong>degré 3</strong>, l’alerte apparaît aussi sur la
+            page <Ui>Situation</Ui>, dans la carte Météo.
+          </li>
+          <li>
+            « Dernière mise à jour il y a … » dit l’âge des données. Sans
+            internet, les dernières données restent affichées avec leur heure ;
+            actualisez avant de décider.
+          </li>
+          <li>
+            Les <strong>alertes météo de MétéoSuisse</strong> (orages, pluie,
+            vent, neige, chaleur, gel) ne sont pas encore publiées en données
+            ouvertes : le bouton <Ui>Alertes MétéoSuisse</Ui> ouvre la page
+            officielle.
+          </li>
+          <li>
+            Ce qui part : les coordonnées du lieu vers geo.admin.ch et le numéro
+            des stations vers admin.ch. Rien d’autre.
+          </li>
+        </ul>
         <ul>
           <li>
             Chaque prévision chargée est <strong>gardée dans la session</strong>{" "}
@@ -1878,8 +1919,9 @@ export const TOPICS: Topic[] = [
           </li>
         </ul>
         <Note kind="warn">
-          Les alertes officielles sont celles de MétéoSuisse et des autorités.
-          orion aic aide à les noter et à les partager, il ne les remplace pas.
+          Les alertes officielles sont celles de MétéoSuisse, de l’OFEV et des
+          autorités : elles restent la référence. orion aic les reprend, aide à
+          les noter et à les partager, il ne les remplace pas.
         </Note>
       </>
     ),

@@ -4,16 +4,17 @@
 
 orion aic n’a ni compte, ni base de données serveur, ni télémétrie, ni IA. Les saisies et imports sont traités dans le navigateur. Polices, icônes, code, signes cartographiques et modules d’export sont servis par la même origine. L’hébergeur reçoit les requêtes de chargement du site et peut journaliser l’adresse IP et les métadonnées HTTP : « local » ne signifie pas navigation anonyme.
 
-Quatre services réseau sont **facultatifs** et n’existent que si l’opérateur les utilise :
+Cinq services réseau sont **facultatifs** et n’existent que si l’opérateur les utilise :
 
-| Service                        | Destination                                   | Ce qui part                                                                                     |
-| ------------------------------ | --------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Synchronisation entre postes   | Relais du site (`/sync`, WebSocket)           | Messages chiffrés de bout en bout ; un identifiant de salle dérivé. Jamais le code ni le texte. |
-| Fonds de carte                 | `wmts.geo.admin.ch`, `tile.openstreetmap.org` | Requêtes de tuiles (zone et zoom affichés).                                                     |
-| Recherche de lieu              | `api3.geo.admin.ch`                           | Le texte recherché (adresse, lieu).                                                             |
-| Prévisions météo (sur demande) | `api.open-meteo.com`                          | Les coordonnées du lieu météo choisi.                                                           |
+| Service                           | Destination                                                         | Ce qui part                                                                                                                                                                                                    |
+| --------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Synchronisation entre postes      | Relais du site (`/sync`, WebSocket)                                 | Messages chiffrés de bout en bout ; un identifiant de salle dérivé. Jamais le code ni le texte.                                                                                                                |
+| Fonds de carte                    | `wmts.geo.admin.ch`, `tile.openstreetmap.org`                       | Requêtes de tuiles (zone et zoom affichés).                                                                                                                                                                    |
+| Recherche de lieu                 | `api3.geo.admin.ch`                                                 | Le texte recherché (adresse, lieu).                                                                                                                                                                            |
+| Prévisions météo (sur demande)    | `api.open-meteo.com`                                                | Les coordonnées du lieu météo choisi.                                                                                                                                                                          |
+| Alertes officielles (sur demande) | `data.geo.admin.ch`, `api3.geo.admin.ch`, `environment.ld.admin.ch` | Rien pour la carte des crues et la liste des stations (fichiers nationaux) ; les coordonnées MN95 du lieu pour le danger d’incendie ; le numéro des trois stations les plus proches pour leur mesure (LINDAS). |
 
-La politique CSP n’autorise aucune autre connexion (`connect-src 'self'` + ces deux API + les deux serveurs de tuiles, `img-src` + ces deux serveurs de tuiles). Les serveurs de tuiles figurent aussi dans `connect-src` parce que le service worker les télécharge lui-même pour les garder hors ligne : sans eux, toutes les tuiles échouent et la carte affiche à tort « hors ligne ». Aucun script, style ou police externe.
+La politique CSP n’autorise aucune autre connexion (`connect-src 'self'` + ces API + les serveurs de tuiles, `img-src` + les serveurs de tuiles). Les serveurs de tuiles figurent aussi dans `connect-src` parce que le service worker les télécharge lui-même pour les garder hors ligne : sans eux, toutes les tuiles échouent et la carte affiche à tort « hors ligne ». Aucun script, style ou police externe.
 
 Le choix d’une installation institutionnelle, d’un poste autorisé et du droit de traiter les données appartient à l’organisation. Ce logiciel n’est pas certifié ni homologué. Le chiffrement ne constitue pas à lui seul une conformité à la LIPAD/LPD, un plan d’archivage ou une analyse d’impact.
 
@@ -44,6 +45,7 @@ Le service worker met en cache le code de l’application, les signes cartograph
 - Un import est prévisualisé avant mutation. Une fusion ignore les doublons exacts et refuse les entrées dont les versions divergent ; les données des modules (messages, carte, moyens…) suivent les règles de la synchronisation.
 - CSV/TSV : syntaxe vérifiée, cellules et lignes bornées, formules neutralisées dans les exports. XLSX/ODS écrivent uniquement des cellules texte.
 - Les textes importés ou reçus sont affichés par React, jamais injectés en HTML. Les libellés de la recherche de lieu geo.admin.ch sont réduits à du texte.
+- Alertes officielles (Météo, `shared/official.ts`) : chaque réponse est bornée en taille (6 Mo pour la carte des crues, 2 Mo pour la liste des stations, 200 Ko pour le danger d’incendie, 32 Ko par mesure) puis validée par schéma Zod ; un élément invalide est ignoré, une réponse invalide est refusée ; une mesure d’une autre station que celle demandée est refusée ; les textes sont réduits à du texte. Seule la dernière réponse est gardée, dans le stockage local du navigateur (comme la dernière prévision), avec son heure ; elle n’entre ni dans la session, ni dans la synchronisation. Seules les alertes créées par un seuil de débit ou de niveau entrent dans le journal.
 - Le fichier `.orionaic` est chiffré. Tous les autres formats sont en clair, avec reconnaissance explicite dans l’interface.
 
 ## Signature des exports

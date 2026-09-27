@@ -11,8 +11,11 @@ import {
   METRICS,
   applyThresholds,
   crossings,
+  isHydroMetric,
   latestForecast,
 } from "../../../shared/thresholds";
+import type { StationReading } from "../../../shared/official.ts";
+import { readOfficial } from "./officialData";
 import { useApp } from "../../app/context";
 import { type FieldSpec } from "../../ui/records";
 import { SettingSheet } from "../../ui/SettingSheet";
@@ -32,11 +35,22 @@ const metricLabel = (m: ThresholdMetric) =>
     rain24h: () => t("Pluie en 24 h"),
     tmax: () => t("Température maximale"),
     tmin: () => t("Température minimale"),
+    discharge: () => t("Débit mesuré d’un cours d’eau"),
+    waterLevel: () => t("Niveau d’eau mesuré, en altitude"),
   })[m]?.() ?? METRICS[m].label;
 
 /** "Rafales ≥ 60 km/h", in the language of the post. */
-const thresholdLabel = (th: Pick<Threshold, "metric" | "value">) =>
-  `${metricLabel(th.metric)} ${METRICS[th.metric].above ? "≥" : "≤"} ${th.value} ${METRICS[th.metric].unit}`;
+const thresholdLabel = (
+  th: Pick<Threshold, "metric" | "value" | "stationName" | "station">,
+) =>
+  `${metricLabel(th.metric)} ${METRICS[th.metric].above ? "≥" : "≤"} ${th.value} ${METRICS[th.metric].unit}${
+    isHydroMetric(th.metric)
+      ? ` · ${th.stationName || (th.station ? t("station {id}", { id: th.station }) : t("station à choisir"))}`
+      : ""
+  }`;
+
+const stationLabel = (s: StationReading) =>
+  `${s.place ? `${s.water} · ${s.place}` : s.water} (${s.id})`;
 
 type Draft = Omit<Threshold, "id" | "createdAt" | "updatedAt" | "by"> &
   Partial<Pick<Threshold, "id" | "createdAt" | "updatedAt" | "by">>;
@@ -98,30 +112,93 @@ const STANDARD: Draft[] = [
   },
 ];
 
-const spec = (): FieldSpec[] => [
+const spec = (stations: StationReading[]): FieldSpec[] => [
   {
     kind: "custom",
     key: "metric",
     wide: true,
-    render: (value, set) => (
-      <ChoiceField<ThresholdMetric>
-        label={t("Grandeur")}
-        value={(value.metric as ThresholdMetric) ?? "gusts"}
-        onChange={(metric) => set({ metric })}
-        options={THRESHOLD_METRICS.map((m) => ({
-          value: m,
-          label: METRICS[m].above
-            ? t("{label} ({unit}, au-dessus)", {
-                label: metricLabel(m),
-                unit: METRICS[m].unit,
-              })
-            : t("{label} ({unit}, au-dessous)", {
-                label: metricLabel(m),
-                unit: METRICS[m].unit,
-              }),
-        }))}
-      />
-    ),
+    render: (value, set) => {
+      const metric = (value.metric as ThresholdMetric) ?? "gusts";
+      const station = String(value.station ?? "");
+      const known = stations.some((s) => s.id === station);
+      return (
+        <>
+          <ChoiceField<ThresholdMetric>
+            label={t("Grandeur")}
+            value={metric}
+            onChange={(next) => set({ metric: next })}
+            options={THRESHOLD_METRICS.map((m) => ({
+              value: m,
+              label: METRICS[m].above
+                ? t("{label} ({unit}, au-dessus)", {
+                    label: metricLabel(m),
+                    unit: METRICS[m].unit,
+                  })
+                : t("{label} ({unit}, au-dessous)", {
+                    label: metricLabel(m),
+                    unit: METRICS[m].unit,
+                  }),
+            }))}
+          />
+          {isHydroMetric(metric) &&
+            (stations.length ? (
+              <ChoiceField<string>
+                label={t("Station de mesure (OFEV)")}
+                hint={t(
+                  "Les stations les plus proches du lieu météo, chargées avec les alertes officielles.",
+                )}
+                value={known ? station : ""}
+                onChange={(id) => {
+                  const s = stations.find((x) => x.id === id);
+                  set({
+                    station: id,
+                    stationName: s
+                      ? (s.place ? `${s.water} · ${s.place}` : s.water).slice(
+                          0,
+                          200,
+                        )
+                      : "",
+                  });
+                }}
+                options={[
+                  { value: "", label: t("Choisir une station…") },
+                  ...(!known && station
+                    ? [
+                        {
+                          value: station,
+                          label: String(value.stationName || station),
+                        },
+                      ]
+                    : []),
+                  ...stations.map((s) => ({
+                    value: s.id,
+                    label: stationLabel(s),
+                  })),
+                ]}
+              />
+            ) : (
+              <label>
+                <span>{t("Numéro de la station OFEV")}</span>
+                <input
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={station}
+                  placeholder={t("ex. 2170")}
+                  onChange={(e) => {
+                    const id = e.target.value.replace(/\D/g, "").slice(0, 6);
+                    set({ station: id, stationName: "" });
+                  }}
+                />
+                <small>
+                  {t(
+                    "Chargez d’abord les alertes officielles (Météo) pour choisir parmi les stations proches.",
+                  )}
+                </small>
+              </label>
+            ))}
+        </>
+      );
+    },
   },
   {
     kind: "custom",
@@ -137,7 +214,7 @@ const spec = (): FieldSpec[] => [
           onChange={(e) => {
             const v = Number(e.target.value);
             set({
-              value: Number.isFinite(v) ? Math.max(-60, Math.min(1000, v)) : 0,
+              value: Number.isFinite(v) ? Math.max(-60, Math.min(10000, v)) : 0,
             });
           }}
         />
@@ -203,6 +280,28 @@ export function ThresholdsCard() {
       ),
     [list, forecast, now],
   );
+  // Measurements of the stations kept on this device (Météo → official).
+  const stations = useMemo(() => {
+    const snapshot = readOfficial(journal.id);
+    const place = journal.ops.settings.weatherPlace;
+    return snapshot &&
+      place &&
+      Math.abs(snapshot.place.lat - place.lat) < 0.001 &&
+      Math.abs(snapshot.place.lng - place.lng) < 0.001
+      ? snapshot.stations
+      : [];
+  }, [journal.id, journal.ops.settings.weatherPlace, now]);
+  const measured = (th: Threshold) => {
+    const s = stations.find((x) => x.id === th.station);
+    const value = s
+      ? th.metric === "discharge"
+        ? s.discharge
+        : s.waterLevel
+      : null;
+    return s && value !== null && s.at !== null
+      ? { value, at: s.at, over: value >= th.value }
+      : null;
+  };
   return (
     <section className="card w-12" aria-label={t("Seuils météo")}>
       <div className="card-head">
@@ -266,11 +365,13 @@ export function ThresholdsCard() {
       </div>
       <p className="muted" style={{ fontSize: 13, margin: "0 0 8px" }}>
         {t(
-          "À chaque prévision reçue, un seuil franchi crée une alerte (une par jour et par seuil, même si plusieurs postes la voient) et, si demandé, une entrée à traiter. Le niveau des cours d’eau n’est pas dans la prévision : saisissez les alertes crue à la main.",
+          "À chaque prévision reçue, un seuil franchi crée une alerte (une par jour et par seuil, même si plusieurs postes la voient) et, si demandé, une entrée à traiter. Un seuil de débit ou de niveau d’eau est comparé à la mesure de la station OFEV choisie, chaque fois que ce poste charge les alertes officielles.",
         )}
       </p>
       {list.map((th) => {
-        const c = next.get(th.id);
+        const hydro = isHydroMetric(th.metric);
+        const c = hydro ? undefined : next.get(th.id);
+        const m = hydro ? measured(th) : null;
         return (
           <div key={th.id} className={`th-row ${th.active ? "" : "off"}`}>
             <button
@@ -290,22 +391,30 @@ export function ThresholdsCard() {
                   th.label && thresholdLabel(th),
                   t("degré {level}", { level: th.level }),
                   th.followUp && t("entrée à traiter"),
-                  !forecast
-                    ? t("pas encore de prévision")
-                    : c
-                      ? t("franchi le {day} dès {time} (pic {peak} {unit})", {
-                          day: c.day.split("-").reverse().join("."),
-                          time: time(new Date(c.first).toISOString()),
-                          peak: Math.round(c.peak * 10) / 10,
+                  hydro
+                    ? m
+                      ? t("dernière mesure {value} {unit} à {time}", {
+                          value: Math.round(m.value * 100) / 100,
                           unit: METRICS[th.metric].unit,
+                          time: time(new Date(m.at).toISOString()),
                         })
-                      : t("pas franchi dans la prévision"),
+                      : t("pas encore de mesure sur ce poste")
+                    : !forecast
+                      ? t("pas encore de prévision")
+                      : c
+                        ? t("franchi le {day} dès {time} (pic {peak} {unit})", {
+                            day: c.day.split("-").reverse().join("."),
+                            time: time(new Date(c.first).toISOString()),
+                            peak: Math.round(c.peak * 10) / 10,
+                            unit: METRICS[th.metric].unit,
+                          })
+                        : t("pas franchi dans la prévision"),
                 ]
                   .filter(Boolean)
                   .join(" · ")}
               </small>
             </button>
-            {c && th.active && (
+            {(c || m?.over) && th.active && (
               <span className="pill warn">{t("Franchi")}</span>
             )}
             {!readOnly && (
@@ -354,7 +463,7 @@ export function ThresholdsCard() {
             </>
           }
           title={editing.id ? thresholdLabel(editing) : t("Nouveau seuil")}
-          spec={spec()}
+          spec={spec(stations)}
           initial={editing as Record<string, unknown>}
           onClose={() => setEditing(null)}
         />

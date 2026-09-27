@@ -182,20 +182,32 @@ export const THRESHOLD_METRICS = [
   "rain24h",
   "tmax",
   "tmin",
+  // Measured at a FOEN gauging station (not in the forecast).
+  "discharge",
+  "waterLevel",
 ] as const;
 export type ThresholdMetric = (typeof THRESHOLD_METRICS)[number];
+export const HYDRO_METRICS = ["discharge", "waterLevel"] as const;
+export const isHydroMetric = (
+  m: ThresholdMetric,
+): m is (typeof HYDRO_METRICS)[number] =>
+  (HYDRO_METRICS as readonly string[]).includes(m);
 
 export const thresholdSchema = z
   .object({
     ...record,
     metric: z.enum(THRESHOLD_METRICS),
-    value: z.number().min(-60).max(1000),
+    // Up to 10 000: discharges in m³/s, water levels in metres of altitude.
+    value: z.number().min(-60).max(10000),
     level: z.enum(["1", "2", "3", "4", "5"]),
     label: text(120),
     region: text(200),
     active: z.boolean(),
     // Also write an entry "à suivre" in the journal when crossed.
     followUp: z.boolean(),
+    // Gauging station (FOEN number) of a discharge or water level threshold.
+    station: z.union([z.string().regex(/^\d{3,6}$/), z.literal("")]).optional(),
+    stationName: text(200).optional(),
   })
   .strict();
 
