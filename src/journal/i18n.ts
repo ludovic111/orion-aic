@@ -6,7 +6,7 @@ import { common } from "../../shared/i18n/common.ts";
 export const { t, tn, tIn, dict } = translator({
   ...common,
   // ---------- Landing ----------
-  "version 2.0": { de: "Version 2.0", it: "versione 2.0" },
+  "version 2.1": { de: "Version 2.1", it: "versione 2.1" },
   "Sécurité et données": { de: "Sicherheit und Daten", it: "Sicurezza e dati" },
   "Thème sombre": { de: "Dunkles Design", it: "Tema scuro" },
   "Thème clair": { de: "Helles Design", it: "Tema chiaro" },

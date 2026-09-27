@@ -5,7 +5,7 @@ Locale et chiffrée, sans compte ni base de données, synchronisée en direct en
 
 - Production : <https://orionaic.xyz>
 - Licence : AGPL-3.0-only (le code source complet est téléchargeable depuis l’application)
-- Version : 2.0
+- Version : 2.1
 - Documentation d’utilisation : dans l’application, module **Aide** (trois niveaux de détail).
 - Une idée, un besoin, quelque chose à changer ? Écrire à <ludo47j@gmail.com> (aussi dans l’application : menu opérateur → « Une idée, un besoin ? »).
 

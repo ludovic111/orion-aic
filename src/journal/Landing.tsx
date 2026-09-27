@@ -96,7 +96,7 @@ export function Landing({
     <div className="landing">
       <header className="landing-bar">
         <Brand size={28} />
-        <span className="landing-version">{t("version 2.0")}</span>
+        <span className="landing-version">{t("version 2.1")}</span>
         <button className="link push" onClick={onPrivacy}>
           {t("Sécurité et données")}
         </button>
