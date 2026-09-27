@@ -83,29 +83,36 @@ export async function reducePhoto(file: File): Promise<Reduced> {
   let side = PHOTO_MAX_SIDE;
   let best: Blob | null = null;
   let size = { width: 0, height: 0 };
-  // Smaller and smaller until the photo is light enough (almost always at
-  // the first try).
-  for (
-    let round = 0;
-    round < 5 && !(best && best.size <= PHOTO_TARGET_BYTES);
-    round++
-  ) {
-    const scale = Math.min(1, side / Math.max(width, height));
-    canvas.width = Math.max(1, Math.round(width * scale));
-    canvas.height = Math.max(1, Math.round(height * scale));
-    // A transparent picture gets a white ground (JPEG has no transparency).
-    context.fillStyle = "#ffffff";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.imageSmoothingQuality = "high";
-    context.drawImage(image, 0, 0, canvas.width, canvas.height);
-    for (const quality of [0.82, 0.72, 0.62]) {
-      const blob = await encode(canvas, quality);
-      if (!blob) break;
-      best = blob;
-      size = { width: canvas.width, height: canvas.height };
-      if (blob.size <= PHOTO_TARGET_BYTES) break;
+  try {
+    // Smaller and smaller until the photo is light enough (almost always at
+    // the first try).
+    for (
+      let round = 0;
+      round < 5 && !(best && best.size <= PHOTO_TARGET_BYTES);
+      round++
+    ) {
+      const scale = Math.min(1, side / Math.max(width, height));
+      canvas.width = Math.max(1, Math.round(width * scale));
+      canvas.height = Math.max(1, Math.round(height * scale));
+      // A transparent picture gets a white ground (JPEG has no transparency).
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.imageSmoothingQuality = "high";
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      for (const quality of [0.82, 0.72, 0.62]) {
+        const blob = await encode(canvas, quality);
+        if (!blob) break;
+        best = blob;
+        size = { width: canvas.width, height: canvas.height };
+        if (blob.size <= PHOTO_TARGET_BYTES) break;
+      }
+      side = Math.round(side * 0.75);
     }
-    side = Math.round(side * 0.75);
+  } finally {
+    // Safari keeps a canvas' memory until its size is zero: without this,
+    // a batch of photos on an iPhone can run out of memory.
+    canvas.width = 0;
+    canvas.height = 0;
   }
   if (!best) throw new Error(t("Ce navigateur ne peut pas réduire la photo."));
   const url = await dataUrl(best);
