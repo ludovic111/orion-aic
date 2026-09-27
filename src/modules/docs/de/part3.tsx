@@ -130,7 +130,7 @@ export const PART3A: Topic[] = [
         <Steps>
           <li>
             <Path steps={["Operateur-Menü", "Synchronisation"]} />, oder ein
-            Klick auf die Anzeige <Ui>Allein</Ui> oben.
+            Klick auf die Anzeige <Ui>Nicht geteilt</Ui> oben.
           </li>
           <li>
             <Ui>Sitzungscode erstellen</Ui>. Ein Code wird angezeigt, etwa{" "}
@@ -144,16 +144,15 @@ export const PART3A: Topic[] = [
         <H>Auf den anderen Arbeitsplätzen: beitreten</H>
         <Steps>
           <li>
-            Öffnen Sie <a href={SITE}>orionaic.xyz</a> → <Ui>Beitreten</Ui>.
-            (Oder scannen Sie den QR-Code mit dem Telefon: Der Code ist bereits
-            ausgefüllt.)
+            Öffnen Sie <a href={SITE}>orionaic.xyz</a> →{" "}
+            <Ui>Einer Sitzung beitreten</Ui>. (Oder scannen Sie den QR-Code mit
+            dem Telefon: Der Code ist bereits ausgefüllt.)
           </li>
           <li>Geben Sie den Code und Ihren Namen oder Ihre Funktion ein.</li>
           <li>
-            Wenn Sie die Sitzung auf diesem Arbeitsplatz behalten möchten,
-            aktivieren Sie{" "}
-            <Ui>Verschlüsselte Sicherung auf diesem Arbeitsplatz</Ui> und wählen
-            Sie eine Passphrase.
+            Um die Sitzung auf diesem Arbeitsplatz zu behalten, lassen Sie{" "}
+            <Ui>Sitzung auf diesem Gerät behalten (empfohlen)</Ui> angekreuzt
+            und denken Sie sich einen Wiederherstellungssatz aus.
           </li>
           <li>
             <Ui>Sitzung beitreten</Ui>. Die Sitzung trifft ein, sobald ein
@@ -161,9 +160,9 @@ export const PART3A: Topic[] = [
           </li>
         </Steps>
         <p>
-          Oben zeigt die Anzeige <Ui>Allein</Ui>, <Ui>3 Plätze</Ui> (mit den
-          Initialen aller; beim Darüberfahren, wer in welchem Modul ist) oder{" "}
-          <Ui>Neu verbinden</Ui>.
+          Oben zeigt die Anzeige <Ui>Nicht geteilt</Ui>, <Ui>3 Plätze</Ui> (mit
+          den Initialen aller; beim Darüberfahren, wer in welchem Modul ist)
+          oder <Ui>Neu verbinden</Ui>.
         </p>
         <Note kind="warn">
           Der Code ist ein <strong>Passwort</strong>: Er öffnet die ganze
@@ -620,8 +619,8 @@ export const PART3B: Topic[] = [
         <H>Präsentieren in 3 Schritten</H>
         <Steps>
           <li>
-            Bildschirm-Schaltfläche <Ui>Lage präsentieren</Ui> oben rechts (oder{" "}
-            <K>⌘K</K> → « Präsentieren »).
+            Operateur-Menü (Ihre Initialen, oben rechts) →{" "}
+            <Ui>Lage präsentieren</Ui> (oder <K>⌘K</K> → « Präsentieren »).
           </li>
           <li>
             Bereiten Sie in wenigen Sekunden vor: Ihren Namen, das Publikum («
@@ -733,8 +732,9 @@ export const PART3B: Topic[] = [
         <H>Zu einer bestimmten Uhrzeit zurückkehren</H>
         <Steps>
           <li>
-            Klicken Sie oben rechts auf die Uhr <Ui>Zeitreise</Ui> (oder{" "}
-            <K>⌘K</K> → « Zeitreise »). Unten erscheint eine Leiste.
+            Operateur-Menü (Ihre Initialen, oben rechts) → <Ui>Zeitreise</Ui>{" "}
+            (oder <K>⌘K</K> → « Zeitreise »). Unten erscheint eine Leiste;{" "}
+            <Ui>Zurück zur Live-Ansicht</Ui>, oben, führt zu jetzt zurück.
           </li>
           <li>
             Ziehen Sie den Schieberegler oder geben Sie ein Datum und eine

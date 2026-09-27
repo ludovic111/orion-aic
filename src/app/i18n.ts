@@ -143,12 +143,6 @@ export const { t, tn, tIn, dict } = translator({
     de: "Überall suchen oder handeln (⌘K)",
     it: "Cercare o agire ovunque (⌘K)",
   },
-  "Rechercher ou agir": { de: "Suchen oder handeln", it: "Cerca o agisci" },
-  "… partout": { de: " … überall", it: "… ovunque" },
-  "Synchronisation désactivée : partager la session avec d’autres postes": {
-    de: "Synchronisation deaktiviert: Sitzung mit anderen Arbeitsplätzen teilen",
-    it: "Sincronizzazione disattivata: condividere la sessione con altre postazioni",
-  },
   "Synchronisation active": {
     de: "Synchronisation aktiv",
     it: "Sincronizzazione attiva",
@@ -175,49 +169,26 @@ export const { t, tn, tIn, dict } = translator({
     de: "{n} Zusammenführungen zu prüfen",
     it: "{n} fusioni da vedere",
   },
-  Seul: { de: "Allein", it: "Da solo" },
   "{n} poste": { de: "{n} Platz", it: "{n} postazione" },
   "{n} postes": { de: "{n} Plätze", it: "{n} postazioni" },
   Reconnexion: { de: "Neu verbinden", it: "Riconnessione" },
-  "Sauvegarde chiffrée sur ce poste": {
-    de: "Verschlüsselte Speicherung auf diesem Arbeitsplatz",
-    it: "Salvataggio cifrato su questa postazione",
-  },
-  "Session temporaire : exportez avant de fermer": {
-    de: "Temporäre Sitzung: vor dem Schliessen exportieren",
-    it: "Sessione temporanea: esportate prima di chiudere",
-  },
   "Échec sauvegarde": {
     de: "Speichern fehlgeschlagen",
     it: "Salvataggio fallito",
   },
   "Sauvegarde…": { de: "Speichern …", it: "Salvataggio…" },
-  Chiffré: { de: "Verschlüsselt", it: "Cifrato" },
-  Temporaire: { de: "Temporär", it: "Temporaneo" },
   "Hors ligne": { de: "Offline", it: "Offline" },
   "Revenir à l’état actuel": {
     de: "Zum aktuellen Stand zurück",
     it: "Tornare allo stato attuale",
   },
   "Remonter le temps": { de: "Zeitreise", it: "Macchina del tempo" },
-  "Remonter le temps : revoir l’opération à n’importe quelle heure": {
-    de: "Zeitreise: den Einsatz zu jeder beliebigen Zeit ansehen",
-    it: "Macchina del tempo: rivedere l’operazione a qualsiasi ora",
-  },
   "Présenter la situation": {
     de: "Lage präsentieren",
     it: "Presentare la situazione",
   },
-  "Présenter la situation (plein écran)": {
-    de: "Lage präsentieren (Vollbild)",
-    it: "Presentare la situazione (schermo intero)",
-  },
   "Thème sombre": { de: "Dunkles Thema", it: "Tema scuro" },
   "Thème clair": { de: "Helles Thema", it: "Tema chiaro" },
-  "Opérateur, réglages et session": {
-    de: "Operateur, Einstellungen und Sitzung",
-    it: "Operatore, impostazioni e sessione",
-  },
   // ShellMenus.tsx
   "{n} entrées (1)": {
     fr: "{n} entrées",
@@ -299,7 +270,6 @@ export const { t, tn, tIn, dict } = translator({
   // ReminderBar.tsx
   Rappels: { de: "Erinnerungen", it: "Promemoria" },
   "Prévu à {time}": { de: "Geplant um {time}", it: "Previsto alle {time}" },
-  "Plus tard (15 min)": { de: "Später (15 Min.)", it: "Più tardi (15 min)" },
   "Me le rappeler dans 15 minutes": {
     de: "In 15 Minuten erinnern",
     it: "Ricordamelo tra 15 minuti",
@@ -535,11 +505,6 @@ export const { t, tn, tIn, dict } = translator({
     de: "Reduziert (langsamer Rechner, Empfindlichkeit)",
     it: "Ridotte (postazione lenta, sensibilità)",
   },
-  "Le bouton soleil / lune de la barre du haut passe du thème clair au thème sombre choisis ici. Chaque poste garde son propre thème.":
-    {
-      de: "Die Sonne-/Mond-Taste in der oberen Leiste wechselt zwischen dem hier gewählten hellen und dunklen Thema. Jeder Arbeitsplatz behält sein eigenes Thema.",
-      it: "Il pulsante sole / luna della barra in alto passa dal tema chiaro al tema scuro scelti qui. Ogni postazione mantiene il proprio tema.",
-    },
   "Impression automatique": {
     de: "Automatischer Druck",
     it: "Stampa automatica",
@@ -574,12 +539,6 @@ export const { t, tn, tIn, dict } = translator({
     {
       de: "Der Browser zeigt bei jedem Blatt sein Druckfenster. Um ganz ohne Fenster zu drucken, Chrome oder Edge mit der Option <0>--kiosk-printing</0> starten (siehe Hilfe).",
       it: "Il browser mostra la sua finestra di stampa a ogni scheda. Per stampare senza alcuna finestra, avviare Chrome o Edge con l’opzione <0>--kiosk-printing</0> (vedi l’aiuto).",
-    },
-  "Modules affichés": { de: "Angezeigte Module", it: "Moduli visualizzati" },
-  "Masquez ce que vous n’utilisez pas. Les données restent intactes et les autres postes gardent leur propre choix.":
-    {
-      de: "Blenden Sie aus, was Sie nicht verwenden. Die Daten bleiben unverändert, und die anderen Arbeitsplätze behalten ihre eigene Auswahl.",
-      it: "Nascondete ciò che non usate. I dati restano intatti e le altre postazioni mantengono la propria scelta.",
     },
   toujours: { de: "immer", it: "sempre" },
   "Valeurs proposées en un clic dans les formulaires. On peut toujours taper autre chose. Les référentiels font partie du journal : ils sont partagés avec les postes synchronisés et exportés dans l’archive.":
@@ -823,4 +782,123 @@ export const { t, tn, tIn, dict } = translator({
       de: "Ablösung. {follow} Pendenz(en), davon {late} überfällig. {radios} Funkgerät(e) in Betrieb.",
       it: "Avvicendamento. {follow} seguito/i da dare, di cui {late} in ritardo. {radios} radio in servizio.",
     },
+  // Simpler shell: top bar, menu of the post, dock settings
+  "Plus tard": {
+    de: "Später",
+    it: "Più tardi",
+  },
+  "Le menu opérateur (vos initiales, en haut à droite) passe du thème clair au thème sombre choisis ici. Chaque poste garde son propre thème.":
+    {
+      de: "Das Operateur-Menü (Ihre Initialen, oben rechts) wechselt zwischen dem hellen und dem dunklen Thema, die hier gewählt sind. Jeder Arbeitsplatz behält sein eigenes Thema.",
+      it: "Il menu operatore (le vostre iniziali, in alto a destra) passa dal tema chiaro al tema scuro scelti qui. Ogni postazione mantiene il proprio tema.",
+    },
+  "Modules de la barre": {
+    de: "Module der Leiste",
+    it: "Moduli della barra",
+  },
+  "Choisissez ce qui est dans la barre de gauche (en bas sur téléphone), ce qui attend sous « Plus d’outils » et ce qui est masqué. Les données restent intactes et les autres postes gardent leur propre choix.":
+    {
+      de: "Wählen Sie, was in der Leiste links (auf dem Telefon unten) steht, was unter « Weitere Werkzeuge » wartet und was ausgeblendet ist. Die Daten bleiben unverändert, und die anderen Arbeitsplätze behalten ihre eigene Wahl.",
+      it: "Scegliete cosa sta nella barra a sinistra (in basso sul telefono), cosa aspetta sotto « Altri strumenti » e cosa è nascosto. I dati restano intatti e le altre postazioni mantengono la propria scelta.",
+    },
+  "Afficher le nom sous chaque icône": {
+    de: "Namen unter jedem Symbol anzeigen",
+    it: "Mostrare il nome sotto ogni icona",
+  },
+  "Sans les noms, la barre est plus étroite.": {
+    de: "Ohne Namen ist die Leiste schmaler.",
+    it: "Senza i nomi, la barra è più stretta.",
+  },
+  "Place de {module}": {
+    de: "Platz von {module}",
+    it: "Posizione di {module}",
+  },
+  "Dans la barre": {
+    de: "In der Leiste",
+    it: "Nella barra",
+  },
+  "Plus d’outils": {
+    de: "Weitere Werkzeuge",
+    it: "Altri strumenti",
+  },
+  Masqué: {
+    de: "Ausgeblendet",
+    it: "Nascosto",
+  },
+  "Choix automatique : les modules essentiels, plus ceux de la fonction de ce poste choisie plus haut.":
+    {
+      de: "Automatische Wahl: die wichtigsten Module und jene der oben gewählten Funktion dieses Arbeitsplatzes.",
+      it: "Scelta automatica: i moduli essenziali, più quelli della funzione di questa postazione scelta più in alto.",
+    },
+  "Choix personnalisé pour ce poste.": {
+    de: "Eigene Wahl für diesen Arbeitsplatz.",
+    it: "Scelta personalizzata per questa postazione.",
+  },
+  "Revenir au choix automatique": {
+    de: "Zur automatischen Wahl zurückkehren",
+    it: "Tornare alla scelta automatica",
+  },
+  "Pour la nuit ou une salle sombre": {
+    de: "Für die Nacht oder einen dunklen Raum",
+    it: "Per la notte o una sala buia",
+  },
+  "Pour le jour ou une salle éclairée": {
+    de: "Für den Tag oder einen hellen Raum",
+    it: "Per il giorno o una sala illuminata",
+  },
+  "Revoir l’opération à n’importe quelle heure": {
+    de: "Den Einsatz zu jeder beliebigen Uhrzeit nachsehen",
+    it: "Rivedere l’operazione a qualsiasi ora",
+  },
+  "Plein écran, pour un rapport": {
+    de: "Vollbild, für einen Rapport",
+    it: "Schermo intero, per un rapporto",
+  },
+  "… ou agir partout": {
+    de: " … oder überall handeln",
+    it: "… o agire ovunque",
+  },
+  "Cette session n’est que sur ce poste. Cliquer pour la partager avec d’autres postes.":
+    {
+      de: "Diese Sitzung ist nur auf diesem Arbeitsplatz. Klicken, um sie mit anderen Arbeitsplätzen zu teilen.",
+      it: "Questa sessione è solo su questa postazione. Fare clic per condividerla con altre postazioni.",
+    },
+  "Non partagé": {
+    de: "Nicht geteilt",
+    it: "Non condivisa",
+  },
+  "L’enregistrement sur ce poste a échoué : exportez une copie maintenant.": {
+    de: "Das Speichern auf diesem Arbeitsplatz ist fehlgeschlagen: Exportieren Sie jetzt eine Kopie.",
+    it: "Il salvataggio su questa postazione non è riuscito: esportate subito una copia.",
+  },
+  "Enregistré et chiffré sur ce poste : rien n’est perdu en fermant l’onglet.":
+    {
+      de: "Auf diesem Arbeitsplatz gespeichert und verschlüsselt: Beim Schliessen des Tabs geht nichts verloren.",
+      it: "Salvato e cifrato su questa postazione: chiudendo la scheda non si perde nulla.",
+    },
+  "Rien n’est gardé sur ce poste : fermer l’onglet efface la session. Cliquer pour la protéger ou l’exporter.":
+    {
+      de: "Auf diesem Arbeitsplatz wird nichts gespeichert: Das Schliessen des Tabs löscht die Sitzung. Klicken, um sie zu schützen oder zu exportieren.",
+      it: "Su questa postazione non si conserva nulla: chiudere la scheda cancella la sessione. Fare clic per proteggerla o esportarla.",
+    },
+  Enregistré: {
+    de: "Gespeichert",
+    it: "Salvato",
+  },
+  "Non enregistré": {
+    de: "Nicht gespeichert",
+    it: "Non salvato",
+  },
+  "Revenir au direct": {
+    de: "Zurück zur Live-Ansicht",
+    it: "Tornare alla diretta",
+  },
+  "Menu : réglages, affichage, session": {
+    de: "Menü: Einstellungen, Anzeige, Sitzung",
+    it: "Menu: impostazioni, visualizzazione, sessione",
+  },
+  "Menu de {name} : réglages, affichage, session": {
+    de: "Menü von {name}: Einstellungen, Anzeige, Sitzung",
+    it: "Menu di {name}: impostazioni, visualizzazione, sessione",
+  },
 } satisfies Dict);

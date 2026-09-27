@@ -426,4 +426,68 @@ export const { t, tn, tIn, dict } = translator({
     de: "Im Journal erfassen",
     it: "Registrare nel diario",
   },
+  // Simple view and « Par où commencer ? » (StartCard.tsx)
+  "Revenir à la vue simple": {
+    de: "Zurück zur einfachen Ansicht",
+    it: "Tornare alla vista semplice",
+  },
+  "Afficher tout le tableau de bord": {
+    de: "Ganzes Dashboard anzeigen",
+    it: "Mostrare tutto il cruscotto",
+  },
+  "Tableaux, listes de contrôle, moyens, équipe, radio, météo et liens.": {
+    de: "Lagetafeln, Checklisten, Mittel, Team, Funk, Wetter und Verknüpfungen.",
+    it: "Tabelle, liste di controllo, mezzi, squadra, radio, meteo e collegamenti.",
+  },
+  "Par où commencer ?": {
+    de: "Wo anfangen?",
+    it: "Da dove cominciare?",
+  },
+  "Fermer ce guide": {
+    de: "Diese Anleitung schliessen",
+    it: "Chiudere questa guida",
+  },
+  "Noter ce qui se passe": {
+    de: "Festhalten, was geschieht",
+    it: "Annotare ciò che accade",
+  },
+  "Un fait, une décision, un appel : écrivez-le au journal. L’heure et le numéro sont ajoutés tout seuls.":
+    {
+      de: "Ein Ereignis, ein Entscheid, ein Anruf: Schreiben Sie es ins Journal. Uhrzeit und Nummer kommen von selbst dazu.",
+      it: "Un fatto, una decisione, una chiamata: scrivetelo nel diario. L’ora e il numero si aggiungono da soli.",
+    },
+  "Un message arrive par radio, téléphone ou papier : notez-le, il sera trié puis consigné.":
+    {
+      de: "Eine Meldung kommt per Funk, Telefon oder auf Papier: Erfassen Sie sie, sie wird sortiert und dann ins Journal übernommen.",
+      it: "Un messaggio arriva per radio, telefono o su carta: annotatelo, sarà smistato e poi registrato.",
+    },
+  "Travailler à plusieurs": {
+    de: "Zu mehreren arbeiten",
+    it: "Lavorare in più persone",
+  },
+  "Donnez le code de session aux autres postes : tout se partage en direct, chiffré.":
+    {
+      de: "Geben Sie den Sitzungscode den anderen Arbeitsplätzen: Alles wird live und verschlüsselt geteilt.",
+      it: "Date il codice di sessione alle altre postazioni: tutto si condivide in diretta, cifrato.",
+    },
+  "Partager la session": {
+    de: "Sitzung teilen",
+    it: "Condividere la sessione",
+  },
+  "Garder une copie": {
+    de: "Eine Kopie behalten",
+    it: "Tenere una copia",
+  },
+  "Exportez régulièrement une archive ou un PDF : c’est votre sauvegarde.": {
+    de: "Exportieren Sie regelmässig ein Archiv oder ein PDF: Das ist Ihre Sicherung.",
+    it: "Esportate regolarmente un archivio o un PDF: è il vostro salvataggio.",
+  },
+  "Toute l’aide, pas à pas": {
+    de: "Die ganze Hilfe, Schritt für Schritt",
+    it: "Tutto l’aiuto, passo per passo",
+  },
+  "J’ai compris": {
+    de: "Verstanden",
+    it: "Ho capito",
+  },
 } satisfies Dict);

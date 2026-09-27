@@ -497,7 +497,8 @@ export const CONDUCT_TOGETHER_TOPICS: Topic[] = [
           <Ui>Lagerapport vorbereiten</Ui> mit einem Klick.
         </li>
         <li>
-          <Ui>Erledigt</Ui> legt sie ab; die Uhr verschiebt sie um 15 Minuten.
+          <Ui>Erledigt</Ui> legt sie ab; <Ui>Später</Ui> verschiebt sie um 15
+          Minuten. Der Hinweis steht oben auf der Seite: Er verdeckt nichts.
         </li>
       </Steps>
     ),

@@ -478,7 +478,8 @@ export const CONDUCT_TOGETHER_TOPICS: Topic[] = [
           <Ui>Prepara il punto della situazione</Ui> con un clic.
         </li>
         <li>
-          <Ui>Fatto</Ui> lo chiude; l’orologio lo rinvia di 15 minuti.
+          <Ui>Fatto</Ui> lo chiude; <Ui>Più tardi</Ui> lo rinvia di 15 minuti.
+          Il riquadro è in cima alla pagina: non nasconde nulla.
         </li>
       </Steps>
     ),

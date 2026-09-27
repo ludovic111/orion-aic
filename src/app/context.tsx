@@ -4,6 +4,7 @@ import type { InputOf, Ops } from "../../shared/ops";
 import type { Edge, Item, Module, Ref } from "../../shared/links";
 import type { PrintJob } from "../print/PrintPreview";
 import type { Prefs } from "./prefs";
+import type { SettingsTab } from "./Settings";
 import type { ExportScope } from "../export/scope";
 
 /** Registers written even on a closed journal or from the time machine. */
@@ -94,6 +95,8 @@ export type AppContext = {
   setPrefs: (patch: Partial<Prefs>) => void;
   /** Open the documentation at a topic. */
   help: (topic: string) => void;
+  /** Open the settings at a tab (« Ce poste », « Synchronisation »…). */
+  settings: (tab: SettingsTab) => void;
   /** Record a journal entry now; returns its id. */
   addEntry: (fields: Partial<Fields>, links?: Ref[]) => string | null;
   /** Open the entry form, prefilled. */

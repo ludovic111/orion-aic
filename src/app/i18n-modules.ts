@@ -119,7 +119,21 @@ export const { t, tn, dict } = translator({
     de: "Debriefing und Übung",
     it: "Debriefing ed esercizio",
   },
-  RETEX: { de: "Debriefing", it: "Debriefing" },
+  Débriefing: { de: "Debriefing", it: "Debriefing" },
+  // Groups of « Plus d’outils » (dock)
+  Conduite: { de: "Führung", it: "Condotta" },
+  "Moyens et liaisons": {
+    de: "Mittel und Verbindungen",
+    it: "Mezzi e collegamenti",
+  },
+  "Contacts, météo, agenda": {
+    de: "Kontakte, Wetter, Agenda",
+    it: "Contatti, meteo, agenda",
+  },
+  "Suivi et analyse": {
+    de: "Nachverfolgung und Auswertung",
+    it: "Seguito e analisi",
+  },
   "Relecture de l’opération, chiffres de la conduite, points à retenir ; scénario et injects de la direction d’exercice.":
     {
       de: "Nachbetrachtung des Einsatzes, Führungskennzahlen, Erkenntnisse; Szenario und Einspielungen der Übungsleitung.",

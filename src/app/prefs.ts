@@ -6,6 +6,8 @@ import {
   type PaletteId,
 } from "./palettes";
 import { initialLang, isLang, setLang, type Lang } from "../i18n";
+import type { Module } from "../../shared/links";
+import { migrateDock } from "./dock.ts";
 
 // Preferences of this post (this browser). Not part of the session: another
 // post keeps its own theme, printer options and visible modules.
@@ -16,8 +18,19 @@ export type Prefs = {
   /** Colour theme used in dark mode. */
   darkPalette: PaletteId;
   motion: "full" | "reduced";
-  /** Modules hidden from the dock. */
+  /** Modules hidden from the navigation (dock and « Plus d'outils »). */
   hidden: string[];
+  /**
+   * Modules shown directly in the dock; the others are under « Plus
+   * d'outils ». null: automatic, from the function of the post (dock.ts).
+   */
+  dock: Module[] | null;
+  /** Names of the modules under their icons (off: compact dock). */
+  dockLabels: boolean;
+  /** « Par où commencer ? » was closed on this post. */
+  startDone: boolean;
+  /** Situation shows every card (off: the essential ones). */
+  situationFull: boolean;
   /** Print each new journal entry as soon as it is recorded. */
   autoPrint: boolean;
   /** Also print entries recorded on other synchronised posts. */
@@ -38,6 +51,10 @@ export const DEFAULT_PREFS: Prefs = {
   darkPalette: "graphite",
   motion: "full",
   hidden: [],
+  dock: null,
+  dockLabels: true,
+  startDone: false,
+  situationFull: false,
   autoPrint: false,
   autoPrintRemote: false,
   autoPrintMessages: false,
@@ -51,15 +68,19 @@ const DESIGN = "orion-aic-design";
 function read(): Prefs {
   try {
     const raw = localStorage.getItem(KEY);
-    const prefs: Prefs = raw
-      ? { ...DEFAULT_PREFS, ...JSON.parse(raw) }
-      : { ...DEFAULT_PREFS, lang: initialLang() };
+    const stored = raw ? JSON.parse(raw) : null;
+    const prefs: Prefs =
+      stored && typeof stored === "object"
+        ? { ...DEFAULT_PREFS, ...stored, ...migrateDock(stored) }
+        : { ...DEFAULT_PREFS, lang: initialLang() };
     // A palette removed or mistyped falls back to the default of its mode.
     if (!isLightPalette(prefs.lightPalette))
       prefs.lightPalette = DEFAULT_PREFS.lightPalette;
     if (!isDarkPalette(prefs.darkPalette))
       prefs.darkPalette = DEFAULT_PREFS.darkPalette;
     if (typeof prefs.dictation !== "boolean") prefs.dictation = false;
+    for (const key of ["dockLabels", "startDone", "situationFull"] as const)
+      if (typeof prefs[key] !== "boolean") prefs[key] = DEFAULT_PREFS[key];
     if (!isLang(prefs.lang)) prefs.lang = initialLang();
     if (localStorage.getItem(DESIGN) !== "atelier") {
       localStorage.setItem(DESIGN, "atelier");

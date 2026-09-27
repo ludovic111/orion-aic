@@ -139,35 +139,41 @@ export const TOPICS: Topic[] = [
             un exercice fictif complet, « Crue de l’Arve », se charge.
           </li>
           <li>
-            <strong>Créer une session.</strong> Onglet <Ui>Nouvelle session</Ui>{" "}
+            <strong>Rejoindre ou créer une session.</strong> Un autre poste a
+            déjà ouvert la session ? Onglet <Ui>Rejoindre une session</Ui>{" "}
+            (ouvert d’office) : son code, ou scannez son QR code avec l’appareil
+            photo. Vous êtes le premier poste ? Onglet <Ui>Nouvelle session</Ui>{" "}
             : le nom de l’événement (par exemple « Crue de l’Arve »), votre nom
             ou votre fonction, et le mode <Ui>Exercice</Ui> ou{" "}
             <Ui>Intervention</Ui>.
           </li>
           <li>
             <strong>Protéger vos données.</strong> Laissez cochée{" "}
-            <Ui>Sauvegarde chiffrée sur ce poste</Ui> et choisissez une{" "}
-            <em>phrase de récupération</em> d’au moins 12 caractères. Écrivez-la
-            en lieu sûr : personne ne pourra la retrouver pour vous.
+            <Ui>Garder la session sur cet appareil (recommandé)</Ui> et inventez
+            une <em>phrase de récupération</em> : un mot de passe d’au moins 12
+            caractères, demandé pour rouvrir la session. Écrivez-la en lieu sûr
+            : personne ne pourra la retrouver pour vous.
           </li>
           <li>
-            <strong>Noter le premier événement.</strong> Dans le{" "}
-            <Ui>Journal</Ui>, écrivez ce qui se passe, puis <Ui>Enregistrer</Ui>{" "}
-            (ou <K>⌘↵</K> / <K>Ctrl+↵</K>). L’entrée reçoit un numéro : #001.
+            <strong>Noter le premier événement.</strong> La page Situation
+            s’ouvre avec la carte <Ui>Par où commencer ?</Ui> : quatre étapes,
+            chacune avec son bouton. <Ui>Nouvelle entrée</Ui>, écrivez ce qui se
+            passe, puis <Ui>Enregistrer</Ui> (ou <K>⌘↵</K> / <K>Ctrl+↵</K>).
+            L’entrée reçoit un numéro : #001.
           </li>
           <li>
-            <strong>Inviter les autres postes</strong> (si vous êtes plusieurs).{" "}
-            <Path
-              steps={[
-                "Réglages",
-                "Synchronisation",
-                "Créer un code de session",
-              ]}
-            />
-            . Sur l’autre poste : <Ui>Rejoindre</Ui>, puis le code. Voilà, vous
-            travaillez ensemble.
+            <strong>Inviter les autres postes</strong> (si vous êtes plusieurs).
+            Touchez <Ui>Non partagé</Ui> en haut, puis{" "}
+            <Ui>Créer un code de session</Ui>. Sur l’autre poste :{" "}
+            <Ui>Rejoindre une session</Ui>, puis le code. Voilà, vous travaillez
+            ensemble.
           </li>
         </Steps>
+        <p>
+          La carte <Ui>Par où commencer ?</Ui> disparaît avec{" "}
+          <Ui>J’ai compris</Ui>. Pour la revoir : bouton{" "}
+          <Ui>Revoir « Par où commencer ? »</Ui> en haut de ce sujet.
+        </p>
         <Example>
           <p>
             14:05, la Patrouille Alpha annonce par radio : « L’Arve déborde au
@@ -203,10 +209,13 @@ export const TOPICS: Topic[] = [
               <Ui>Reprendre</Ui>,
               "Une session chiffrée est déjà enregistrée sur ce poste : tapez la phrase de récupération, puis Déverrouiller.",
             ],
-            [<Ui>Nouvelle session</Ui>, "Un nouvel événement commence."],
             [
-              <Ui>Rejoindre</Ui>,
-              "Un autre poste a déjà la session et vous a donné son code (ou son QR code).",
+              <Ui>Rejoindre une session</Ui>,
+              "Un autre poste a déjà la session et vous a donné son code (ou son QR code). Onglet ouvert d’office.",
+            ],
+            [
+              <Ui>Nouvelle session</Ui>,
+              "Un nouvel événement commence et vous êtes le premier poste.",
             ],
             [
               <Ui>Importer</Ui>,
@@ -265,9 +274,11 @@ export const TOPICS: Topic[] = [
     hue: 212,
     short: (
       <p>
-        En haut, la barre : le journal actif, la recherche et l’état du poste. À
-        gauche (en bas sur téléphone), le <strong>dock</strong> avec tous les
-        modules. Au milieu, la page du module choisi.
+        En haut, la barre : le journal actif, la recherche et l’état du poste,
+        en mots. À gauche (en bas sur téléphone), la{" "}
+        <strong>barre des modules</strong>, chacun avec son nom ; les moins
+        courants sont sous <Ui>Plus d’outils</Ui>. Au milieu, la page du module
+        choisi.
       </p>
     ),
     guide: (
@@ -285,35 +296,40 @@ export const TOPICS: Topic[] = [
             <Ui>Retirer ce journal de la session</Ui>.
           </li>
           <li>
-            <strong>Rechercher ou agir</strong> (<K>⌘K</K> / <K>Ctrl+K</K>) :
+            <strong>Rechercher</strong> (<K>⌘K</K> / <K>Ctrl+K</K> au clavier) :
             tapez quelques lettres pour trouver un élément, un module ou une
             action.
           </li>
           <li>
-            <strong>Synchronisation</strong> : <Ui>Seul</Ui> quand vous
-            travaillez seul, <Ui>3 postes</Ui> avec les initiales de chacun
-            quand vous êtes plusieurs, <Ui>Reconnexion</Ui> si la liaison est
-            coupée.
+            <strong>Partage</strong> : <Ui>Non partagé</Ui> quand la session
+            n’est que sur ce poste, <Ui>3 postes</Ui> avec les initiales de
+            chacun quand vous êtes plusieurs, <Ui>Reconnexion</Ui> si la liaison
+            est coupée. Un toucher ouvre la synchronisation.
           </li>
           <li>
-            <strong>Sauvegarde</strong> : <Ui>Chiffré</Ui> (vert, tout est gardé
-            sur le poste) ou <Ui>Temporaire</Ui> (orange, perdu à la fermeture
-            de l’onglet).
+            <strong>Sauvegarde</strong> : <Ui>Enregistré</Ui> (tout est gardé,
+            chiffré, sur le poste) ou <Ui>Non enregistré</Ui> (orange : fermer
+            l’onglet efface tout). Un toucher ouvre la session, pour la protéger
+            ou l’exporter.
           </li>
           <li>
-            <strong>Heure suisse</strong> et bouton{" "}
-            <strong>thème clair / sombre</strong>.
+            <strong>Heure suisse</strong>.
           </li>
           <li>
             <strong>Menu opérateur</strong> (vos initiales) : réglages du poste,
-            référentiels, synchronisation, session, sécurité, installation, code
-            source, verrouiller.
+            référentiels, synchronisation, session ; thème clair / sombre,{" "}
+            <Ui>Remonter le temps</Ui>, <Ui>Présenter la situation</Ui>, écran
+            mural ; sécurité, installation, code source, verrouiller.
           </li>
           <li>
-            <strong>Dock</strong> : un clic = un module. Une pastille{" "}
+            <strong>Barre des modules</strong> : un toucher = un module, avec
+            son nom sous l’icône. D’office : Situation, Journal, Messages, Mes
+            tâches, Carte, Moyens, Équipe (et les modules de votre fonction).{" "}
+            <Ui>Plus d’outils</Ui> ouvre tous les autres, avec une phrase chacun
+            ; <Ui>Aide</Ui> est en bas. Une pastille{" "}
             <span className="docs-dot crit" /> rouge signale des échéances
             dépassées ; une pastille <span className="docs-dot accent" />{" "}
-            violette, de nouveaux messages.
+            foncée, de nouveaux messages.
           </li>
           <li>
             <strong>Bouton ?</strong> : l’aide sur la page où vous êtes.
@@ -326,14 +342,34 @@ export const TOPICS: Topic[] = [
         <H>Détails utiles</H>
         <ul>
           <li>
-            Au survol, chaque icône du dock montre le nom du module et une
-            phrase qui explique à quoi il sert.
+            Au survol prolongé, chaque module de la barre montre une phrase qui
+            explique à quoi il sert (la même que dans <Ui>Plus d’outils</Ui>).
           </li>
           <li>
-            Les modules que vous n’utilisez pas peuvent être masqués :{" "}
-            <Path steps={["Réglages", "Ce poste", "Modules affichés"]} />.
-            Situation, Journal et Aide restent toujours visibles. Masquer un
-            module ne supprime aucune donnée.
+            Chaque module peut aller dans la barre, sous <Ui>Plus d’outils</Ui>,
+            ou être masqué :{" "}
+            <Path steps={["Réglages", "Ce poste", "Modules de la barre"]} /> (ou{" "}
+            <Ui>Choisir les modules de la barre</Ui> au bas de « Plus d’outils
+            »). Situation, Journal et Aide restent toujours visibles. Masquer un
+            module ne supprime aucune donnée ;{" "}
+            <Ui>Revenir au choix automatique</Ui> rétablit la barre selon la
+            fonction du poste.
+          </li>
+          <li>
+            Sans les noms sous les icônes, la barre est plus étroite :{" "}
+            <Ui>Afficher le nom sous chaque icône</Ui>, dans le même réglage.
+          </li>
+          <li>
+            Sur la page Situation, la vue simple montre l’essentiel ;{" "}
+            <Ui>Afficher tout le tableau de bord</Ui> ajoute tableaux, listes de
+            contrôle, moyens, équipe, radio, météo et liens, et reste ainsi sur
+            ce poste.
+          </li>
+          <li>
+            Les rappels (export, impression, point de situation) s’affichent en
+            haut de la page, jamais par-dessus : <Ui>Plus tard</Ui>,{" "}
+            <Ui>Fait</Ui> ou leur action. Une confirmation en bas de l’écran se
+            ferme d’un toucher.
           </li>
           <li>
             Si la connexion internet tombe, une puce <Ui>Hors ligne</Ui>{" "}
@@ -393,8 +429,8 @@ export const TOPICS: Topic[] = [
             ],
             [
               "Barre du haut",
-              <span className="pill ok">Chiffré</span>,
-              <span className="pill warn">Temporaire</span>,
+              <span className="pill ok">Enregistré</span>,
+              <span className="pill warn">Non enregistré</span>,
             ],
           ]}
         />
@@ -886,7 +922,8 @@ export const TOPICS: Topic[] = [
           </li>
           <li>
             <Ui>Enregistrer</Ui> : le message arrive dans la colonne{" "}
-            <Ui>Nouveau</Ui>, et une pastille violette apparaît sur le dock.
+            <Ui>Nouveau</Ui>, et une pastille apparaît sur <Ui>Messages</Ui>,
+            dans la barre des modules.
           </li>
         </Steps>
         <H>Traiter un message</H>
@@ -2054,8 +2091,8 @@ export const TOPICS: Topic[] = [
         <H>Retrouver qui a fait quoi</H>
         <Steps>
           <li>
-            Ouvrez <Ui>Traçabilité</Ui> dans la barre de gauche (ou <K>⌘K</K> →
-            « Traçabilité »).
+            Ouvrez <Ui>Traçabilité</Ui> sous <Ui>Plus d’outils</Ui>, dans la
+            barre de gauche (ou <K>⌘K</K> → « Traçabilité »).
           </li>
           <li>
             L’onglet <Ui>Qui a fait quoi</Ui> liste tous les changements, du
@@ -2251,7 +2288,7 @@ export const TOPICS: Topic[] = [
         <Steps>
           <li>
             <Path steps={["Menu opérateur", "Synchronisation"]} />, ou un clic
-            sur la puce <Ui>Seul</Ui> en haut.
+            sur la puce <Ui>Non partagé</Ui> en haut.
           </li>
           <li>
             <Ui>Créer un code de session</Ui>. Un code s’affiche, du type{" "}
@@ -2264,13 +2301,15 @@ export const TOPICS: Topic[] = [
         <H>Sur les autres postes : rejoindre</H>
         <Steps>
           <li>
-            Ouvrez <a href={SITE}>orionaic.xyz</a> → <Ui>Rejoindre</Ui>. (Ou
-            scannez le QR code avec le téléphone : le code est déjà rempli.)
+            Ouvrez <a href={SITE}>orionaic.xyz</a> →{" "}
+            <Ui>Rejoindre une session</Ui>. (Ou scannez le QR code avec le
+            téléphone : le code est déjà rempli.)
           </li>
           <li>Tapez le code et votre nom ou votre fonction.</li>
           <li>
-            Si vous voulez garder la session sur ce poste, cochez{" "}
-            <Ui>Sauvegarde chiffrée sur ce poste</Ui> et choisissez une phrase.
+            Pour garder la session sur ce poste, laissez cochée{" "}
+            <Ui>Garder la session sur cet appareil (recommandé)</Ui> et inventez
+            une phrase.
           </li>
           <li>
             <Ui>Rejoindre la session</Ui>. La session arrive dès qu’un poste qui
@@ -2278,8 +2317,8 @@ export const TOPICS: Topic[] = [
           </li>
         </Steps>
         <p>
-          En haut, la puce indique <Ui>Seul</Ui>, <Ui>3 postes</Ui> (avec les
-          initiales de chacun ; au survol, qui est sur quel module) ou{" "}
+          En haut, la puce indique <Ui>Non partagé</Ui>, <Ui>3 postes</Ui> (avec
+          les initiales de chacun ; au survol, qui est sur quel module) ou{" "}
           <Ui>Reconnexion</Ui>.
         </p>
         <Note kind="warn">
@@ -2721,8 +2760,8 @@ export const TOPICS: Topic[] = [
         <H>Présenter en 3 étapes</H>
         <Steps>
           <li>
-            Bouton écran <Ui>Présenter la situation</Ui> en haut à droite (ou{" "}
-            <K>⌘K</K> → « Présenter »).
+            Menu opérateur (vos initiales, en haut à droite) →{" "}
+            <Ui>Présenter la situation</Ui> (ou <K>⌘K</K> → « Présenter »).
           </li>
           <li>
             Préparez en quelques secondes : votre nom, le public (« Maire,
@@ -2829,8 +2868,10 @@ export const TOPICS: Topic[] = [
         <H>Revenir à une heure précise</H>
         <Steps>
           <li>
-            Cliquez l’horloge <Ui>Remonter le temps</Ui> en haut à droite (ou{" "}
-            <K>⌘K</K> → « Remonter le temps »). Une barre apparaît en bas.
+            Menu opérateur (vos initiales, en haut à droite) →{" "}
+            <Ui>Remonter le temps</Ui> (ou <K>⌘K</K> → « Remonter le temps »).
+            Une barre apparaît en bas ; <Ui>Revenir au direct</Ui>, en haut,
+            ramène à maintenant.
           </li>
           <li>
             Glissez le curseur, ou tapez une date et une heure. Les petites
@@ -3167,9 +3208,9 @@ export const TOPICS: Topic[] = [
             <strong>Thème sombre</strong> : <em>Graphite</em> (par défaut),{" "}
             <em>Minuit</em> (bleu nuit) ou <em>Nuit tactique</em> : tout en
             rouge sur noir, carte comprise, pour garder la vision de nuit sur le
-            terrain. Le bouton soleil / lune passe de l’un à l’autre ; les
-            thèmes s’essaient aussi depuis la recherche (<kbd>⌘K</kbd>, « thème
-            »).
+            terrain. Le menu opérateur (<Ui>Thème sombre</Ui> /{" "}
+            <Ui>Thème clair</Ui>) passe de l’un à l’autre ; les thèmes
+            s’essaient aussi depuis la recherche (<kbd>⌘K</kbd>, « thème »).
           </li>
           <li>
             <strong>Animations</strong> : Toutes, ou Réduites (poste lent,
@@ -3180,8 +3221,9 @@ export const TOPICS: Topic[] = [
             entrées des autres postes, messages.
           </li>
           <li>
-            <strong>Modules affichés</strong> : masquez ce que vous n’utilisez
-            pas. Les données restent intactes.
+            <strong>Modules de la barre</strong> : pour chaque module, dans la
+            barre, sous <Ui>Plus d’outils</Ui> ou masqué ; noms sous les icônes
+            ou barre compacte. Les données restent intactes.
           </li>
         </ul>
         <H>Référentiels</H>
@@ -3353,13 +3395,20 @@ export const TOPICS: Topic[] = [
         />
         <H>Ce qui change sur petit écran</H>
         <ul>
-          <li>Le dock des modules passe en bas de l’écran.</li>
+          <li>
+            La barre des modules passe en bas de l’écran : Situation, Journal,
+            Messages, Carte, et <Ui>Plus</Ui> pour tous les autres.
+          </li>
           <li>
             Un bouton rond <Ui>+</Ui> en bas à droite ouvre une nouvelle entrée.
           </li>
           <li>
-            Les boutons sont plus grands, la saisie se fait dans une fenêtre
-            dédiée.
+            Les boutons sont plus grands (44 px au moins), la saisie se fait
+            dans une fenêtre dédiée.
+          </li>
+          <li>
+            Sur la page d’accueil, le formulaire vient en premier, puis
+            l’exercice de démonstration.
           </li>
         </ul>
       </>
@@ -3542,9 +3591,9 @@ export const TOPICS: Topic[] = [
           : module <Ui>Traçabilité</Ui>.
         </Faq>
         <Faq q="Peut-on revoir la situation telle qu’elle était à 10 h ?">
-          Oui : l’horloge <Ui>Remonter le temps</Ui> en haut à droite, puis
-          choisissez 10:00. Tous les modules montrent l’état de ce moment, la
-          météo comprise.
+          Oui : menu opérateur (vos initiales, en haut à droite) →{" "}
+          <Ui>Remonter le temps</Ui>, puis choisissez 10:00. Tous les modules
+          montrent l’état de ce moment, la météo comprise.
         </Faq>
         <Faq q="Comment proposer une amélioration ?">
           Écrivez à <a href={feedbackLink("FAQ")}>{CONTACT_EMAIL}</a> (menu
@@ -3572,8 +3621,8 @@ export const TOPICS: Topic[] = [
           <Path
             steps={["Réglages", "Synchronisation", "Créer un code de session"]}
           />
-          , puis sur les autres postes : <Ui>Rejoindre</Ui> et le code. Voir «
-          Synchronisation entre postes ».
+          , puis sur les autres postes : <Ui>Rejoindre une session</Ui> et le
+          code. Voir « Synchronisation entre postes ».
         </Faq>
         <Faq q="Est-ce que ça marche sans internet ?">
           Oui, après un premier chargement. La synchronisation a besoin
@@ -3609,9 +3658,11 @@ export const TOPICS: Topic[] = [
           Exportez une archive <code>.orionaic</code>, envoyez-la, et donnez la
           phrase par un autre moyen. L’autre poste l’importe.
         </Faq>
-        <Faq q="Je ne trouve plus un module dans le dock.">
-          Il est peut-être masqué :{" "}
-          <Path steps={["Réglages", "Ce poste", "Modules affichés"]} />.
+        <Faq q="Je ne trouve plus un module dans la barre.">
+          Regardez sous <Ui>Plus d’outils</Ui> (<Ui>Plus</Ui> sur téléphone) :
+          les modules moins courants y sont rangés. S’il n’y est pas, il est
+          masqué :{" "}
+          <Path steps={["Réglages", "Ce poste", "Modules de la barre"]} />.
         </Faq>
         <Faq q="Les couleurs ou les animations me gênent.">
           Choisissez un autre thème (par exemple <em>Contraste élevé</em> ou{" "}
@@ -3640,9 +3691,10 @@ export const TOPICS: Topic[] = [
           Non, les navigateurs ne le permettent pas pour cet usage. Sans
           internet, utilisez le réseau local.
         </Faq>
-        <Faq q="Que signifient les pastilles sur le dock ?">
-          Rouge : des échéances sont dépassées. Violette : des messages nouveaux
-          attendent d’être traités.
+        <Faq q="Que signifient les pastilles sur la barre des modules ?">
+          Rouge : des échéances sont dépassées. Foncée : des messages nouveaux
+          attendent d’être traités. Un point sur <Ui>Plus d’outils</Ui> : un
+          module rangé là demande de l’attention.
         </Faq>
         <Faq q="Quel navigateur utiliser ?">
           Un navigateur récent : Chrome, Edge, Firefox ou Safari. La page doit
@@ -3750,8 +3802,8 @@ export const TOPICS: Topic[] = [
           règles et la formation de la protection civile.
         </Gloss>
         <Gloss term="Module">
-          Une partie d’orion aic : journal, carte, radio… Chacun a son icône
-          dans le dock.
+          Une partie d’orion aic : journal, carte, radio… Chacun a son icône et
+          son nom dans la barre des modules, ou sous <Ui>Plus d’outils</Ui>.
         </Gloss>
         <Gloss term="Référentiel">
           Une liste de valeurs standards proposées en un clic, modifiable dans
