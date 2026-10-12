@@ -2,7 +2,7 @@
 
 > Un petit ordinateur dans une valise, son propre Wi-Fi, et tous les postes du PC travaillent ensemble sur la même session, sans internet.
 
-Ce guide s’adresse à la personne qui prépare le matériel du poste de conduite. Il ne demande pas d’être informaticien : chaque commande est à recopier telle quelle. Il complète la section « Réseau local sans internet » du [README](../README.md) et la section LAN de [SECURITY.md](../SECURITY.md).
+Ce guide s’adresse à la personne qui prépare le matériel du poste de conduite. Il ne demande pas d’être informaticien : chaque commande est à recopier telle quelle. Il complète la section [« Réseau local sans internet »](GUIDE.md#réseau-local-sans-internet) du guide et la section LAN de [SECURITY.md](../SECURITY.md).
 
 Les prix sont indicatifs (Suisse, 2026), pour du matériel acheté par l’organisation. Aucun modèle n’est imposé.
 
@@ -246,7 +246,7 @@ Le bouton d’import de la carte lit les fichiers **KML, KMZ, GeoJSON et GPX** (
 L’impression part du **navigateur de chaque poste**, pas du serveur : il n’y a rien à installer sur le Raspberry Pi (pas de CUPS).
 
 - Le plus simple : une **imprimante réseau** (Wi-Fi ou Ethernet) connectée au Wi-Fi `PC-ORION` ou au routeur de voyage. Les tablettes et ordinateurs récents la trouvent seuls (AirPrint, IPP Everywhere, Mopria), sans pilote.
-- Autre possibilité : une imprimante USB branchée sur un **ordinateur portable** du PC, qui devient le poste d’impression (option « Imprimer aussi les entrées des autres postes », et au besoin Chrome en `--kiosk-printing`, voir le README).
+- Autre possibilité : une imprimante USB branchée sur un **ordinateur portable** du PC, qui devient le poste d’impression (option « Imprimer aussi les entrées des autres postes », et au besoin Chrome en `--kiosk-printing`, voir [Impression automatique](GUIDE.md#impression-automatique) dans le guide).
 - Faire une impression d’essai de chaque poste avant le départ. Emporter du papier et un toner de réserve.
 
 ## Alimentation
