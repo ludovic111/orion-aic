@@ -529,7 +529,7 @@ Module **Débriefing et exercice** (RETEX).
 - Le plan radio documente le réseau ; il ne pilote pas les terminaux. Les numéros de groupes et RFSI réels viennent du plan de flotte cantonal. Ceux de la démonstration sont fictifs.
 - Effacer les données du navigateur efface la sauvegarde locale. Une sauvegarde locale n’est pas une archive.
 - Pièces jointes : photos seulement ; pour un PDF ou un autre document, noter sa référence.
-- Limites techniques : 10 000 entrées par journal, 500 versions par entrée, message de 12 000 caractères, 1 000 terminaux, 20 000 messages, 5 000 objets de carte, import de 96 Mo ; photos : 12 par entrée, message ou objet de carte, 440 Ko au plus chacune une fois réduite (fichier d’origine de 40 Mo au plus), 40 Mo pour toutes les photos d’une session. Les messages de synchronisation sont découpés en parts de 192 Ko (96 Mo compressés au plus par message). Un poste qui rejoint reçoit chaque journal entier d’un seul poste (il le demande au premier qui l’annonce ; à un autre si rien n’arrive en 30 s). Relais : un poste qui lit lentement fait patienter ceux qui lui envoient (au-delà de 2 Mio en attente) au lieu d’être coupé ; il n’est déconnecté que s’il reste encombré plus de 45 s (moins de 25 Ko/s environ) ou si 16 Mio l’attendent.
+- Limites techniques : 10 000 entrées par journal, 500 versions par entrée, message de 12 000 caractères, 1 000 terminaux, 20 000 messages, 5 000 objets de carte, import de 96 Mo ; photos : 12 par entrée, message ou objet de carte, 440 Ko au plus chacune une fois réduite (fichier d’origine de 40 Mo au plus), 40 Mo pour toutes les photos d’une session. Les messages de synchronisation sont découpés en parts de 192 Ko (96 Mo compressés au plus par message). Un poste qui rejoint reçoit chaque journal entier d’un seul poste (il le demande au premier qui l’annonce ; à un autre si rien n’arrive en 30 s). Relais Node (réseau local, Docker) : un poste qui lit lentement fait patienter ceux qui lui envoient (au-delà de 2 Mio en attente) au lieu d’être coupé ; il n’est déconnecté que s’il reste encombré plus de 45 s (moins de 25 Ko/s environ) ou si 16 Mio l’attendent. Sur orionaic.xyz (Cloudflare), ce contrôle de flux n’existe pas : Cloudflare met en tampon ce qu’un poste lent n’a pas encore lu.
 
 ## Installation et hébergement
 
@@ -563,15 +563,23 @@ docker build -t orion-aic .
 docker run -p 4311:4311 orion-aic
 ```
 
-### Railway (hébergement de production)
+### Cloudflare Workers (hébergement de production)
 
-- Projet et service Railway `orion-aic`, construits depuis le `Dockerfile` de la branche **`main`** du dépôt `ludovic111/orion-aic` (réglages du service : constructeur Dockerfile, contrôle de santé, redémarrage en cas d’échec).
-- Région **EU West (Amsterdam, `europe-west4-drams3a`)**, la plus proche de la Suisse parmi les régions Railway, réglée dans Settings → Scale. Une seule instance : le relais garde les salles en mémoire.
-- Domaine : <https://orionaic.xyz> (et `www.orionaic.xyz`), DNS chez Porkbun : ALIAS `@` et CNAME `www` vers Railway, plus les enregistrements TXT `_railway-verify` de vérification. L’ancienne adresse `orion-web-production-1466.up.railway.app` reste active.
-- **Chaque push sur `main` redéploie automatiquement.** Contrôle de santé : `/healthz`.
-- Variables : `PORT=4311`, `HOST=0.0.0.0`. Aucun volume ni base de données.
+Le site public passe du service Railway `orion-aic` à un Worker Cloudflare (offre gratuite, 22 novembre 2026) :
 
-Pour un autre hébergeur : servir `dist/` avec les en-têtes de [`public/_headers`](../public/_headers) et relayer `/sync` vers `server/relay.mjs` (ou se passer de la synchronisation). La CSP doit autoriser les serveurs de tuiles dans `img-src` **et** dans `connect-src` : le service worker télécharge lui-même les tuiles pour les garder hors ligne, et sans `connect-src` toutes échouent (la carte affichait alors à tort « Fond indisponible hors ligne »).
+- `wrangler.jsonc` : le Worker `orion-aic` ([`worker/index.mjs`](../worker/index.mjs)) sert les fichiers de `dist/` (Workers static assets) avec exactement les réponses de `server/app.mjs` : mêmes en-têtes (CSP, HSTS, `nosniff`…, partagés dans [`server/policy.mjs`](../server/policy.mjs)), mêmes types et règles de cache, `/healthz`, 404 et 405. Il passe avant les fichiers à chaque requête : `public/_headers` n’est pas appliqué.
+- Le relais `/sync` est un **Durable Object** unique ([`worker/relay.mjs`](../worker/relay.mjs), classe `Relay`, stockage SQLite exigé par l’offre gratuite) qui tient toutes les salles, comme le processus Node unique qu’il remplace. Même protocole 2 et mêmes limites ([`server/relay-limits.mjs`](../server/relay-limits.mjs)) ; il utilise l’hibernation des WebSocket (l’objet peut quitter la mémoire entre deux messages sans couper les postes). Il n’écrit qu’une alarme (fin des connexions qui ne rejoignent pas de salle sous 10 s) et ne journalise rien. Différences imposées par la plate-forme : pas de contrôle de flux (Cloudflare met en tampon ce qu’un poste lent n’a pas encore lu et ne permet pas de mettre un expéditeur en pause), pas de ping du relais (Cloudflare ferme lui-même les connexions mortes ; les postes s’envoient déjà une pulsation toutes les 40 s), et les compteurs d’entrées en salle par adresse repartent à zéro si l’objet hiberne. L’adresse du client vient de `CF-Connecting-IP`.
+- Adresse : <https://orion-aic.lu4ovic.workers.dev>. **Chaque push sur `main` qui passe la CI est déployé** (job `deploy` de `.github/workflows/ci.yml` : `npm run deploy`, puis `npm run test:worker` contre l’adresse déployée). Le dépôt porte le secret `CLOUDFLARE_API_TOKEN` et les variables `CLOUDFLARE_ACCOUNT_ID` et `WORKER_URL`.
+- Déployer à la main : `npm run deploy` (build puis `wrangler deploy`, avec `CLOUDFLARE_API_TOKEN` et `CLOUDFLARE_ACCOUNT_ID` dans l’environnement). Essayer en local : `npm run build && npm run worker:dev` (http://127.0.0.1:8787). `npm run test:worker` lance `wrangler dev` et joue [`tests/worker.test.mjs`](../tests/worker.test.mjs) (en-têtes, fichiers, refus, relais) ; avec `WORKER_URL=…`, contre cette adresse.
+- Comparer deux déploiements route par route (statut, en-têtes, empreinte du contenu) : `node scripts/parity.mjs https://orionaic.xyz https://orion-aic.lu4ovic.workers.dev`.
+
+**Domaine** : <https://orionaic.xyz> et `www.orionaic.xyz` pointent encore vers Railway (DNS chez Porkbun : ALIAS `@` et CNAME `www` vers Railway, TXT `_railway-verify`). Pour basculer :
+
+1. Ajouter la zone `orionaic.xyz` au compte Cloudflare (offre gratuite), vérifier que les enregistrements importés ne gardent que ce qui sert encore (pas d’ALIAS/CNAME vers Railway pour `@` et `www`, ni `_railway-verify`), puis remplacer chez Porkbun les serveurs de noms par les deux serveurs `*.ns.cloudflare.com` indiqués ; désactiver DNSSEC chez Porkbun avant, s’il est actif.
+2. Une fois la zone active, décommenter `routes` dans `wrangler.jsonc` (domaines personnalisés `orionaic.xyz` et `www.orionaic.xyz`) et déployer : Cloudflare crée les enregistrements et les certificats.
+3. Vérifier avec `node scripts/parity.mjs https://orion-web-production-1466.up.railway.app https://orionaic.xyz`, puis arrêter le service Railway.
+
+Pour un autre hébergeur : le `Dockerfile` (serveur Node et relais) convient tel quel derrière un proxy HTTPS ; sinon, servir `dist/` avec les en-têtes de [`public/_headers`](../public/_headers) et relayer `/sync` vers `server/relay.mjs` (ou se passer de la synchronisation). La CSP doit autoriser les serveurs de tuiles dans `img-src` **et** dans `connect-src` : le service worker télécharge lui-même les tuiles pour les garder hors ligne, et sans `connect-src` toutes échouent (la carte affichait alors à tort « Fond indisponible hors ligne »).
 
 ## Développement
 
@@ -584,9 +592,10 @@ npm run format:check  # Prettier
 npm run build         # build de production + service worker
 npm start             # serveur de production + relais
 npm run lan           # réseau local en HTTPS
+npm run test:worker   # Worker Cloudflare et son relais, dans wrangler dev
 ```
 
-La CI GitHub (`.github/workflows`) exécute format, typecheck, tests, build, tests de bout en bout, `npm audit` et le build Docker à chaque push ; en cas d’échec, le rapport Playwright est joint à l’exécution (artefact `playwright-report`).
+La CI GitHub (`.github/workflows`) exécute format, typecheck, tests, build, tests de bout en bout, `npm audit`, le build Docker et les tests du Worker Cloudflare (`npm run test:worker`) à chaque push, puis déploie `main` sur Cloudflare ; en cas d’échec, le rapport Playwright est joint à l’exécution (artefact `playwright-report`).
 
 ### Tests de bout en bout
 

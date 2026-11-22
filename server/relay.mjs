@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+import { LIMITS, MAX_CONTROL, PROTOCOL } from "./relay-limits.mjs";
 
 // Live synchronisation relay. Posts of the same session join a room whose id
 // is derived from the session code (PBKDF2 then HKDF, in the browser); the
@@ -35,28 +36,10 @@ import { createHash, randomBytes } from "node:crypto";
 // read again: a slow post slows the others down for a while, never for ever.
 
 const GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-export const PROTOCOL = 2;
-const MAX_CONTROL = 4096;
+// Protocol number and limits, shared with the Cloudflare Durable Object
+// (worker/relay.mjs), which runs the same protocol on Cloudflare.
+export { LIMITS, PROTOCOL } from "./relay-limits.mjs";
 const HEARTBEAT = 25_000;
-export const LIMITS = {
-  /** Largest frame: clients split messages into parts of 192 KiB. */
-  payload: 1024 * 1024,
-  peersPerRoom: 64,
-  rooms: 2000,
-  /** One address may be a whole command post behind one NAT. */
-  socketsPerIp: 96,
-  roomsPerIp: 16,
-  /** Joins per address: a burst of 30, then one every 2 s. */
-  joinBurst: 30,
-  joinRefillMs: 2000,
-  /** Bytes waiting for one post above which its senders are paused. */
-  backlog: 2 * 1024 * 1024,
-  /** Bytes waiting for one post above which it is disconnected. */
-  hardBacklog: 16 * 1024 * 1024,
-  /** Longest congestion of one post (ms) before it is disconnected. */
-  stall: 45_000,
-  joinTimeout: 10_000,
-};
 const BROADCAST = Buffer.alloc(8);
 
 function frame(opcode, payload = Buffer.alloc(0)) {

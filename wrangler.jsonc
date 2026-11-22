@@ -1,0 +1,30 @@
+// Cloudflare Workers deployment of orionaic.xyz (docs/GUIDE.md, « Cloudflare
+// Workers »). `npm run build` first: the Worker serves dist/.
+{
+  "name": "orion-aic",
+  "main": "worker/index.mjs",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // The Worker answers every request (headers of server/policy.mjs); it
+    // reads the files through ASSETS, path for path, like server/app.mjs.
+    "run_worker_first": true,
+    "html_handling": "none",
+    "not_found_handling": "none",
+  },
+  // The relay /sync: one Durable Object for every room (worker/relay.mjs).
+  // SQLite-backed, as the free plan requires; it stores nothing but an alarm.
+  "durable_objects": {
+    "bindings": [{ "name": "RELAY", "class_name": "Relay" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Relay"] }],
+  // Custom domains, once the orionaic.xyz zone is on Cloudflare (see
+  // docs/GUIDE.md): uncomment, then `npx wrangler deploy`.
+  // "routes": [
+  //   { "pattern": "orionaic.xyz", "custom_domain": true },
+  //   { "pattern": "www.orionaic.xyz", "custom_domain": true },
+  // ],
+}
