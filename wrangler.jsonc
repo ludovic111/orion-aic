@@ -21,8 +21,7 @@
     "bindings": [{ "name": "RELAY", "class_name": "Relay" }],
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Relay"] }],
-  // Custom domains, once the orionaic.xyz zone is on Cloudflare (see
-  // docs/GUIDE.md): uncomment, then `npx wrangler deploy`.
+  // orionaic.xyz's zone is on Cloudflare since 2026-11-22.
   "routes": [
     { "pattern": "orionaic.xyz", "custom_domain": true },
     { "pattern": "www.orionaic.xyz", "custom_domain": true },
