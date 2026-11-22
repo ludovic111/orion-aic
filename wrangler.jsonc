@@ -23,8 +23,8 @@
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Relay"] }],
   // Custom domains, once the orionaic.xyz zone is on Cloudflare (see
   // docs/GUIDE.md): uncomment, then `npx wrangler deploy`.
-  // "routes": [
-  //   { "pattern": "orionaic.xyz", "custom_domain": true },
-  //   { "pattern": "www.orionaic.xyz", "custom_domain": true },
-  // ],
+  "routes": [
+    { "pattern": "orionaic.xyz", "custom_domain": true },
+    { "pattern": "www.orionaic.xyz", "custom_domain": true },
+  ],
 }
