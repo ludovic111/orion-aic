@@ -39,6 +39,10 @@ const dev = spawn(
     "--port",
     String(port),
     "--show-interactive-dev-session=false",
+    // With custom-domain routes in wrangler.jsonc, wrangler dev would present
+    // requests as orionaic.xyz; keep the local origin the tests talk to.
+    "--local-upstream",
+    `127.0.0.1:${port}`,
   ],
   { stdio: ["ignore", "ignore", "inherit"], detached: true },
 );
