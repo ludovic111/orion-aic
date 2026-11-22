@@ -16,10 +16,13 @@
     "check": "tsc --noEmit && tsc --noEmit -p e2e",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "e2e": "playwright test -c e2e/playwright.config.ts",
-    "format": "prettier --write src shared server scripts tests e2e docs *.json *.md index.html vite.config.ts .github/workflows",
-    "format:check": "prettier --check src shared server scripts tests e2e docs *.json *.md index.html vite.config.ts .github/workflows",
+    "format": "prettier --write src shared server worker scripts tests e2e docs *.json wrangler.jsonc *.md index.html vite.config.ts .github/workflows",
+    "format:check": "prettier --check src shared server worker scripts tests e2e docs *.json wrangler.jsonc *.md index.html vite.config.ts .github/workflows",
     "lan": "npm run build && node server/lan.mjs",
-    "lan:serve": "node server/lan.mjs"
+    "lan:serve": "node server/lan.mjs",
+    "worker:dev": "npx --yes wrangler@4.158.0 dev",
+    "test:worker": "node scripts/test-worker.mjs",
+    "deploy": "npm run build && npx --yes wrangler@4.158.0 deploy"
   },
   "dependencies": {
     "d3-force": "^3.0.0",

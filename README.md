@@ -58,6 +58,7 @@ npm start          # http://127.0.0.1:4311, à servir en HTTPS en dehors de loca
 
 - **Réseau local sans internet** : `npm run lan` sert l’application en HTTPS sur le réseau du poste de conduite. Pour un serveur autonome dans une valise (Raspberry Pi et son propre Wi-Fi) : [PC en valise](docs/PC-EN-VALISE.md).
 - **Docker** : `docker build -t orion-aic .` puis `docker run -p 4311:4311 orion-aic`.
+- **Cloudflare Workers** (le site public) : `npm run deploy` ; un push sur `main` qui passe la CI est déployé.
 - Hébergement, en-têtes et relais : [Installation et hébergement](docs/GUIDE.md#installation-et-hébergement).
 
 ### Développer
@@ -88,7 +89,7 @@ Dans l’application, le module **Aide** documente chaque écran en trois niveau
 
 ## État du projet et limites
 
-La version 2.1 est en service sur <https://orionaic.xyz> depuis le 27 septembre 2026. La CI (format, TypeScript, tests, build, tests de bout en bout dans Chromium, `npm audit`, image Docker) s’exécute à chaque push. Limites connues :
+La version 2.1 est en service sur <https://orionaic.xyz> depuis le 27 septembre 2026. La CI (format, TypeScript, tests, build, tests de bout en bout dans Chromium, `npm audit`, image Docker, Worker Cloudflare) s’exécute à chaque push et déploie `main` sur Cloudflare Workers. Limites connues :
 
 - **Non homologué.** Logiciel indépendant, sans affiliation, homologation ni approbation de l’OFPP, de l’OCPPAM ou de l’État de Genève. L’emploi de données réelles exige un poste, une installation et une autorisation de l’organisation. Le chiffrement ne vaut pas à lui seul conformité à la LIPAD ou à la LPD.
 - **Identité déclarative.** Les noms d’opérateur ne sont pas authentifiés ; l’historique n’est pas une signature électronique, et la signature des exports est auto-signée, sans horodatage de confiance.
